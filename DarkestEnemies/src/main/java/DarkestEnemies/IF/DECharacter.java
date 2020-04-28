@@ -9,10 +9,12 @@ package DarkestEnemies.IF;
  *
  * @author emilt
  */
-public interface User {
+public interface DECharacter {
     
-    public void login();
-    public DECharacter getCharacter();
-    public void createCharacter(String name);
-    
+    public enum ENUMTYPE{PLAYER, NPC};
+    public ENUMTYPE getType();
+    public String getCharacterName();
+    public int getHealth();
+    public int getMana();
+    public int getAttackDmg();
 }

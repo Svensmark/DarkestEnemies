@@ -9,12 +9,8 @@ package DarkestEnemies.IF;
  *
  * @author emilt
  */
-public interface Character {
+public interface DarkestEnemiesGameCtrl {
     
-    public enum ENUMTYPE{PLAYER, NPC};
-    public ENUMTYPE getType();
-    public String getCharacterName();
-    public int getHealth();
-    public int getMana();
-    public int getAttackDmg();
+    
+    
 }

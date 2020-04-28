@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package DarkestEnemies.IF;
+package DarkestEnemies.impl;
+
+import DarkestEnemies.IF.DarkestEnemiesGameCtrl;
 
 /**
  *
  * @author emilt
  */
-public interface User {
+public class DEGameCtrlImpl implements DarkestEnemiesGameCtrl {
     
-    public void login();
-    public DECharacter getCharacter();
-    public void createCharacter(String name);
+    
     
 }

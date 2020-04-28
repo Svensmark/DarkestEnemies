@@ -3,16 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package DarkestEnemies.IF;
+package advprg.meyer.textio;
 
 /**
  *
- * @author emilt
+ * @author Tobias Grundtvig
  */
-public interface User {
-    
-    public void login();
-    public DECharacter getCharacter();
-    public void createCharacter(String name);
-    
+public interface ITextIOConnectionHandler
+{
+    public void handleConnection(ITextIO client);
 }
