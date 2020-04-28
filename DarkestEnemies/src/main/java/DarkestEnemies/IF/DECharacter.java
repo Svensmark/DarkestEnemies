@@ -9,10 +9,8 @@ package DarkestEnemies.IF;
  *
  * @author emilt
  */
-public interface User {
+public interface DECharacter {
     
-    public void login();
-    public DECharacter getCharacter();
-    public void createCharacter(String name);
+    public String getCharacterName();
     
 }

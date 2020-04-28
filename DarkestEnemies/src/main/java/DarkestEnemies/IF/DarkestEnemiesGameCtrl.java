@@ -9,8 +9,8 @@ package DarkestEnemies.IF;
  *
  * @author emilt
  */
-public interface Character {
+public interface DarkestEnemiesGameCtrl {
     
-    public String getCharacterName();
+    
     
 }
