@@ -3,16 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package DarkestEnemies.IF;
+package DarkestEnemies.textgame;
 
 /**
  *
  * @author emilt
  */
-public interface User {
-    
-    public void login();
-    public Character getCharacter();
-    public void createCharacter(String name);
+public class TextGameServer {
     
 }
