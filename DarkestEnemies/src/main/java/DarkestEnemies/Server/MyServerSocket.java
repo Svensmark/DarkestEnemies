@@ -19,6 +19,7 @@ public class MyServerSocket {
         else 
           this.server = new ServerSocket(0, 1, InetAddress.getLocalHost());
     }
+    
     private void listen() throws Exception {
         String data = null;
         Socket client = this.server.accept();
@@ -31,6 +32,7 @@ public class MyServerSocket {
             System.out.println("\r\nMessage from " + clientAddress + ": " + data);
         }
     }
+    
     public InetAddress getSocketAddress() {
         return this.server.getInetAddress();
     }
@@ -38,6 +40,7 @@ public class MyServerSocket {
     public int getPort() {
         return this.server.getLocalPort();
     }
+    
     public static void main(String[] args) throws Exception {
         MyServerSocket app = new MyServerSocket(args[0]);
         System.out.println("\r\nRunning Server: " + 
