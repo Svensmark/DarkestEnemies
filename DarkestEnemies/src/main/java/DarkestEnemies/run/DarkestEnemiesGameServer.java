@@ -5,10 +5,16 @@
  */
 package DarkestEnemies.run;
 
+import DarkestEnemies.textgame.TextGameServer;
+
 /**
  *
  * @author emilt
  */
 public class DarkestEnemiesGameServer {
-    
+          
+    public static void main(String[] args) {
+        TextGameServer tgs = new TextGameServer(9999);
+        tgs.run();
+    }
 }
