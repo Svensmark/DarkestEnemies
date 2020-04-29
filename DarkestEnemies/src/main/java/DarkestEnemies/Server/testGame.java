@@ -10,7 +10,7 @@ public class testGame implements ITextGame{
 
     @Override
     public int getNumberOfPlayers() {
-        return 1;
+        return 2;
     }
 
     @Override
