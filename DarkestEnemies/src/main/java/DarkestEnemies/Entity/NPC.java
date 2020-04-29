@@ -16,7 +16,7 @@ import javax.persistence.Id;
  * @author William
  */
 @Entity
-public class NPC implements DarkestEnemies.IF.Character, Serializable {
+public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     
     private static final long serialVersionUID = 1L;
     @Id
@@ -44,6 +44,11 @@ public class NPC implements DarkestEnemies.IF.Character, Serializable {
         this.name = name;
         this.role = "Friendly";
     }
+
+    public NPC() {
+    }
+    
+    
     
     @Override
     public ENUMTYPE getType() {

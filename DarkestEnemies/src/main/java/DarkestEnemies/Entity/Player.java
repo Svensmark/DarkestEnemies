@@ -16,7 +16,7 @@ import javax.persistence.Id;
  * @author William
  */
 @Entity
-public class Player implements DarkestEnemies.IF.Character, Serializable {
+public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     
     private static final long serialVersionUID = 1L;
     @Id
@@ -34,6 +34,11 @@ public class Player implements DarkestEnemies.IF.Character, Serializable {
         this.mana = mana;
         this.attackDmg = attackDmg;
     }
+
+    public Player() {
+    }
+    
+    
     
     
     @Override
