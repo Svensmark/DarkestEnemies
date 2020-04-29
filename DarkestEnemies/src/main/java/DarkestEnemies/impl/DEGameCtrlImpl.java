@@ -8,6 +8,8 @@ package DarkestEnemies.impl;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.IF.DEGameCtrl;
 import DarkestEnemies.textio.ITextIO;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -22,7 +24,9 @@ public class DEGameCtrlImpl implements DEGameCtrl {
 
     @Override
     public void showMenu(DECharacter player, ITextIO textIO) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        textIO.clear();
+        ArrayList<String> choices = new ArrayList<String>( Arrays.asList("Find enemy", "Inventory", "Log out") );
+        textIO.select("Test header", choices, "Test footer");
     }
 
     @Override
