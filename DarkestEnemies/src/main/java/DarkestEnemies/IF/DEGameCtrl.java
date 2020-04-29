@@ -17,6 +17,7 @@ public interface DEGameCtrl {
     public void showMenu(DECharacter player, ITextIO textIO);
     public DECharacter findEnemy(DECharacter player, ITextIO textIO);
     public void logOut(DECharacter player, ITextIO textIO);
+    public void showInventory(DECharacter player, ITextIO textIO);
     
     public void combat(Iterable<DECharacter> Team1Characters, Iterable<DECharacter> Team2Characters);
     

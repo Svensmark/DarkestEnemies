@@ -24,14 +24,28 @@ public class DEGameCtrlImpl implements DEGameCtrl {
 
     @Override
     public void showMenu(DECharacter player, ITextIO textIO) {
-        textIO.clear();
-        ArrayList<String> choices = new ArrayList<String>( Arrays.asList("Find enemy", "Inventory", "Log out") );
-        textIO.select("Test header", choices, "Test footer");
-    }
-
-    @Override
-    public void logOut(DECharacter player, ITextIO textIO) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //Game is active
+        boolean active = true;
+        
+        while (active) {
+            textIO.clear();
+            ArrayList<String> choices = new ArrayList<String>(Arrays.asList("Find enemy", "Inventory", "Log out"));
+            int index = textIO.select("Test header", choices, "Test footer");
+            switch (index) {
+                case 1:
+                    //Finds an enemy player with findEnemy() and uses combat(player,enemy).
+                    //Sets them as lists
+                    combat(Arrays.asList(player), Arrays.asList(findEnemy(player, textIO)));
+                    break;
+                case 2:
+                    showInventory(player, textIO);
+                    break;
+                case 3:
+                    logOut(player, textIO);
+                    active = false;
+                    break;
+            }
+        }
     }
 
     @Override
@@ -43,10 +57,15 @@ public class DEGameCtrlImpl implements DEGameCtrl {
     public void combat(Iterable<DECharacter> Team1Characters, Iterable<DECharacter> Team2Characters) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
 
-    
-    
-    
+    @Override
+    public void logOut(DECharacter player, ITextIO textIO) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void showInventory(DECharacter player, ITextIO textIO) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }
