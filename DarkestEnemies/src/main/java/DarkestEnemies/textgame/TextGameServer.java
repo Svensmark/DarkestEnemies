@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author Tobias Grundtvig
@@ -30,6 +27,7 @@ public class TextGameServer implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("test");
         try {
             String adr = java.net.InetAddress.getLocalHost().getHostAddress();
             serverSocket = new ServerSocket(port);
@@ -42,6 +40,8 @@ public class TextGameServer implements Runnable {
                     TextIOServerSocket textSocket = new TextIOServerSocket(socket);
                     new Thread(textSocket).start();
                     
+                    textSocket.put("hello");
+                    
                     break;
 
                 } catch (SocketException e) {
@@ -49,7 +49,6 @@ public class TextGameServer implements Runnable {
                     // but the only way we can break out of the accept method.
                 }
             }
-
         } catch (IOException e) {
             System.out.println("Server crashed!");
             throw new RuntimeException(e);
@@ -128,6 +127,7 @@ public class TextGameServer implements Runnable {
         }
 
     }
+  
 }
 
 
