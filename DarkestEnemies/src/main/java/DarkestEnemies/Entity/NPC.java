@@ -44,6 +44,11 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
         this.name = name;
         this.role = "Friendly";
     }
+
+    public NPC() {
+    }
+    
+    
     
     @Override
     public ENUMTYPE getType() {

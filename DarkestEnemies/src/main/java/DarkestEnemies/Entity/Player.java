@@ -34,6 +34,11 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         this.mana = mana;
         this.attackDmg = attackDmg;
     }
+
+    public Player() {
+    }
+    
+    
     
     
     @Override
