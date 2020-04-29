@@ -55,6 +55,7 @@ Temporary Items
 .apdisk
 
 ### Maven ###
+*/target/*
 */target/**
 target/
 pom.xml.tag
