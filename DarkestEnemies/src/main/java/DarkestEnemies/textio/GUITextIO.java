@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package advprg.meyer.textio;
+package DarkestEnemies.textio;
 
 import DarkestEnemies.syncbox.SyncBox;
 import java.lang.reflect.InvocationTargetException;
@@ -71,8 +71,7 @@ public class GUITextIO extends javax.swing.JFrame implements ITextIO
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
+    private void initComponents() {
 
         inputField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
@@ -81,10 +80,8 @@ public class GUITextIO extends javax.swing.JFrame implements ITextIO
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        inputField.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        inputField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 inputFieldActionPerformed(evt);
             }
         });
