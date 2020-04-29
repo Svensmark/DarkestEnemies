@@ -5,7 +5,7 @@
  */
 package DarkestEnemies.IF;
 
-import advprg.meyer.textio.ITextIO;
+import DarkestEnemies.textio.ITextIO;
 /**
  *
  * @author emilt

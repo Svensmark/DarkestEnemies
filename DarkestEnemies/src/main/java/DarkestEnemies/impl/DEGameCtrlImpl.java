@@ -7,7 +7,7 @@ package DarkestEnemies.impl;
 
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.IF.DEGameCtrl;
-import advprg.meyer.textio.ITextIO;
+import DarkestEnemies.textio.ITextIO;
 
 /**
  *
