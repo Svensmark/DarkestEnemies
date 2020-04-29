@@ -10,11 +10,13 @@ package DarkestEnemies.IF;
  * @author emilt
  */
 public interface DECharacter {
-    
+    //Get methods
     public enum ENUMTYPE{PLAYER, NPC};
     public ENUMTYPE getType();
     public String getCharacterName();
     public int getHealth();
     public int getMana();
     public int getAttackDmg();
+    
+    
 }
