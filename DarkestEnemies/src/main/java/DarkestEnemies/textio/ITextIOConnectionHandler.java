@@ -3,14 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package DarkestEnemies.IF;
+package DarkestEnemies.textio;
 
 /**
  *
- * @author emilt
+ * @author Tobias Grundtvig
  */
-public interface DarkestEnemiesGameCtrl {
-    
-    
-    
+public interface ITextIOConnectionHandler
+{
+    public void handleConnection(ITextIO client);
 }
