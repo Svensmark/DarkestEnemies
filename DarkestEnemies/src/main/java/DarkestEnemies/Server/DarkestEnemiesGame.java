@@ -65,25 +65,25 @@ public class DarkestEnemiesGame implements ITextGame {
             //First encounter
             while (playerAlive == true || enemyAlive == true) {
 
-                //Checks HP for NPC
-                if (enemy.getHealth() <= 0) {
-                    System.out.println("Well you've diddley done it! Congrats!");
-                    enemyAlive = false;
-                    break;
-                }
-
-                //Checks HP for Players
-                for (int j = 0; j < players.length; ++j) {
-                    if (entities.get(j).getHealth() <= 0) {
-                        players[j].put("Oh no! You've been killed! Game over!\n");
-                        players[j + 1].put("Oh no!" + entities.get(j).getCharacterName() + " has been killed! You flee in fear. Game over!\n");
-                        playerAlive = false;
-                        break;
-                    }
-                }
-
                 //Encounter START
                 for (int i = 0; i < encounter.size() - 1; i++) {
+                    
+                    //Checks HP for NPC
+                    if (enemy.getHealth() <= 0) {
+                        System.out.println("Well you've diddley done it! Congrats!");
+                        enemyAlive = false;
+                        break;
+                    }
+
+                    //Checks HP for Players
+                    for (int j = 0; j < players.length; ++j) {
+                        if (entities.get(j).getHealth() <= 0) {
+                            players[j].put("Oh no! You've been killed! Game over!\n");
+                            players[j + 1].put("Oh no!" + entities.get(j).getCharacterName() + " has been killed! You flee in fear. Game over!\n");
+                            playerAlive = false;
+                            break;
+                        }
+                    }
 
                     //If the the character is an NPC
                     if (encounter.get(i).getClass() == NPC.class) {
@@ -126,6 +126,7 @@ public class DarkestEnemiesGame implements ITextGame {
             break;
 
         }
+        
 
     }
 
