@@ -17,9 +17,10 @@ import java.util.Arrays;
  */
 public class DEGameCtrlImpl implements DEGameCtrl {
 
+    
     @Override
     public void start(DECharacter player, ITextIO textIO) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        showMenu(player, textIO);
     }
 
     @Override
@@ -27,10 +28,11 @@ public class DEGameCtrlImpl implements DEGameCtrl {
         //Game is active
         boolean active = true;
         
+        //Main loop of the game
         while (active) {
             textIO.clear();
             ArrayList<String> choices = new ArrayList<String>(Arrays.asList("Find enemy", "Inventory", "Log out"));
-            int index = textIO.select("Test header", choices, "Test footer");
+            int index = textIO.select("Main menu", choices, "Test footer");
             switch (index) {
                 case 1:
                     //Finds an enemy player with findEnemy() and uses combat(player,enemy).
@@ -38,10 +40,13 @@ public class DEGameCtrlImpl implements DEGameCtrl {
                     combat(Arrays.asList(player), Arrays.asList(findEnemy(player, textIO)));
                     break;
                 case 2:
+                    //Shows the inventory
                     showInventory(player, textIO);
                     break;
                 case 3:
+                    //Logs the player out
                     logOut(player, textIO);
+                    //Main loop is false
                     active = false;
                     break;
             }
