@@ -17,6 +17,10 @@ public interface DECharacter {
     public int getHealth();
     public int getMana();
     public int getAttackDmg();
+    public void setCharacterName(String name);
+    public void setHealth(int health);
+    public void setMana(int mana);
+    public void setAttackDmg(int atk);
     
     
 }

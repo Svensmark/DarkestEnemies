@@ -77,20 +77,26 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
 
     public String getRole() {
         return role;
-    }
-
+    } 
+    
+    
+    @Override
     public void setCharacterName(String name) {
         this.name = name;
     }
 
+    
+    @Override
     public void setHealth(int health) {
         this.health = health;
     }
 
+    @Override
     public void setMana(int mana) {
         this.mana = mana;
     }
 
+    @Override
     public void setAttackDmg(int attackDmg) {
         this.attackDmg = attackDmg;
     }
@@ -106,6 +112,5 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-    
     
 }

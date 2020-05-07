@@ -7,6 +7,7 @@ package DarkestEnemies.Server;
 
 import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
+import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.textio.ITextIO;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class DarkestEnemiesGame implements ITextGame {
     @Override
     public void startGame(ITextIO[] players) {
         String[] names = new String[players.length];
-        List<Player> entities = new ArrayList();
+        List<DECharacter> playerEntities = new ArrayList();
 
         while (true) {
 
@@ -35,7 +36,7 @@ public class DarkestEnemiesGame implements ITextGame {
                 players[i].put("Let's start with your name!\nWhat do you wish to be called?:\n");
                 names[i] = players[i].get();
                 Player p = new Player(names[i], 100, 0, 2);
-                entities.add(p);
+                playerEntities.add(p);
             }
 
             //Start Announcement
@@ -44,7 +45,7 @@ public class DarkestEnemiesGame implements ITextGame {
             }
 
             //enemy setup
-            NPC enemy = new NPC("Goblin", 10, 0, 5);
+            NPC enemy = new NPC("Goblin", 10, 0, 50);
 
             //introduction to encounter
             for (int i = 0; i < players.length; i++) {
@@ -53,9 +54,9 @@ public class DarkestEnemiesGame implements ITextGame {
             }
 
             //encounter setup
-            List encounter = new ArrayList();
+            List<DECharacter> encounter = new ArrayList();
             for (int i = 0; i < players.length; i++) {
-                encounter.add(players[i]);
+                encounter.add(playerEntities.get(i));
             }
             encounter.add(enemy);
             
@@ -68,14 +69,18 @@ public class DarkestEnemiesGame implements ITextGame {
             while (playerAlive == true && enemyAlive == true) {
 
                 //Encounter START
-                for (int i = 0; i < encounter.size() - 1; i++) {
-
+                for (int i = 0; i < encounter.size(); i++) {
+                    System.out.println(encounter.get(i).getClass());
                     //If the the character is an NPC
                     if (encounter.get(i).getClass() == NPC.class) {
+                        
                         System.out.println("The NPC has taken their turn");
                         for (int j = 0; j < players.length; j++) {
-                            entities.get(j).setHealth(entities.get(i).getHealth() - enemy.getAttackDmg());
-                            players[j].put("You've been hit! You now have: " + entities.get(j).getHealth() + " hp left!\n");
+                            System.out.println("current hp " + playerEntities.get(j).getHealth());
+                            System.out.println("enemy atkdmg " + enemy.getAttackDmg());
+                            System.out.println(playerEntities.get(j).getHealth() - enemy.getAttackDmg());
+                            playerEntities.get(j).setHealth(playerEntities.get(j).getHealth() - enemy.getAttackDmg());
+                            players[j].put("You've been hit! You now have: " + playerEntities.get(j).getHealth() + " hp left!\n");
                         }
                     }
 
@@ -89,18 +94,25 @@ public class DarkestEnemiesGame implements ITextGame {
 
                         players[i].clear();
                         int choice = players[i].select("What do you wish to do?", actions, "");
-
+                        System.out.println(choice);
                         switch (choice) {
+                            
                             //Attack
-                            case 0:
-                                enemy.setHealth(enemy.getHealth() - entities.get(i).getAttackDmg());
-                                players[i].put("Hit! " + enemy.getCharacterName() + " now has " + enemy.getHealth() + " left!\n");
-                            //Heal
                             case 1:
-                                if (entities.get(i).getHealth() > 90) {
-                                    entities.get(i).setHealth(100);
+                                enemy.setHealth(enemy.getHealth() - playerEntities.get(i).getAttackDmg());
+                                players[i].put("Hit! " + enemy.getCharacterName() + " now has " + enemy.getHealth() + " left!\n");
+                                break;
+                            //Heal
+                            case 2:
+                                if (playerEntities.get(i).getHealth() > 90) {
+                                    playerEntities.get(i).setHealth(100);
+                                    System.out.println("Healed some small ammount");
+                                    break;
+                                } else {
+                                    playerEntities.get(i).setHealth(playerEntities.get(i).getHealth());
+                                    System.out.println("Healed for 10!");
+                                    break;
                                 }
-                                entities.get(i).setHealth(entities.get(i).getHealth() + 10);
 
                         }
                     }
@@ -114,9 +126,9 @@ public class DarkestEnemiesGame implements ITextGame {
 
                     //Checks HP for Players
                     for (int j = 0; j < players.length; ++j) {
-                        if (entities.get(j).getHealth() <= 0) {
+                        if (playerEntities.get(j).getHealth() <= 0) {
                             players[j].put("Oh no! You've been killed! Game over!\n");
-                            players[j + 1].put("Oh no!" + entities.get(j).getCharacterName() + " has been killed! You flee in fear. Game over!\n");
+                            players[j + 1].put("Oh no!" + playerEntities.get(j).getCharacterName() + " has been killed! You flee in fear. Game over!\n");
                             playerAlive = false;
                             break;
                         }

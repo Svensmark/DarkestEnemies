@@ -66,18 +66,22 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         return attackDmg;
     }
 
+    @Override
     public void setCharacterName(String name) {
         this.name = name;
     }
 
+    @Override
     public void setHealth(int health) {
         this.health = health;
     }
 
+    @Override
     public void setMana(int mana) {
         this.mana = mana;
     }
 
+    @Override
     public void setAttackDmg(int attackDmg) {
         this.attackDmg = attackDmg;
     }

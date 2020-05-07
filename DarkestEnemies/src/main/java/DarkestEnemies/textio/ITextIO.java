@@ -77,6 +77,6 @@ public interface ITextIO extends Closeable
             put("\n" + (++count) + " - " + s);
         }
         put("\n" + footer);
-        return getInteger(1, count)-1;
+        return getInteger(1, count);
     }
 }
