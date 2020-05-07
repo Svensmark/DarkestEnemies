@@ -35,11 +35,16 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         this.attackDmg = attackDmg;
     }
 
+    public Player(String name) {
+        this.name = name;
+        this.health = 10;
+        this.mana = 10;
+        this.attackDmg = 2;
+    }    
+    
     public Player() {
+        
     }
-    
-    
-    
     
     @Override
     public ENUMTYPE getType() {

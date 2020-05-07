@@ -26,11 +26,11 @@ public class DarkestEnemiesGame implements ITextGame {
     @Override
     public void startGame(ITextIO[] players) {
         String[] names = new String[players.length];
-        List<DECharacter> playerEntities = new ArrayList();
 
         while (true) {
 
-            playerSetup(players, names, playerEntities);
+            //Setups a list of players
+            List<DECharacter> playerEntities = playerSetup(players, names);
 
             //Start Announcement
             for (int i = 0; i < players.length; i++) {
@@ -38,7 +38,7 @@ public class DarkestEnemiesGame implements ITextGame {
             }
 
             //enemy setup
-            NPC enemy = new NPC("Goblin", 10, 0, 5);
+            NPC enemy = new NPC("Goblin", 10, 0, 1);
 
             //encounter setup
             List<DECharacter> encounter = new ArrayList();
@@ -55,7 +55,6 @@ public class DarkestEnemiesGame implements ITextGame {
             break;
 
         }
-
     }
 
     private void firstEncounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) {
@@ -108,14 +107,14 @@ public class DarkestEnemiesGame implements ITextGame {
                             break;
                         //Heal
                         case 2:
-                            if (playerEntities.get(i).getHealth() > 90) {
-                                playerEntities.get(i).setHealth(100);
+                            if (playerEntities.get(i).getHealth() > 9) {
+                                playerEntities.get(i).setHealth(10);
                                 System.out.println("Healed some small ammount");
                                 break;
                             } else {
-                                playerEntities.get(i).setHealth(playerEntities.get(i).getHealth() + 10);
+                                playerEntities.get(i).setHealth(playerEntities.get(i).getHealth() + 1);
                                 players[i].clear();
-                                System.out.println("Healed for 10!");
+                                System.out.println("Healed for 1!");
                                 break;
                             }
 
@@ -143,15 +142,17 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    private void playerSetup(ITextIO[] players, String[] names, List<DECharacter> playerEntities) {
+    private List<DECharacter> playerSetup(ITextIO[] players, String[] names) {
+        List<DECharacter> playerEntities = new ArrayList();
         //Player setup
         System.out.println("Welcome! We're just getting everyone set up. Please type in the information propmpted to you or wait your turn.\n");
         for (int i = 0; i < players.length; i++) {
             players[i].put("Let's start with your name!\nWhat do you wish to be called?:");
             names[i] = players[i].get();
-            Player p = new Player(names[i], 100, 0, 2);
+            Player p = new Player(names[i], 10, 0, 2);
             playerEntities.add(p);
         }
+        return playerEntities;
     }
 
 }
