@@ -31,7 +31,7 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
 
     
     // Constructor for enemy NPC's
-    public NPC(String name, int health, int mana, int attackDmg, String role) {
+    public NPC(String name, int health, int mana, int attackDmg) {
         this.name = name;
         this.health = health;
         this.mana = mana;
@@ -40,7 +40,7 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     }
 
     // Constructor for friendly NPC's
-    public NPC(String name, String role) {
+    public NPC(String name) {
         this.name = name;
         this.role = "Friendly";
     }

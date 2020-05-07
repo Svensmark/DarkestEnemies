@@ -5,16 +5,18 @@
  */
 package DarkestEnemies.run;
 
-import DarkestEnemies.textgame.TextGameServer;
+import DarkestEnemies.Server.DarkestEnemiesGame;
+import DarkestEnemies.Server.GameServer;
 
 /**
  *
  * @author emilt
  */
 public class DarkestEnemiesGameServer {
-          
+
     public static void main(String[] args) {
-        TextGameServer tgs = new TextGameServer(9999);
-        tgs.run();
+        int port = 3737;
+        GameServer server = new GameServer(new DarkestEnemiesGame(), port);
+        server.run();
     }
 }

@@ -62,11 +62,13 @@ public class testGame implements ITextGame{
             }
         }
     }
+
+    
     
     public static void main(String[] args) {
-         int port = 3737;
+        int port = 3737;
         GameServer server = new GameServer(new testGame(), port);
         server.run();
     }
     
-}
+} 
