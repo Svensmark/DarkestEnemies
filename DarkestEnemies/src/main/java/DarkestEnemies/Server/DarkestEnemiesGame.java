@@ -104,7 +104,7 @@ public class DarkestEnemiesGame implements ITextGame {
                         case 1:
                             enemy.setHealth(enemy.getHealth() - playerEntities.get(i).getAttackDmg());
                             players[i].clear();
-                            players[i].put("Hit! " + enemy.getCharacterName() + " now has " + enemy.getHealth() + " left!\n");
+                            players[i].put("Hit! " + enemy.getCharacterName() + " now has " + enemy.getHealth() + " left!\n\n");
                             break;
                         //Heal
                         case 2:
@@ -113,7 +113,7 @@ public class DarkestEnemiesGame implements ITextGame {
                                 System.out.println("Healed some small ammount");
                                 break;
                             } else {
-                                playerEntities.get(i).setHealth(playerEntities.get(i).getHealth());
+                                playerEntities.get(i).setHealth(playerEntities.get(i).getHealth() + 10);
                                 players[i].clear();
                                 System.out.println("Healed for 10!");
                                 break;
@@ -147,7 +147,7 @@ public class DarkestEnemiesGame implements ITextGame {
         //Player setup
         System.out.println("Welcome! We're just getting everyone set up. Please type in the information propmpted to you or wait your turn.\n");
         for (int i = 0; i < players.length; i++) {
-            players[i].put("Let's start with your name!\nWhat do you wish to be called?:\n");
+            players[i].put("Let's start with your name!\nWhat do you wish to be called?:");
             names[i] = players[i].get();
             Player p = new Player(names[i], 100, 0, 2);
             playerEntities.add(p);
