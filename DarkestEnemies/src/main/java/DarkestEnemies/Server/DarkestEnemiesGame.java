@@ -26,8 +26,6 @@ public class DarkestEnemiesGame implements ITextGame {
     public void startGame(ITextIO[] players) {
         String[] names = new String[players.length];
         List<Player> entities = new ArrayList();
-        boolean playerAlive = true;
-        boolean enemyAlive = true;
 
         while (true) {
 
@@ -54,36 +52,23 @@ public class DarkestEnemiesGame implements ITextGame {
                 players[i].put("This is your first encounter, should be easy. Just wack a mole him!\n");
             }
 
-            //encounter setup START
+            //encounter setup
             List encounter = new ArrayList();
             for (int i = 0; i < players.length; i++) {
                 encounter.add(players[i]);
             }
             encounter.add(enemy);
-            //encounter setup END
+            
+
+            //Setups bools
+            boolean playerAlive = true;
+            boolean enemyAlive = true;
 
             //First encounter
-            while (playerAlive == true || enemyAlive == true) {
+            while (playerAlive == true && enemyAlive == true) {
 
                 //Encounter START
                 for (int i = 0; i < encounter.size() - 1; i++) {
-                    
-                    //Checks HP for NPC
-                    if (enemy.getHealth() <= 0) {
-                        System.out.println("Well you've diddley done it! Congrats!");
-                        enemyAlive = false;
-                        break;
-                    }
-
-                    //Checks HP for Players
-                    for (int j = 0; j < players.length; ++j) {
-                        if (entities.get(j).getHealth() <= 0) {
-                            players[j].put("Oh no! You've been killed! Game over!\n");
-                            players[j + 1].put("Oh no!" + entities.get(j).getCharacterName() + " has been killed! You flee in fear. Game over!\n");
-                            playerAlive = false;
-                            break;
-                        }
-                    }
 
                     //If the the character is an NPC
                     if (encounter.get(i).getClass() == NPC.class) {
@@ -102,6 +87,7 @@ public class DarkestEnemiesGame implements ITextGame {
                         actions.add("Attack");
                         actions.add("Heal");
 
+                        players[i].clear();
                         int choice = players[i].select("What do you wish to do?", actions, "");
 
                         switch (choice) {
@@ -118,7 +104,24 @@ public class DarkestEnemiesGame implements ITextGame {
 
                         }
                     }
-                }
+                    
+                    //Checks HP for NPC
+                    if (enemy.getHealth() <= 0) {
+                        System.out.println("Well you've diddley done it! Congrats!");
+                        enemyAlive = false;
+                        break;
+                    }
+
+                    //Checks HP for Players
+                    for (int j = 0; j < players.length; ++j) {
+                        if (entities.get(j).getHealth() <= 0) {
+                            players[j].put("Oh no! You've been killed! Game over!\n");
+                            players[j + 1].put("Oh no!" + entities.get(j).getCharacterName() + " has been killed! You flee in fear. Game over!\n");
+                            playerAlive = false;
+                            break;
+                        }
+                    }                                       
+                }                    
             }
 
             //Breaks out of the main loop
@@ -126,7 +129,6 @@ public class DarkestEnemiesGame implements ITextGame {
             break;
 
         }
-        
 
     }
 
