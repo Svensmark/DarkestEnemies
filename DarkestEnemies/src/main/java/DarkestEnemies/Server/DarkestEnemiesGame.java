@@ -29,12 +29,7 @@ import utils.EMF_Creator;
  */
 public class DarkestEnemiesGame implements ITextGame {
 
-    EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(
-            "pu",
-            "jdbc:mysql://localhost:3307/darkestenemies",
-            "dev",
-            "ax2",
-            EMF_Creator.Strategy.CREATE);
+    EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.DEV, EMF_Creator.Strategy.CREATE);
     //AccountFacade facade = AccountFacade.getAccountFacade(emf);
 
     @Override

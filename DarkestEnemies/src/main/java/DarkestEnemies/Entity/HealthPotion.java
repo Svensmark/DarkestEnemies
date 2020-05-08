@@ -13,29 +13,20 @@ import javax.persistence.Id;
 
 /**
  *
- * @author William
+ * @author Asger
  */
 @Entity
-public class SingleUseItem implements Serializable, DarkestEnemies.IF.ItemI {
+public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String description;
-    private int value;
-
-    public SingleUseItem(String name, String description, int value) {
-        this.name = name;
-        this.description = description;
-        this.value = value;
-    }
-
-    public SingleUseItem() {
-    }
+    private String info;
+    private int value; 
     
-    
+
     public Long getId() {
         return id;
     }
@@ -44,20 +35,24 @@ public class SingleUseItem implements Serializable, DarkestEnemies.IF.ItemI {
         this.id = id;
     }
 
-    
-    @Override
-    public Object getItem() {
-        return this;
-    }
-
     @Override
     public String getName() {
         return name;
     }
 
     @Override
-    public String getDescription() {
-        return description;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getInfo() {
+        return info;
+    }
+
+    @Override
+    public void setInfo(String info) {
+        this.info = info;
     }
 
     @Override
@@ -65,18 +60,17 @@ public class SingleUseItem implements Serializable, DarkestEnemies.IF.ItemI {
         return value;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    @Override
     public void setValue(int value) {
         this.value = value;
     }
-    
-    
+
+    @Override
+    public String use(int value) {
+        System.out.println("healed for " + value);
+        return "implementere senere bois.";
+    }
+
+   
     
 }

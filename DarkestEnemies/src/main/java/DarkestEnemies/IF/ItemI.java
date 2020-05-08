@@ -7,11 +7,15 @@ package DarkestEnemies.IF;
 
 /**
  *
- * @author William
+ * @author Asger
  */
-public interface ItemI<T> {
-    public T getItem();
+public interface ItemI {
     public String getName();
-    public String getDescription();
+    public String getInfo();
     public int getValue();
+    public String use(int value);
+    public void setName(String name);
+    public void setInfo(String info);
+    public void setValue(int value);
+    
 }
