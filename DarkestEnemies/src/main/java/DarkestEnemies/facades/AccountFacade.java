@@ -6,6 +6,7 @@
 package DarkestEnemies.facades;
 
 import DarkestEnemies.Entity.Account;
+import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.AccountNotFoundException;
 import entities.exceptions.WrongPasswordException;
@@ -67,7 +68,7 @@ public class AccountFacade {
     }
 
     public DECharacter login(String username, String password) throws AccountNotFoundException, WrongPasswordException{        
-        Query query = getEntityManager().createQuery("SELECT new account FROM Account account WHERE account.username = :username", Account.class);
+        Query query = getEntityManager().createQuery("SELECT account FROM Account account WHERE account.username = :username", Account.class);
         Account account = (Account) query.setParameter("username", username).getResultList().get(0);     
         //The account was not found
         if (account == null) {
@@ -137,13 +138,15 @@ public class AccountFacade {
     public static void main(String[] args) throws Exception{
         emf = EMF_Creator.createEntityManagerFactory(
                 "pu",
-                "jdbc:mysql://localhost:3307/startcode",
+                "jdbc:mysql://localhost:3307/darkestenemies",
                 "dev",
                 "ax2",
                 EMF_Creator.Strategy.CREATE);
         AccountFacade facade = AccountFacade.getAccountFacade(emf);
         
         Account a = facade.createAccount("username", "password");
-        System.out.println(facade.login("username", "password"));
+        Player p = new Player("Lokker", 100, 0, 2);
+        facade.addCharacterToAccount(a, p);
+        //System.out.println(facade.login("username", "password"));
     }
 }
