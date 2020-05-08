@@ -26,7 +26,7 @@ public class Account implements Serializable {
 
     private String username;
     private String password;
-    private DECharacter character;
+    private Player character;
     
     public Account() {
     }
@@ -54,7 +54,7 @@ public class Account implements Serializable {
         return character;
     }
 
-    public void setCharacter(DECharacter character) {
+    public void setCharacter(Player character) {
         this.character = character;
     }
 

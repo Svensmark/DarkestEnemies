@@ -27,19 +27,22 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     private int health;
     private int mana;
     private int attackDmg;
+    private int level;
 
-    public Player(String name, int health, int mana, int attackDmg) {
+    public Player(String name, int health, int mana, int attackDmg, int level) {
         this.name = name;
         this.health = health;
         this.mana = mana;
         this.attackDmg = attackDmg;
+        this.level = level;
     }
 
     public Player(String name) {
         this.name = name;
-        this.health = 10;
-        this.mana = 10;
+        this.health = 100;
+        this.mana = 0;
         this.attackDmg = 2;
+        this.level = 1;
     }    
     
     public Player() {
@@ -98,6 +101,7 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setId(Long id) {
         this.id = id;
     }
+    
     
 
 }

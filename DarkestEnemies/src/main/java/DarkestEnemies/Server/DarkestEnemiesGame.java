@@ -5,13 +5,20 @@
  */
 package DarkestEnemies.Server;
 
+import DarkestEnemies.Entity.Account;
 import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
+import DarkestEnemies.exceptions.AccountNotFoundException;
+import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.textio.ITextIO;
+import entities.exceptions.WrongPasswordException;
 import com.github.javafaker.Faker;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import javax.persistence.EntityManagerFactory;
+import utils.EMF_Creator;
 
 /**
  *
@@ -20,6 +27,14 @@ import java.util.List;
 public class DarkestEnemiesGame implements ITextGame {
     
     Faker faker = new Faker();
+
+    EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(
+            "pu",
+            "jdbc:mysql://localhost:3307/darkestenemies",
+            "dev",
+            "ax2",
+            EMF_Creator.Strategy.CREATE);
+    //AccountFacade facade = AccountFacade.getAccountFacade(emf);
 
     @Override
     public int getNumberOfPlayers() {
@@ -60,6 +75,61 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
+    private List<DECharacter> playerSetup(ITextIO[] players, String[] names) {
+
+        List<DECharacter> playerEntities = new ArrayList();
+
+        //Player setup
+        for (int i = 0; i < players.length; i++) {
+
+            //Login & Create account
+            List<String> options = Arrays.asList("Login", "Create account");
+            int option = players[i].select("Please choose an option", options, "");
+            switch (option) {
+                
+                //User chooses to login
+                case 1:
+                    boolean login = true;
+                    while (login) {
+                        try {
+                            AccountFacade af = AccountFacade.getAccountFacade(emf);
+                            players[i].put("Usename:");
+                            String username = players[i].get();
+                            players[i].put("Password:");
+                            String password = players[i].get();
+                            DECharacter player = af.login(username, password);
+
+                            //If nothing went wrong the logged in player is added to the list
+                            playerEntities.add(player);
+                            login = false;
+                        } catch (AccountNotFoundException e) {
+                            players[i].put("Something went wrong, please try again (user came back as null)");
+                            e.printStackTrace();
+                        } catch (WrongPasswordException e) {
+                            players[i].put("Username and password does not match, please try again");
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+
+                //User chooses to create account    
+                case 2:
+                    AccountFacade af = AccountFacade.getAccountFacade(emf);
+                    players[i].put("New usename:");
+                    String username = players[i].get();
+                    players[i].put("New password:");
+                    String password = players[i].get();
+                    Account a = af.createAccount(username, password);
+                    players[i].put("Character name:");
+                    String characterName = players[i].get();
+                    af.addCharacterToAccount(a, new Player(characterName));
+                    players[i].put("Succes - you can now login with your account");
+                    break;                    
+            }
+        }
+        return playerEntities;
+    }
+
     private void firstEncounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) {
         //Setups bools
         boolean playerAlive = true;
@@ -70,12 +140,12 @@ public class DarkestEnemiesGame implements ITextGame {
             players[i].put("Oh no! You've encountered a goblin!\n");
             players[i].put("This is your first encounter, should be easy. Just wack a mole him!\n");
         }
-        
+
         while (playerAlive == true && enemyAlive == true) {
 
             //Encounter START
             for (int i = 0; i < encounter.size(); i++) {
-                
+
                 System.out.println(encounter.get(i).getClass());
                 //If the the character is an NPC
                 if (encounter.get(i).getClass() == NPC.class) {
@@ -99,7 +169,6 @@ public class DarkestEnemiesGame implements ITextGame {
                     actions.add("Heal");
 
                     int choice = players[i].select("What do you wish to do?", actions, "");
-                    System.out.println(choice);
                     switch (choice) {
 
                         //Attack
@@ -122,7 +191,7 @@ public class DarkestEnemiesGame implements ITextGame {
                             }
 
                     }
-                    
+
                 }
 
                 //Checks HP for NPC
@@ -145,23 +214,5 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    private List<DECharacter> playerSetup(ITextIO[] players, String[] names) {
-        List<DECharacter> playerEntities = new ArrayList();
-        //Player setup
-        System.out.println("Welcome! We're just getting everyone set up. Please type in the information propmpted to you or wait your turn.\n");
-        for (int i = 0; i < players.length; i++) {
-            players[i].put("Let's start with your name!\nWhat do you wish to be called?:");
-            names[i] = players[i].get();
-            Player p = new Player(names[i], 10, 0, 2);
-            playerEntities.add(p);
-        }
-        return playerEntities;
-    }
-    
-    public static void main(String[] args) {
-        Faker fak = new Faker();
-        String name = fak.elderScrolls().creature();
-        System.out.println(name);
-    }
 
 }
