@@ -122,6 +122,7 @@ public class DarkestEnemiesGame implements ITextGame {
                     String characterName = players[i].get();
                     af.addCharacterToAccount(a, new Player(characterName));
                     players[i].put("Succes - you can now login with your account");
+                    i--;
                     break;                    
             }
         }

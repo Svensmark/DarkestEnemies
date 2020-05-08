@@ -10,6 +10,7 @@ import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.AccountNotFoundException;
 import entities.exceptions.WrongPasswordException;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
@@ -69,17 +70,17 @@ public class AccountFacade {
 
     public DECharacter login(String username, String password) throws AccountNotFoundException, WrongPasswordException{        
         Query query = getEntityManager().createQuery("SELECT account FROM Account account WHERE account.username = :username", Account.class);
-        Account account = (Account) query.setParameter("username", username).getResultList().get(0);     
+        List<Account> account = query.setParameter("username", username).getResultList();     
         //The account was not found
-        if (account == null) {
-            throw new AccountNotFoundException("Something went wrong, the account returned null");
+        if (account.isEmpty()) {
+            throw new AccountNotFoundException("Something went wrong, the account returned null\n");
         }
         
         //If the password is correct
-        if(checkPassword(password, account.getPassword())) {
-            return account.getCharacter();
+        if(checkPassword(password, account.get(0).getPassword())) {
+            return account.get(0).getCharacter();
         } else {
-            throw new WrongPasswordException("The password does not match the usename, check if either is correct");
+            throw new WrongPasswordException("The password does not match the usename, check if either is correct\n");
         }
     }
 
