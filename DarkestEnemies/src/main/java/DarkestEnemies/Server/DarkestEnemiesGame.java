@@ -9,6 +9,7 @@ import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.textio.ITextIO;
+import com.github.javafaker.Faker;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,8 @@ import java.util.List;
  * @author Asger
  */
 public class DarkestEnemiesGame implements ITextGame {
+    
+    Faker faker = new Faker();
 
     @Override
     public int getNumberOfPlayers() {
@@ -153,6 +156,12 @@ public class DarkestEnemiesGame implements ITextGame {
             playerEntities.add(p);
         }
         return playerEntities;
+    }
+    
+    public static void main(String[] args) {
+        Faker fak = new Faker();
+        String name = fak.elderScrolls().creature();
+        System.out.println(name);
     }
 
 }
