@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import org.mindrot.jbcrypt.BCrypt;
+import utils.EMF_Creator;
 
 /**
  *
@@ -27,7 +28,7 @@ public class AccountFacade {
     private AccountFacade() {
     }
 
-    public static AccountFacade getReviewFacade(EntityManagerFactory _emf) {
+    public static AccountFacade getAccountFacade(EntityManagerFactory _emf) {
         if (instance == null) {
             emf = _emf;
             instance = new AccountFacade();
@@ -39,13 +40,27 @@ public class AccountFacade {
         return emf.createEntityManager();
     }
 
-    public void createAccount(String username, String password) {
+    public Account createAccount(String username, String password) {
         EntityManager em = getEntityManager();
         try {
             Account account = new Account(username, hashPassword(password));
             em.getTransaction().begin();
             em.persist(account);
             em.getTransaction().commit();
+            return account;
+        } finally {
+            em.close();
+        }
+    }
+    
+    public Account addCharacterToAccount(Account account, DECharacter character) {
+        EntityManager em = getEntityManager();
+        account.setCharacter(character);
+        try {
+            em.getTransaction().begin();
+            em.merge(account);
+            em.getTransaction().commit();
+            return account;
         } finally {
             em.close();
         }
@@ -109,5 +124,26 @@ public class AccountFacade {
         password_verified = BCrypt.checkpw(password_plaintext, stored_hash);
 
         return (password_verified);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public static void main(String[] args) throws Exception{
+        emf = EMF_Creator.createEntityManagerFactory(
+                "pu",
+                "jdbc:mysql://localhost:3307/startcode",
+                "dev",
+                "ax2",
+                EMF_Creator.Strategy.CREATE);
+        AccountFacade facade = AccountFacade.getAccountFacade(emf);
+        
+        Account a = facade.createAccount("username", "password");
+        System.out.println(facade.login("username", "password"));
     }
 }
