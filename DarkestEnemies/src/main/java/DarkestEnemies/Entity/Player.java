@@ -28,6 +28,8 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     private int mana;
     private int attackDmg;
     private int level;
+    private int currentExp;
+    private int neededExp;
 
     public Player(String name, int health, int mana, int attackDmg, int level) {
         this.name = name;
@@ -89,6 +91,38 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         this.mana = mana;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getCurrentExp() {
+        return currentExp;
+    }
+
+    public void setCurrentExp(int currentExp) {
+        this.currentExp = currentExp;
+    }
+
+    public int getNeededExp() {
+        return neededExp;
+    }
+
+    public void setNeededExp(int neededExp) {
+        this.neededExp = neededExp;
+    }
+
     @Override
     public void setAttackDmg(int attackDmg) {
         this.attackDmg = attackDmg;
@@ -100,8 +134,15 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
+    }    
     
+    public void checkExp() {
+        if (this.currentExp >= this.neededExp) {
+            this.level = this.level + 1;
+            this.currentExp = this.currentExp - this.neededExp;
+            this.neededExp = (int) Math.pow(0.8, this.level)*1000;
+        }
+    }
     
 
 }

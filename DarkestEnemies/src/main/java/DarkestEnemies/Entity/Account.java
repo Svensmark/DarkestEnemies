@@ -58,6 +58,7 @@ public class Account implements Serializable {
         this.character = character;
     }
 
+
     
     
 }

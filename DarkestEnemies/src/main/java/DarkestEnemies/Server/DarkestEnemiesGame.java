@@ -40,12 +40,12 @@ public class DarkestEnemiesGame implements ITextGame {
 
     @Override
     public void startGame(ITextIO[] players) {
-        String[] names = new String[players.length];
 
+        //Setups a list of players
+        List<DECharacter> playerEntities = playerSetup(players);
+        
+        //Main loop
         while (true) {
-
-            //Setups a list of players
-            List<DECharacter> playerEntities = playerSetup(players, names);
 
             //Start Announcement
             for (int i = 0; i < players.length; i++) {
@@ -72,7 +72,7 @@ public class DarkestEnemiesGame implements ITextGame {
     }
 
     
-    private List<DECharacter> playerSetup(ITextIO[] players, String[] names) {
+    private List<DECharacter> playerSetup(ITextIO[] players) {
         List<DECharacter> playerEntities = new ArrayList();
         //Player setup
         for (int i = 0; i < players.length; i++) {
