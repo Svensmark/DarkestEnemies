@@ -13,7 +13,6 @@ import DarkestEnemies.exceptions.AccountNotFoundException;
 import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.textio.ITextIO;
 import entities.exceptions.WrongPasswordException;
-import com.github.javafaker.Faker;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,8 +24,6 @@ import utils.EMF_Creator;
  * @author Asger
  */
 public class DarkestEnemiesGame implements ITextGame {
-    
-    Faker faker = new Faker();
 
     EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(
             "pu",
@@ -46,13 +43,33 @@ public class DarkestEnemiesGame implements ITextGame {
 
         //Setups a list of players
         List<DECharacter> playerEntities = playerSetup(players);
-        
+
         //Main loop
         while (true) {
 
             //Start Announcement
             for (int i = 0; i < players.length; i++) {
-                players[i].put("Alrighty! Let's get started!\n");
+                
+                //The player in players list is in menu
+                boolean menu = true;
+                while (menu) {
+                    List<String> options = Arrays.asList("Find enemy", "Inventory", "Log out");
+                    int menuChoice = players[i].select("Main menu", options, "");
+                    switch (menuChoice) {
+                        //User chooses to find an enemy
+                        case 1:
+                            menu = false;
+                            break;
+                        
+                        //Player chooses inventory
+                        case 2:
+                            players[i].put("Not implemented yet");
+                            
+                        //Player logs out
+                        case 3: 
+                            players[i].put("Not implemented yet");
+                    }
+                }
             }
 
             //enemy setup
@@ -74,7 +91,6 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    
     private List<DECharacter> playerSetup(ITextIO[] players) {
         List<DECharacter> playerEntities = new ArrayList();
         //Player setup
@@ -84,7 +100,7 @@ public class DarkestEnemiesGame implements ITextGame {
             List<String> options = Arrays.asList("Login", "Create account");
             int option = players[i].select("Please choose an option", options, "");
             switch (option) {
-                
+
                 //User chooses to login
                 case 1:
                     boolean login = true;
@@ -123,7 +139,7 @@ public class DarkestEnemiesGame implements ITextGame {
                     af.addCharacterToAccount(a, new Player(characterName));
                     players[i].put("Succes - you can now login with your account");
                     i--;
-                    break;                    
+                    break;
             }
         }
         return playerEntities;
@@ -210,6 +226,5 @@ public class DarkestEnemiesGame implements ITextGame {
             }
         }
     }
-
 
 }
