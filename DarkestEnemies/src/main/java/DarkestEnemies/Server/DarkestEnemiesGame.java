@@ -12,10 +12,14 @@ import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.AccountNotFoundException;
 import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.textio.ITextIO;
+import com.github.javafaker.Faker;
 import entities.exceptions.WrongPasswordException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
 import utils.EMF_Creator;
 
@@ -40,7 +44,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
     @Override
     public void startGame(ITextIO[] players) {
-
+        
         //Setups a list of players
         List<DECharacter> playerEntities = playerSetup(players);
 
@@ -49,7 +53,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
             //Start Announcement
             for (int i = 0; i < players.length; i++) {
-                
+
                 //The player in players list is in menu
                 boolean menu = true;
                 while (menu) {
@@ -60,14 +64,24 @@ public class DarkestEnemiesGame implements ITextGame {
                         case 1:
                             menu = false;
                             break;
-                        
+
                         //Player chooses inventory
                         case 2:
                             players[i].put("Not implemented yet");
-                            
+
                         //Player logs out
-                        case 3: 
-                            players[i].put("Not implemented yet");
+                        case 3:
+                        {
+                            try {
+                                players[i + 1].close();
+                                players[i].close();
+                            } catch (IOException ex) {
+                                Logger.getLogger(DarkestEnemiesGame.class.getName()).log(Level.SEVERE, null, ex);
+                                players[i].put("Something went wrong.");
+                            }
+                        }
+                            //players[i].put("Not implemented yet");
+
                     }
                 }
             }
@@ -144,6 +158,27 @@ public class DarkestEnemiesGame implements ITextGame {
         }
         return playerEntities;
     }
+
+    private NPC enemySetup(List<Player> playerEntities, ITextIO[] players) {
+        int health = 0;
+        int mana = 0;
+        int attack = 0;
+
+        for (int i = 0; i < players.length; i++) {
+            health += (playerEntities.get(i).getLevel() * 10) + (playerEntities.get(i).getAttackDmg() * 5);
+        }
+        
+        for(int i = 0; i < players.length; i++){
+            attack += ((playerEntities.get(i).getLevel() *10) / 5) + (health/20);
+        }
+        
+        
+        Faker faker = new Faker();
+        String name = faker.elderScrolls().creature();
+        return new NPC(name, (health / players.length), mana, (attack / players.length));
+    }
+    
+    
 
     private void firstEncounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) {
         //Setups bools
