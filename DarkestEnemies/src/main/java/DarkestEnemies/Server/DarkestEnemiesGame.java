@@ -13,6 +13,7 @@ import DarkestEnemies.exceptions.AccountNotFoundException;
 import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.textio.ITextIO;
 import entities.exceptions.WrongPasswordException;
+import com.github.javafaker.Faker;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +25,8 @@ import utils.EMF_Creator;
  * @author Asger
  */
 public class DarkestEnemiesGame implements ITextGame {
+    
+    Faker faker = new Faker();
 
     EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(
             "pu",
@@ -119,6 +122,7 @@ public class DarkestEnemiesGame implements ITextGame {
                     String characterName = players[i].get();
                     af.addCharacterToAccount(a, new Player(characterName));
                     players[i].put("Succes - you can now login with your account");
+                    i--;
                     break;                    
             }
         }
@@ -206,5 +210,6 @@ public class DarkestEnemiesGame implements ITextGame {
             }
         }
     }
+
 
 }
