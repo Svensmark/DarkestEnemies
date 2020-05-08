@@ -54,7 +54,7 @@ public class AccountFacade {
         }
     }
     
-    public Account addCharacterToAccount(Account account, DECharacter character) {
+    public Account addCharacterToAccount(Account account, Player character) {
         EntityManager em = getEntityManager();
         account.setCharacter(character);
         try {
@@ -145,7 +145,7 @@ public class AccountFacade {
         AccountFacade facade = AccountFacade.getAccountFacade(emf);
         
         Account a = facade.createAccount("username", "password");
-        Player p = new Player("Lokker", 100, 0, 2);
+        Player p = new Player("Lokker", 100, 0, 2, 1);
         facade.addCharacterToAccount(a, p);
         //System.out.println(facade.login("username", "password"));
     }
