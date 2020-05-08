@@ -165,17 +165,17 @@ public class DarkestEnemiesGame implements ITextGame {
         int attack = 0;
 
         for (int i = 0; i < players.length; i++) {
-            health += (playerEntities.get(i).getLevel() * 10) + (playerEntities.get(i).getAttackDmg() * 5);
+            health += (playerEntities.get(i).getLevel() * 5) + (playerEntities.get(i).getAttackDmg() * 2.5);
         }
         
         for(int i = 0; i < players.length; i++){
-            attack += ((playerEntities.get(i).getLevel() *10) / 5) + (health/20);
+            attack += ((playerEntities.get(i).getLevel() *5) / 2.5) + (health/10);
         }
         
         
         Faker faker = new Faker();
         String name = faker.elderScrolls().creature();
-        return new NPC(name, (health / players.length), mana, (attack / players.length));
+        return new NPC(name, health, mana, attack);
     }
     
     
