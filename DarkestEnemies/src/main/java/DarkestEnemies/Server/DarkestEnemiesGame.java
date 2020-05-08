@@ -68,14 +68,12 @@ public class DarkestEnemiesGame implements ITextGame {
             //Breaks out of the main loop
             System.out.println("Game Complete!");
             break;
-
         }
     }
 
+    
     private List<DECharacter> playerSetup(ITextIO[] players, String[] names) {
-
         List<DECharacter> playerEntities = new ArrayList();
-
         //Player setup
         for (int i = 0; i < players.length; i++) {
 
@@ -186,9 +184,7 @@ public class DarkestEnemiesGame implements ITextGame {
                                 System.out.println("Healed for 1!");
                                 break;
                             }
-
                     }
-
                 }
 
                 //Checks HP for NPC
