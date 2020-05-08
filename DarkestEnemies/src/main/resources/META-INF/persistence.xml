@@ -5,6 +5,7 @@
     <class>DarkestEnemies.Entity.SingleUseItem</class>
     <class>DarkestEnemies.Entity.NPC</class>
     <class>DarkestEnemDarkestEnemies.Entity.Player</class>
+    <class>DarkestEnemies.Entity.Account</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <!-- DO NOT remove the line below. It's not set by the  entityUtils.EMF_Creator -->
@@ -12,5 +13,4 @@
       <!-- The missing values are added by entityUtils.EMF_Creator -->
     </properties>
   </persistence-unit>
-  
 </persistence>

@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package DarkestEnemies.IF;
+package DarkestEnemies.exceptions;
 
 /**
  *
- * @author emilt
+ * @author Gamer
  */
-public interface Account {
+public class AccountNotFoundException extends Exception{
     
-    public void login();
-    public DECharacter getCharacter();
-    public void createCharacter(String name);
+    public AccountNotFoundException(String errorMessage) {
+        super(errorMessage);
+    }
     
 }
