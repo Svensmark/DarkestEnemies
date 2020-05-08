@@ -99,18 +99,22 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         this.name = name;
     }
 
+    @Override
     public int getLevel() {
         return level;
     }
 
+    @Override
     public void setLevel(int level) {
         this.level = level;
     }
 
+    @Override
     public int getCurrentExp() {
         return currentExp;
     }
 
+    @Override
     public void setCurrentExp(int currentExp) {
         this.currentExp = currentExp;
     }
