@@ -68,6 +68,7 @@ public class DarkestEnemiesGame implements ITextGame {
                     //User chooses to find an enemy
                     case 1:
                         if (i != players.length - 1) {
+                            menu = false;
                             break;
                         } else {
                             //enemy setup
