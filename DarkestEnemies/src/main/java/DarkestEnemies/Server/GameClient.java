@@ -67,6 +67,7 @@ public class GameClient implements Runnable{
 
     public static void main(String[] args) {
         ITextIO io = new SysTextIO();
+        
         io.put("Please enter server ip-adress: ");
         String adr = io.get();
         io.put("\nPlease enter server port: ");
