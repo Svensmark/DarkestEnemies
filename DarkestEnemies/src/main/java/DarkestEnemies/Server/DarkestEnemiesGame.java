@@ -39,64 +39,57 @@ public class DarkestEnemiesGame implements ITextGame {
 
     @Override
     public void startGame(ITextIO[] players) {
-        
+
         //Setups a list of players
         List<DECharacter> playerEntities = playerSetup(players);
 
         //Main loop
         while (true) {
-            
-            //Menu
-            beforeEncounter(players);
 
-            //enemy setup
-            NPC enemy = enemySetup(playerEntities, players);
-
-            //encounter setup
-            List<DECharacter> encounter = new ArrayList();
-            for (int i = 0; i < players.length; i++) {
-                encounter.add(playerEntities.get(i));
-            }
-            encounter.add(enemy);
-
-            //Encounter
-            firstEncounter(encounter, players, playerEntities, enemy);
+            //Main menu
+            mainMenu(players, playerEntities);
             
-            //menu
-            beforeEncounter(players);
-            
-            enemy = enemySetup(playerEntities, players);
-            //Encounter
-            firstEncounter(encounter, players, playerEntities, enemy);
-            
-            //Breaks out of the main loop
-            System.out.println("Game Complete!");
-            break;
         }
     }
 
-    private void beforeEncounter(ITextIO[] players) {
+    private void mainMenu(ITextIO[] players, List<DECharacter> playerEntities) {
+
         //Start Announcement
         for (int i = 0; i < players.length; i++) {
-            
+
             //The player in players list is in menu
             boolean menu = true;
             while (menu) {
-                List<String> options = Arrays.asList("Find enemy", "Inventory", "Log out");
+                List<String> options = Arrays.asList("Ready to find enemy", "Inventory", "Log out");
                 int menuChoice = players[i].select("Main menu", options, "");
                 switch (menuChoice) {
+                    
                     //User chooses to find an enemy
                     case 1:
-                        menu = false;
-                        break;
-                        
-                        //Player chooses inventory
+                        if (i != players.length - 1) {
+                            break;
+                        } else {
+                            //enemy setup
+                            NPC enemy = enemySetup(playerEntities, players);
+
+                            //encounter setup
+                            List<DECharacter> encounter = new ArrayList();
+                            for (int j = 0; j < players.length; j++) {
+                                encounter.add(playerEntities.get(j));
+                            }
+                            encounter.add(enemy);
+
+                            //Encounter
+                            firstEncounter(encounter, players, playerEntities, enemy);
+                            break;
+                        }
+
+                    //Player chooses inventory
                     case 2:
                         players[i].put("Not implemented yet");
-                        
-                        //Player logs out
-                    case 3:
-                    {
+
+                    //Player logs out
+                    case 3: {
                         try {
                             players[i + 1].close();
                             players[i].close();
@@ -105,7 +98,6 @@ public class DarkestEnemiesGame implements ITextGame {
                             players[i].put("Something went wrong.");
                         }
                     }
-                    
                 }
             }
         }
@@ -173,18 +165,15 @@ public class DarkestEnemiesGame implements ITextGame {
         for (int i = 0; i < players.length; i++) {
             health += (playerEntities.get(i).getLevel() * 5) + (playerEntities.get(i).getAttackDmg() * 2.5);
         }
-        
-        for(int i = 0; i < players.length; i++){
-            attack += ((playerEntities.get(i).getLevel() * 5) / 2.5) + (health/10);
+
+        for (int i = 0; i < players.length; i++) {
+            attack += ((playerEntities.get(i).getLevel() * 5) / 2.5) + (health / 10);
         }
-        
-        
+
         Faker faker = new Faker();
         String name = faker.elderScrolls().creature();
         return new NPC(name, health, mana, attack);
     }
-    
-    
 
     private void firstEncounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) {
         //Setups bools
@@ -212,7 +201,7 @@ public class DarkestEnemiesGame implements ITextGame {
                         System.out.println("current player hp: " + playerEntities.get(j).getAttackDmg());
                         System.out.println("enemy hp: " + enemy.getHealth());
                         System.out.println("enemy atkdmg: " + enemy.getAttackDmg());
-                        
+
                         playerEntities.get(j).setHealth(playerEntities.get(j).getHealth() - enemy.getAttackDmg());
                         players[j].put("You've been hit! You now have: " + playerEntities.get(j).getHealth() + " hp left!\n");
                     }
