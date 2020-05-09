@@ -5,6 +5,7 @@
  */
 package DarkestEnemies.Entity;
 
+import DarkestEnemies.IF.DECharacter;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -66,9 +67,10 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     }
 
     @Override
-    public String use(int value) {
-        System.out.println("healed for " + value);
-        return "implementere senere bois.";
+    public void use(Player player) {
+        player.setHealth(player.getHealth() + value);
+        System.out.println("Healed for " + value);
+        System.out.println("You now have: " + player.getHealth() + "hp.");
     }
 
    
