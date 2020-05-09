@@ -132,5 +132,15 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setCurrentExp(int currentExp) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public HealthPotion getHealthpotion() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setHealthpotion(HealthPotion healthpotion) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

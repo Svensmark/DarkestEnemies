@@ -11,6 +11,7 @@ import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.AccountNotFoundException;
 import DarkestEnemies.facades.AccountFacade;
+import DarkestEnemies.facades.InventoryFacade;
 import DarkestEnemies.textio.ITextIO;
 import com.github.javafaker.Faker;
 import entities.exceptions.WrongPasswordException;
@@ -31,7 +32,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
     EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.DEV, EMF_Creator.Strategy.CREATE);
     //AccountFacade facade = AccountFacade.getAccountFacade(emf);
-
+    InventoryFacade ifc = InventoryFacade.getInventoryFacade(emf);
     @Override
     public int getNumberOfPlayers() {
         return 2;
@@ -87,9 +88,22 @@ public class DarkestEnemiesGame implements ITextGame {
                     //Player chooses inventory
                     case 2:
                         players[i].put("Not implemented yet");
-
-                    //Player logs out
-                    case 3: {
+                        player.get(i).getHealthpotion().getInfo();
+                        player.get(i).getHealthpotion().getId();
+                        List<String> inventoryOptions = Arrays.asList("Use potion", "Go back");
+                        int inventoryChoice = players[i].select("Inventory", inventoryOptions, "");
+                        switch(inventoryChoice){
+                            case 1:
+                                ifc.useHealthPotion(player.get(i));
+                                player.get(i).getHealthpotion().use(player.get(i));
+                                break;
+                            case 2:
+                                break;
+                        }
+                        break;
+                        //Player logs out
+                    case 3:
+                    {
                         try {
                             players[i + 1].close();
                             players[i].close();
@@ -243,6 +257,9 @@ public class DarkestEnemiesGame implements ITextGame {
                 if (enemy.getHealth() <= 0) {
                     System.out.println("Well you've diddley done it! Congrats!");
                     enemyAlive = false;
+                    for(int j = 0; j < players.length; j++){
+                        ifc.addHealthPotion(playerEntities.get(j), "small health potion", 10);
+                    }
                     break;
                 }
 
