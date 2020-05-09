@@ -30,6 +30,7 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     private int level;
     private int currentExp;
     private int neededExp;
+    private HealthPotion healthpotion;
 
     public Player(String name, int health, int mana, int attackDmg, int level) {
         this.name = name;
@@ -147,6 +148,16 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
             this.neededExp = (int) Math.pow(0.8, this.level)*1000;
         }
     }
+
+    public HealthPotion getHealthpotion() {
+        return healthpotion;
+    }
+
+    public void setHealthpotion(HealthPotion healthpotion) {
+        this.healthpotion = healthpotion;
+    }
+    
+    
     
 
 }

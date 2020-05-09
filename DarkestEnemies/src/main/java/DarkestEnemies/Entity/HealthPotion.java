@@ -26,6 +26,18 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     private String name;
     private String info;
     private int value; 
+
+    public HealthPotion(String name, int value) {
+        this.name = name;
+        this.info = "Potion that heals you for " + value;
+        this.value = value;
+    }
+
+    public HealthPotion() {
+    }
+    
+    
+    
     
 
     public Long getId() {
@@ -67,7 +79,7 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     }
 
     @Override
-    public void use(Player player) {
+    public void use(DECharacter player) {
         player.setHealth(player.getHealth() + value);
         System.out.println("Healed for " + value);
         System.out.println("You now have: " + player.getHealth() + "hp.");
