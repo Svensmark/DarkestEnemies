@@ -25,7 +25,7 @@ public class AccountFacade {
 
     private static AccountFacade instance;
     private static EntityManagerFactory emf;
-    private static int workload = 12;
+    private static final int workload = 12;
 
     private AccountFacade() {
     }
@@ -127,27 +127,6 @@ public class AccountFacade {
 
         return (password_verified);
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    public static void main(String[] args) throws Exception{
-        emf = EMF_Creator.createEntityManagerFactory(
-                "pu",
-                "jdbc:mysql://localhost:3307/darkestenemies",
-                "dev",
-                "ax2",
-                EMF_Creator.Strategy.CREATE);
-        AccountFacade facade = AccountFacade.getAccountFacade(emf);
         
-        Account a = facade.createAccount("username", "password");
-        Player p = new Player("Lokker", 100, 0, 2, 1);
-        facade.addCharacterToAccount(a, p);
-        //System.out.println(facade.login("username", "password"));
-    }
+    
 }

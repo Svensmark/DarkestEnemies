@@ -3,13 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package DarkestEnemies.IF;
+package DarkestEnemies.exceptions;
 
 /**
  *
- * @author emilt
+ * @author Gamer
  */
-public interface AbilitiyI {
+public class AbilityNotFoundException extends Exception{
     
+    public AbilityNotFoundException(String errorMessage) {
+        super(errorMessage);
+    }
     
 }

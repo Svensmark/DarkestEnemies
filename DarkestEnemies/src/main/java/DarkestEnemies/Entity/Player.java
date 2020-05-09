@@ -6,6 +6,7 @@
 package DarkestEnemies.Entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,15 +23,22 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+        
     private String name;
+    
+    //Mandatory stats
     private int health;
     private int mana;
     private int attackDmg;
     private int level;
     private int currentExp;
     private int neededExp;
-    private HealthPotion healthpotion;
+    
+    //Inventory
+    private HealthPotion healthpotion;     //Skal ændres til en liste af ItemI på et tidspunkt i fremtiden
+    private int gold;
+    
+    private ArrayList<Ability> abilities;
 
     public Player(String name, int health, int mana, int attackDmg, int level) {
         this.name = name;
@@ -155,6 +163,22 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
 
     public void setHealthpotion(HealthPotion healthpotion) {
         this.healthpotion = healthpotion;
+    }
+    
+    public int getGold() {
+        return this.gold;
+    }
+    
+    public void addGold(int amount) {
+        this.gold += amount;
+    }
+    
+    public void removeGold(int amount) {
+        this.gold -= amount;
+    }
+    
+    public void addAbility(Ability ability) {
+        this.abilities.add(ability);
     }
     
     

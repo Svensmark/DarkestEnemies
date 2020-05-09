@@ -21,6 +21,7 @@ public interface DECharacter {
     public int getAttackDmg();
     public int getLevel();
     public int getCurrentExp();
+    
     public HealthPotion getHealthpotion();
     public void setCharacterName(String name);
     public void setHealth(int health);
