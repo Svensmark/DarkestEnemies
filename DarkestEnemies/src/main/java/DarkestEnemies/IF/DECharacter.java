@@ -29,7 +29,6 @@ public interface DECharacter {
     public List<HealthPotion> getHealthpotion();
     public List<Ability> getAbilities();
     
-    public HealthPotion getHealthpotion();
     public void setCharacterName(String name);
     public void setHealth(int health);
     public void setMana(int mana);
