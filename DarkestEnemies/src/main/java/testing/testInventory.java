@@ -30,12 +30,12 @@ public class testInventory {
         PlayerFacade pfc = PlayerFacade.getPlayerFacade(_emf);
         AccountFacade acF = AccountFacade.getAccountFacade(_emf);
         InventoryFacade ifc = InventoryFacade.getInventoryFacade(_emf);
-//        Player player1 = new Player("player1");
+//        Player player1 = new Player("Emil");
 //        Account acc1 = acF.createAccount("Svense", "test");
 //        acF.addCharacterToAccount(acc1, player1);
 //
 //        //Setups an account and a character to that account:
-//        Player player2 = new Player("player2");
+//        Player player2 = new Player("Asger");
 //        Account acc2 = acF.createAccount("Asger", "test");
 //        acF.addCharacterToAccount(acc2, player2);
 //        

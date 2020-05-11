@@ -280,10 +280,10 @@ public class DarkestEnemiesGame implements ITextGame {
                         availableTargets.add(encounter.get(j));
                     }
 
-                    //Creates a new list of all the available targets of the ability
+                    //Creates a new list of all the chosen targets of the ability
                     ArrayList<Integer> targetsIndex = new ArrayList();
                     int targetIndex = players[i].select("Who do you wish to target?", names, "");
-                    for (int j = 0; j < encounter.get(j).getAbilities().get(choice - 1).getAmountOfTargets(); ++j) {
+                    for (int j = 0; j < encounter.get(i).getAbilities().get(choice - 1).getAmountOfTargets(); ++j) {
                         targetsIndex.add(targetIndex);
                     }
 
