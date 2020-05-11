@@ -237,11 +237,10 @@ public class DarkestEnemiesGame implements ITextGame {
 
             //Encounter START
             for (int i = 0; i < encounter.size(); i++) {
-
-                System.out.println(encounter.get(i).getClass());
-                //If the the character is an NPC
+                players[i].clear();
+                
+                //If the the character is an NPC                               
                 if (encounter.get(i).getClass() == NPC.class) {
-
                     System.out.println("The NPC has taken their turn");
                     for (int j = 0; j < players.length; j++) {
                         //System monitoring.
@@ -297,11 +296,11 @@ public class DarkestEnemiesGame implements ITextGame {
 
                     for (DECharacter target : targets) {
                         if (chosenAbility.getDamage() <= 0 && chosenAbility.getHealing() > 0) {
-                            players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
                             target.setHealth(target.getHealth() + chosenAbility.getHealing());
-                        } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
                             players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
+                        } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
                             target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
+                            players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
                         }
                     }
 
@@ -312,7 +311,7 @@ public class DarkestEnemiesGame implements ITextGame {
                     enemyAlive = false;
                     for (int j = 0; j < players.length; j++) {
                         players[i].put("You did killed the enemy");
-                        Long potionRank =(long) playerEntities.get(j).getLevel();
+                        Long potionRank = (long) playerEntities.get(j).getLevel();
                         HealthPotion hp = ifc.getHealthPotionByID(potionRank);
                         ifc.addPotionToPlayer(playerEntities.get(j).getId(), hp);
                     }
