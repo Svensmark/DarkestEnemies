@@ -6,6 +6,7 @@
 package DarkestEnemies.Server;
 
 import DarkestEnemies.Entity.Ability;
+import static DarkestEnemies.Entity.Ability_.player;
 import DarkestEnemies.Entity.Account;
 import DarkestEnemies.Entity.HealthPotion;
 import DarkestEnemies.Entity.NPC;
@@ -25,6 +26,10 @@ import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
 import utils.EMF_Creator;
 import DarkestEnemies.IF.DECharacter;
+import DarkestEnemies.exceptions.AbilityNotFoundException;
+import DarkestEnemies.exceptions.PlayerNotFoundException;
+import DarkestEnemies.facades.AbilityFacade;
+import DarkestEnemies.facades.PlayerFacade;
 import DarkestEnemies.exceptions.ItemNotFoundException;
 
 /**
@@ -36,6 +41,8 @@ public class DarkestEnemiesGame implements ITextGame {
     EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.DEV, EMF_Creator.Strategy.CREATE);
     //AccountFacade facade = AccountFacade.getAccountFacade(emf);
     InventoryFacade ifc = InventoryFacade.getInventoryFacade(emf);
+    PlayerFacade pF = PlayerFacade.getPlayerFacade(emf);
+    AbilityFacade abF = AbilityFacade.getAbilityFacade(emf);
 
     @Override
     public int getNumberOfPlayers() {
@@ -44,6 +51,9 @@ public class DarkestEnemiesGame implements ITextGame {
 
     @Override
     public void startGame(ITextIO[] players) {
+
+        //Sets up base abilities in the database if needed
+        abF.setupBasicAbilities();
 
         //Setups a list of players
         List<DECharacter> playerEntities = playerSetup(players);
@@ -90,27 +100,27 @@ public class DarkestEnemiesGame implements ITextGame {
                             encounter.add(enemy);
 
                             //Encounter
-                            firstEncounter(encounter, players, playerEntities, enemy);
+                            encounter(encounter, players, playerEntities, enemy);
                             break;
                         }
 
                     //Player chooses inventory
                     case 2:
-                        
-                        for(int j = 0; j < playerEntities.get(i).getHealthpotion().size(); j++){
+
+                        for (int j = 0; j < playerEntities.get(i).getHealthpotion().size(); j++) {
                             players[i].put(playerEntities.get(i).getHealthpotion().get(j).getInfo());
                         }
-                        
+
                         List<String> inventoryOptions = Arrays.asList();
-                        for(int j = 0; j < playerEntities.get(i).getHealthpotion().size(); j++){
+                        for (int j = 0; j < playerEntities.get(i).getHealthpotion().size(); j++) {
                             inventoryOptions.add("Use " + playerEntities.get(i).getHealthpotion().get(j).getName() + "with index" + j);
                         }
                         inventoryOptions.add("Go Back");
-                        
+
                         int inventoryChoice = players[i].select("Inventory", inventoryOptions, "");
-                        
-                        switch(inventoryChoice){
-                            
+
+                        switch (inventoryChoice) {
+
                             case 1:
                                 players[i].put("Enter the index of the potion you wish to use.");
                                 ifc.useHealthPotion(playerEntities.get(i), players[i].getInteger(0, inventoryOptions.size() - 1));
@@ -172,16 +182,21 @@ public class DarkestEnemiesGame implements ITextGame {
 
                 //User chooses to create account    
                 case 2:
-                    AccountFacade af = AccountFacade.getAccountFacade(emf);
-                    players[i].put("New usename:");
-                    String username = players[i].get();
-                    players[i].put("New password:");
-                    String password = players[i].get();
-                    Account a = af.createAccount(username, password);
-                    players[i].put("Character name:");
-                    String characterName = players[i].get();
-                    af.addCharacterToAccount(a, new Player(characterName));
-                    players[i].put("Succes - you can now login with your account");
+                    //Creates a new player, adds it to the database and writes it out to the IO
+                    String playerName = pF.createNewPlayer(players[i]).getCharacterName();
+                    Player player = null;
+                    try {
+                        player = pF.getPlayerByName(playerName);
+                    } catch (PlayerNotFoundException e) {
+                        System.out.println("Something went wrong with finding the player by name: " + playerName);
+                    }
+
+                    //Adds the start ability to the player "slam"
+                    try {
+                        pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("slam"));
+                    } catch (AbilityNotFoundException e) {
+                        System.out.println("Something went wrong with getting the SLAM ability");
+                    }
                     i--;
                     break;
             }
@@ -207,12 +222,14 @@ public class DarkestEnemiesGame implements ITextGame {
         return new NPC(name, health, mana, attack);
     }
 
-    private void firstEncounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) throws ItemNotFoundException {
+    private void encounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) {
+        players[i].clear();
         //Setups bools
         boolean playerAlive = true;
         boolean enemyAlive = true;
         //introduction to encounter
         for (int i = 0; i < players.length; i++) {
+            players[i].clear();
             players[i].put("Oh no! You've encountered a " + enemy.getCharacterName() + "!\n");
             players[i].put("This is your first encounter, should be easy. Just wack a mole him!\n");
         }
@@ -241,7 +258,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
                 //If the character is a player
                 if (encounter.get(i).getClass() != NPC.class) {
-                    //Creates of list
+                    //Creates an empty list of available actions
                     ArrayList<String> actions = new ArrayList();
 
                     //Gets the abilities of the current player
@@ -249,65 +266,54 @@ public class DarkestEnemiesGame implements ITextGame {
 
                     //Adds the abils name to actions list so it can be selected
                     for (Ability ab : abilities) {
-                        actions.add(ab.getName() + "\n" + " - " + ab.getDescription());
+                        actions.add(ab.getName() + "\n" + "  - " + ab.getDescription());
                     }
                     int choice = players[i].select("What do you wish to do?", actions, "");
-                    
-                    Ability chosenAbility = encounter.get(i).getAbilities().get(choice);
+
+                    //Gets the chosen ability
+                    Ability chosenAbility = encounter.get(i).getAbilities().get(choice - 1);
 
                     //Creates a new list of all the names in the encounter
                     ArrayList<String> names = new ArrayList();
-                    ArrayList<DECharacter> targets = new ArrayList();
+                    ArrayList<DECharacter> availableTargets = new ArrayList();
                     for (int j = 0; j < encounter.size(); j++) {
                         names.add(encounter.get(j).getName());
-                        targets.add(encounter.get(j));
+                        availableTargets.add(encounter.get(j));
                     }
 
-                    //Creates a new list of all the targets of the ability
+                    //Creates a new list of all the available targets of the ability
                     ArrayList<Integer> targetsIndex = new ArrayList();
-                    for (int j = 0; j < encounter.get(j).getAbilities().get(choice).getAmountOfTargets(); ++j) {
-                        int targetIndex = players[i].select("Who do you wish to target?", names, "");
+                    int targetIndex = players[i].select("Who do you wish to target?", names, "");
+                    for (int j = 0; j < encounter.get(j).getAbilities().get(choice - 1).getAmountOfTargets(); ++j) {
                         targetsIndex.add(targetIndex);
                     }
-                    
-                    for (DECharacter target : targets) {
-                        if (chosenAbility.getDamage() <= 0 && chosenAbility.getHealing() > 0) {
-                            target.setHealth(target.getHealth() + chosenAbility.getHealing());
-                        } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
-                            target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
-                        }
-                        
+
+                    //Creates a list of DECharaters that is the actual targets
+                    ArrayList<DECharacter> targets = new ArrayList();
+                    for (int j = 0; j < targetsIndex.size(); ++j) {
+                        int index = targetsIndex.get(j);
+                        DECharacter targ = availableTargets.get(index - 1);
+                        targets.add(targ);
                     }
 
-                    /*
-                    switch (choice) {
+                    for (DECharacter target : targets) {
+                        if (chosenAbility.getDamage() <= 0 && chosenAbility.getHealing() > 0) {
+                            players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
+                            target.setHealth(target.getHealth() + chosenAbility.getHealing());
+                        } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
+                            players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
+                            target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
+                        }
+                    }
 
-                        //Attack
-                        case 1:
-                            enemy.setHealth(enemy.getHealth() - playerEntities.get(i).getAttackDmg());
-                            players[i].clear();
-                            players[i].put("Hit! " + enemy.getCharacterName() + " now has " + enemy.getHealth() + " left!\n\n");
-                            break;
-                        //Heal
-                        case 2:
-                            if (playerEntities.get(i).getHealth() > 9) {
-                                playerEntities.get(i).setHealth(10);
-                                System.out.println("Healed some small ammount");
-                                break;
-                            } else {
-                                playerEntities.get(i).setHealth(playerEntities.get(i).getHealth() + 1);
-                                players[i].clear();
-                                System.out.println("Healed for 1!");
-                                break;
-                            }
-                    }*/
                 }
 
                 //Checks HP for NPC
                 if (enemy.getHealth() <= 0) {
-                    System.out.println("Well you've diddley done it! Congrats!");
                     enemyAlive = false;
                     for (int j = 0; j < players.length; j++) {
+                        players[i].put("You did killed the enemy");
+                        ifc.addHealthPotion(playerEntities.get(j), "small health potion", 10);
                         Long potionRank =(long) playerEntities.get(j).getLevel();
                         HealthPotion hp = ifc.getHealthPotionByID(potionRank);
                         ifc.addPotionToPlayer(playerEntities.get(j).getId(), hp);

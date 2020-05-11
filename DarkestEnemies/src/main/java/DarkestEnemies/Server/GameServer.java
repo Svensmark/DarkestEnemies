@@ -34,7 +34,7 @@ public class GameServer implements Runnable {
     @Override
     public void run() {
         try {
-            String adr = "192.168.0.43";
+            String adr = "192.168.56.1";
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on " + adr + ":" + port);
             int count = game.getNumberOfPlayers();
