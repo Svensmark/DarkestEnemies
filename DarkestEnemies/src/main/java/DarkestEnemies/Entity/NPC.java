@@ -6,10 +6,17 @@
 package DarkestEnemies.Entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -17,12 +24,12 @@ import javax.persistence.Id;
  */
 @Entity
 public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private String name;
     private int health;
     private int mana;
@@ -30,6 +37,9 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     private String role;
 
     
+    @OneToMany(mappedBy = "nPC")
+    private ArrayList<Ability> abilities;
+
     // Constructor for enemy NPC's
     public NPC(String name, int health, int mana, int attackDmg) {
         this.name = name;
@@ -47,14 +57,12 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
 
     public NPC() {
     }
-    
-    
-    
+
     @Override
     public ENUMTYPE getType() {
         return ENUMTYPE.NPC;
     }
-    
+
     @Override
     public String getCharacterName() {
         return name;
@@ -77,15 +85,13 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
 
     public String getRole() {
         return role;
-    } 
-    
-    
+    }
+
     @Override
     public void setCharacterName(String name) {
         this.name = name;
     }
 
-    
     @Override
     public void setHealth(int health) {
         this.health = health;
@@ -142,5 +148,15 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setHealthpotion(HealthPotion healthpotion) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    @Override
+    public List<Ability> getAbilities() {
+        return this.abilities;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
 }

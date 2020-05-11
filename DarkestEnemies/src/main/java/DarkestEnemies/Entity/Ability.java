@@ -5,20 +5,22 @@
  */
 package DarkestEnemies.Entity;
 
-import DarkestEnemies.IF.AbilityI;
 import DarkestEnemies.IF.DECharacter;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 
 /**
  *
  * @author Gamer
  */
 @Entity
-public class Ability implements Serializable, AbilityI {
+public class Ability implements DarkestEnemies.IF.AbilityI, Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -29,15 +31,22 @@ public class Ability implements Serializable, AbilityI {
     private int healing;
     
     private int amountOfTargets;
-    private int rank;
+    private int abilityRank;
     
     private String name;
     private String description;
+    
+    @ManyToOne
+    private Player player;
+    @ManyToOne
+    private NPC nPC;
+    
 
     
-    public Ability(int damage, int healing, int amountOfTargets, String name, String description) {
+    public Ability(int damage, int healing, int amountOfTargets, int abilityRank, String name, String description) {
         this.damage = damage;
         this.healing = healing;
+        this.abilityRank = abilityRank;
         this.name = name;
         this.description = description;
         this.amountOfTargets = amountOfTargets;
@@ -78,7 +87,7 @@ public class Ability implements Serializable, AbilityI {
 
     @Override
     public int getRank() {
-        return this.rank;
+        return this.abilityRank;
     }
 
     

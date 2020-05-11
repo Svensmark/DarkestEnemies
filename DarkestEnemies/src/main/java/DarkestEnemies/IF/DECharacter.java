@@ -5,13 +5,17 @@
  */
 package DarkestEnemies.IF;
 
+import DarkestEnemies.Entity.Ability;
 import DarkestEnemies.Entity.HealthPotion;
+import java.util.List;
 
 /**
  *
  * @author emilt
  */
 public interface DECharacter {
+
+    public String getName();
     //Get methods
     public enum ENUMTYPE{PLAYER, NPC};
     public ENUMTYPE getType();
@@ -21,6 +25,8 @@ public interface DECharacter {
     public int getAttackDmg();
     public int getLevel();
     public int getCurrentExp();
+    
+    public List<Ability> getAbilities();
     
     public HealthPotion getHealthpotion();
     public void setCharacterName(String name);
