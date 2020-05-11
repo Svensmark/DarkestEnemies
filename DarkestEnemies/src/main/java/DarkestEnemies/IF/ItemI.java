@@ -20,4 +20,5 @@ public interface ItemI {
     public void setInfo(String info);
     public void setValue(int value);
     
+    
 }

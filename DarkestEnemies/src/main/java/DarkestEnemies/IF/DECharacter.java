@@ -19,6 +19,7 @@ public interface DECharacter {
     //Get methods
     public enum ENUMTYPE{PLAYER, NPC};
     public ENUMTYPE getType();
+    public Long getId();
     public String getCharacterName();
     public int getHealth();
     public int getMana();

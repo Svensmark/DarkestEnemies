@@ -7,13 +7,12 @@ package DarkestEnemies.Entity;
 
 import DarkestEnemies.IF.DECharacter;
 import java.io.Serializable;
-import javax.persistence.CascadeType;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 
 /**
  *
@@ -28,11 +27,10 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     private Long id;
     private String name;
     private String info;
-    private int value; 
-    
-    @ManyToOne(cascade=CascadeType.PERSIST)
-    @JoinColumn(name="Something")
-    private Player player;
+    private int value;
+
+    @ManyToMany
+    private List<Player> player;
 
     public HealthPotion(String name, int value) {
         this.name = name;
@@ -42,10 +40,6 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
 
     public HealthPotion() {
     }
-    
-    
-    
-    
 
     public Long getId() {
         return id;
@@ -84,6 +78,8 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     public void setValue(int value) {
         this.value = value;
     }
+    
+    
 
     @Override
     public void use(DECharacter player) {
@@ -93,5 +89,5 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     }
 
    
-    
+
 }

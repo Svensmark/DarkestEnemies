@@ -42,10 +42,10 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     private int neededExp;
     
     //Inventory
-    //@OneToMany(mappedBy = "player")
-    //private List<HealthPotion> healthpotion;     //Skal ændres til en liste af ItemI på et tidspunkt i fremtiden
+    private List<HealthPotion> healthpotion;      //Skal ændres til en liste af ItemI på et tidspunkt i fremtiden
     private int gold;
     
+    //Abilities
     @ManyToMany
     private List<Ability> abilities;
 
@@ -151,6 +151,7 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         this.attackDmg = attackDmg;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -170,12 +171,11 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     
     @Override
     public List<HealthPotion> getHealthpotion() {
-        //return healthpotion;
-        return null;
+        return healthpotion;
     }
 
     public void addHealthpotion(HealthPotion healthpotion) {
-        //this.healthpotion.add(healthpotion);        
+        this.healthpotion.add(healthpotion);        
     }
 
     

@@ -7,6 +7,7 @@ package DarkestEnemies.facades;
 
 import DarkestEnemies.Entity.Ability;
 import DarkestEnemies.Entity.Player;
+import DarkestEnemies.exceptions.CharacterNotFoundException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -51,6 +52,15 @@ public class PlayerFacade {
         } finally {
             em.close();            
         }
+    }
+    
+    public Player getPlayerByID(Long id) throws CharacterNotFoundException{
+        EntityManager em = getEntityManager();
+        Player player = em.find(Player.class, id);
+        if(player == null){
+            throw new CharacterNotFoundException("Character with that ID was not found.");
+        }
+        return player;
     }
     
     public void addAbilityToPlayer(Long playerID, Ability ability) {

@@ -7,6 +7,7 @@ package DarkestEnemies.Server;
 
 import DarkestEnemies.Entity.Ability;
 import DarkestEnemies.Entity.Account;
+import DarkestEnemies.Entity.HealthPotion;
 import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.exceptions.AccountNotFoundException;
@@ -24,6 +25,7 @@ import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
 import utils.EMF_Creator;
 import DarkestEnemies.IF.DECharacter;
+import DarkestEnemies.exceptions.ItemNotFoundException;
 
 /**
  *
@@ -49,13 +51,17 @@ public class DarkestEnemiesGame implements ITextGame {
         //Main loop
         while (true) {
 
-            //Main menu
-            mainMenu(players, playerEntities);
+            try {
+                //Main menu
+                mainMenu(players, playerEntities);
+            } catch (ItemNotFoundException ex) {
+                Logger.getLogger(DarkestEnemiesGame.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
         }
     }
 
-    private void mainMenu(ITextIO[] players, List<DECharacter> playerEntities) {
+    private void mainMenu(ITextIO[] players, List<DECharacter> playerEntities) throws ItemNotFoundException {
 
         //Start Announcement
         for (int i = 0; i < players.length; i++) {
@@ -201,7 +207,7 @@ public class DarkestEnemiesGame implements ITextGame {
         return new NPC(name, health, mana, attack);
     }
 
-    private void firstEncounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) {
+    private void firstEncounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) throws ItemNotFoundException {
         //Setups bools
         boolean playerAlive = true;
         boolean enemyAlive = true;
@@ -302,7 +308,9 @@ public class DarkestEnemiesGame implements ITextGame {
                     System.out.println("Well you've diddley done it! Congrats!");
                     enemyAlive = false;
                     for (int j = 0; j < players.length; j++) {
-                        ifc.addHealthPotion(playerEntities.get(j), "small health potion", 10);
+                        Long potionRank =(long) playerEntities.get(j).getLevel();
+                        HealthPotion hp = ifc.getHealthPotionByID(potionRank);
+                        ifc.addPotionToPlayer(playerEntities.get(j).getId(), hp);
                     }
                     break;
                 }
