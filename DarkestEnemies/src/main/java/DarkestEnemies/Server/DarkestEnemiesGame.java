@@ -222,8 +222,7 @@ public class DarkestEnemiesGame implements ITextGame {
         return new NPC(name, health, mana, attack);
     }
 
-    private void encounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) {
-        players[i].clear();
+    private void encounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) throws ItemNotFoundException {
         //Setups bools
         boolean playerAlive = true;
         boolean enemyAlive = true;
@@ -313,7 +312,6 @@ public class DarkestEnemiesGame implements ITextGame {
                     enemyAlive = false;
                     for (int j = 0; j < players.length; j++) {
                         players[i].put("You did killed the enemy");
-                        ifc.addHealthPotion(playerEntities.get(j), "small health potion", 10);
                         Long potionRank =(long) playerEntities.get(j).getLevel();
                         HealthPotion hp = ifc.getHealthPotionByID(potionRank);
                         ifc.addPotionToPlayer(playerEntities.get(j).getId(), hp);
