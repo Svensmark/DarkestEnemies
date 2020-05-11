@@ -7,10 +7,12 @@ package DarkestEnemies.Entity;
 
 import DarkestEnemies.IF.DECharacter;
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -27,6 +29,8 @@ public class Account implements Serializable {
 
     private String username;
     private String password;
+    
+    @OneToOne(cascade=CascadeType.PERSIST)
     private Player character;
     
     public Account() {

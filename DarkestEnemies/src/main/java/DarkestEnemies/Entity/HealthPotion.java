@@ -7,10 +7,12 @@ package DarkestEnemies.Entity;
 
 import DarkestEnemies.IF.DECharacter;
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
@@ -27,7 +29,9 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     private String name;
     private String info;
     private int value; 
-    @ManyToOne
+    
+    @ManyToOne(cascade=CascadeType.PERSIST)
+    @JoinColumn(name="Something")
     private Player player;
 
     public HealthPotion(String name, int value) {

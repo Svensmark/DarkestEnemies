@@ -5,15 +5,15 @@
  */
 package DarkestEnemies.Entity;
 
-import DarkestEnemies.IF.DECharacter;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 
 /**
  *
@@ -34,12 +34,13 @@ public class Ability implements DarkestEnemies.IF.AbilityI, Serializable {
     private int abilityRank;
     
     private String name;
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
     
-    @ManyToOne
-    private Player player;
-    @ManyToOne
-    private NPC nPC;
+    @ManyToMany
+    private List<NPC> nPCs;    
+    @ManyToMany
+    private List<Player> player;
     
 
     

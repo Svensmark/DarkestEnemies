@@ -6,17 +6,13 @@
 package DarkestEnemies.Entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 
 /**
  *
@@ -34,11 +30,10 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     private int health;
     private int mana;
     private int attackDmg;
-    private String role;
+    //private String role;
 
-    
-    @OneToMany(mappedBy = "nPC")
-    private ArrayList<Ability> abilities;
+    @ManyToMany
+    private List<Ability> abilities;
 
     // Constructor for enemy NPC's
     public NPC(String name, int health, int mana, int attackDmg) {
@@ -46,13 +41,13 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
         this.health = health;
         this.mana = mana;
         this.attackDmg = attackDmg;
-        this.role = "Enemy";
+        //this.role = "Enemy";
     }
 
     // Constructor for friendly NPC's
     public NPC(String name) {
         this.name = name;
-        this.role = "Friendly";
+        //this.role = "Friendly";
     }
 
     public NPC() {
@@ -83,10 +78,9 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
         return attackDmg;
     }
 
-    public String getRole() {
-        return role;
-    }
-
+//    public String getRole() {
+//        return role;
+//    }
     @Override
     public void setCharacterName(String name) {
         this.name = name;
@@ -107,10 +101,9 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
         this.attackDmg = attackDmg;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-
+//    public void setRole(String role) {
+//        this.role = role;
+//    }
     public Long getId() {
         return id;
     }
@@ -139,8 +132,6 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    
-
     @Override
     public void addHealthpotion(HealthPotion healthpotion) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -155,7 +146,11 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public List<Ability> getAbilities() {
         return this.abilities;
     }
-
+    
+     public void addAbilities(Ability ability) {
+        this.abilities.add(ability);
+    }
+    
     @Override
     public String getName() {
         return this.name;

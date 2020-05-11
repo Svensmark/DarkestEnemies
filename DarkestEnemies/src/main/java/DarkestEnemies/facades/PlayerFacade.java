@@ -42,12 +42,28 @@ public class PlayerFacade {
         }
     }
     
-    public void addAbilityToPlayer(Player player, Ability ability) {
+    public void persistPlayer(Player player) {
         EntityManager em = getEntityManager();
-        player.addAbility(ability);
         try {
-            em.getTransaction().begin();            
-            em.merge(player);
+            em.getTransaction().begin();
+            em.persist(player);
+            em.getTransaction().commit();
+        } finally {
+            em.close();            
+        }
+    }
+    
+    public void addAbilityToPlayer(Long playerID, Ability ability) {
+        EntityManager em = getEntityManager();
+         
+        try {
+            em.getTransaction().begin();    
+            Player foundPlayer = em.find(Player.class, playerID);
+            Ability foundAbility = em.find(Ability.class, ability.getId());
+            
+            foundPlayer.addAbility(foundAbility);
+            
+            em.merge(foundPlayer);
             em.getTransaction().commit();
         } finally {
             em.close();            
