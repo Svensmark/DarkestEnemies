@@ -8,10 +8,12 @@ package DarkestEnemies.Entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 /**
@@ -40,7 +42,8 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     @OneToMany(mappedBy = "player")
     private List<HealthPotion> healthpotion;     //Skal ændres til en liste af ItemI på et tidspunkt i fremtiden
     private int gold;
-    
+        
+    @OneToMany(mappedBy = "player")
     private ArrayList<Ability> abilities;
 
     public Player(String name, int health, int mana, int attackDmg, int level) {
@@ -185,6 +188,13 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     public void addAbility(Ability ability) {
         this.abilities.add(ability);
     }
+
+    @Override
+    public List<Ability> getAbilities() {
+        return this.abilities;
+    }
+
+
     
     
     

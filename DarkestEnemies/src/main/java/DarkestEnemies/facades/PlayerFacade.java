@@ -43,8 +43,15 @@ public class PlayerFacade {
     }
     
     public void addAbilityToPlayer(Player player, Ability ability) {
+        EntityManager em = getEntityManager();
         player.addAbility(ability);
-        updatePlayer(player);
+        try {
+            em.getTransaction().begin();            
+            em.merge(player);
+            em.getTransaction().commit();
+        } finally {
+            em.close();            
+        }
     }
     
     public void addGoldToPlayer(Player player, int amount) {
