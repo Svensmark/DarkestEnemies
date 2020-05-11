@@ -29,28 +29,28 @@ public class testMain {
         AccountFacade acF = AccountFacade.getAccountFacade(_emf);
         PlayerFacade pF = PlayerFacade.getPlayerFacade(_emf);
         AbilityFacade abF = AbilityFacade.getAbilityFacade(_emf);
-        
-        Ability ability1 = new Ability(15, 0, 1, 1, "Fuck", "Fucks the target very hard");
-        Ability ability2 = new Ability(1000, 0, 1, 1, "Execute", "Executes the target");
-        abF.persistAbility(ability1);
-        abF.persistAbility(ability2);
-
-        List<Ability> abilities = new ArrayList();        
-        abilities.add(ability1);
-        
-        
-        Player player1 = new Player("Name", 10000, 10000, 10000, 10000, abilities);        
-        pF.persistPlayer(player1);
-        
-        
-        /*
 //        
-        Player cha = (Player) acF.login("Svense1", "test");
-        System.out.println(cha.getName());
+//        Ability ability1 = new Ability(15, 0, 1, 1, "Fuck", "Fucks the target very hard");
+//        Ability ability2 = new Ability(1000, 0, 1, 1, "Execute", "Executes the target");
+//        abF.persistAbility(ability1);
+//        abF.persistAbility(ability2);
+//
+//        List<Ability> abilities = new ArrayList();        
+//        abilities.add(ability1);
+//        
+//        
+//        Player player1 = new Player("Name", 10000, 10000, 10000, 10000, abilities);        
+//        pF.persistPlayer(player1);
+        
+        
+       
+//        
+        
+        Player player = pF.getPlayerByName("name");
         Ability abi = abF.getAbilityByName("Execute");
-        System.out.println(abi.getName());
 
-        pF.addAbilityToPlayer(cha.getId(), abi);*/
+        
+        pF.addAbilityToPlayer(player.getId(), abi);
 
     }
 

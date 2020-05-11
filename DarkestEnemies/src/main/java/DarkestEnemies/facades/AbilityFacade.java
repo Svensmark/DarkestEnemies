@@ -20,11 +20,10 @@ import utils.EMF_Creator;
  * @author Gamer
  */
 public class AbilityFacade {
-    
+
     private static AbilityFacade instance;
     private static EntityManagerFactory emf;
-    
-    
+
     public static AbilityFacade getAbilityFacade(EntityManagerFactory _emf) {
         if (instance == null) {
             emf = _emf;
@@ -36,8 +35,7 @@ public class AbilityFacade {
     private EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
-    
-    
+
     public Ability persistAbility(Ability ability) {
         EntityManager em = getEntityManager();
         try {
@@ -49,18 +47,30 @@ public class AbilityFacade {
             em.close();
         }
     }
-    
-    public Ability getAbilityByName(String name) throws AbilityNotFoundException{
+
+    public Ability getAbilityByName(String name) throws AbilityNotFoundException {
         Query query = getEntityManager().createQuery("SELECT ability FROM Ability ability WHERE ability.name = :name", Ability.class);
-        List<Ability> ability = query.setParameter("name", name).getResultList();     
-        
+        List<Ability> ability = query.setParameter("name", name).getResultList();
+
         //The ability was not found
         if (ability.isEmpty()) {
             throw new AbilityNotFoundException("Something went wrong, no ability found with that name");
         }
-        
+
         return ability.get(0);
     }
-    
-    
+
+    public void setupBasicAbilities() {
+        try {
+            getAbilityByName("slam");
+        } catch (AbilityNotFoundException e) {
+            Ability slam = new Ability(8, 0, 1, 1, "Slam", "Executes the target");
+            Ability fireball = new Ability(10, 0, 1, 1, "fireball", "Hurls a conjured fireball at the target!");
+
+            persistAbility(slam);
+            persistAbility(fireball);
+        }
+
+    }
+
 }
