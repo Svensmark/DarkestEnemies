@@ -6,6 +6,7 @@
 package DarkestEnemies.Entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -133,13 +134,15 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    
+
     @Override
-    public HealthPotion getHealthpotion() {
+    public void addHealthpotion(HealthPotion healthpotion) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void setHealthpotion(HealthPotion healthpotion) {
+    public List<HealthPotion> getHealthpotion() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

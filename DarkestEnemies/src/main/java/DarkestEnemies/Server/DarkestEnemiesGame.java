@@ -88,15 +88,25 @@ public class DarkestEnemiesGame implements ITextGame {
 
                     //Player chooses inventory
                     case 2:
-                        players[i].put("Not implemented yet");
-                        playerEntities.get(i).getHealthpotion().getInfo();
-                        playerEntities.get(i).getHealthpotion().getId();
-                        List<String> inventoryOptions = Arrays.asList("Use potion", "Go back");
+                        
+                        for(int j = 0; j < playerEntities.get(i).getHealthpotion().size(); j++){
+                            players[i].put(playerEntities.get(i).getHealthpotion().get(j).getInfo());
+                        }
+                        
+                        List<String> inventoryOptions = Arrays.asList();
+                        for(int j = 0; j < playerEntities.get(i).getHealthpotion().size(); j++){
+                            inventoryOptions.add("Use " + playerEntities.get(i).getHealthpotion().get(j).getName() + "with index" + j);
+                        }
+                        inventoryOptions.add("Go Back");
+                        
                         int inventoryChoice = players[i].select("Inventory", inventoryOptions, "");
+                        
                         switch(inventoryChoice){
+                            
                             case 1:
-                                ifc.useHealthPotion(playerEntities.get(i));
-                                playerEntities.get(i).getHealthpotion().use(playerEntities.get(i));
+                                players[i].put("Enter the index of the potion you wish to use.");
+                                ifc.useHealthPotion(playerEntities.get(i), players[i].getInteger(0, inventoryOptions.size() - 1));
+                                //playerEntities.get(i).getHealthpotion().use(playerEntities.get(i));
                                 break;
                             case 2:
                                 break;

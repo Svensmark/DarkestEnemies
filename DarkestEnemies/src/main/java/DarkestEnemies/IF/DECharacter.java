@@ -6,6 +6,7 @@
 package DarkestEnemies.IF;
 
 import DarkestEnemies.Entity.HealthPotion;
+import java.util.List;
 
 /**
  *
@@ -22,14 +23,14 @@ public interface DECharacter {
     public int getLevel();
     public int getCurrentExp();
     
-    public HealthPotion getHealthpotion();
+    public List<HealthPotion> getHealthpotion();
     public void setCharacterName(String name);
     public void setHealth(int health);
     public void setMana(int mana);
     public void setAttackDmg(int atk);
     public void setLevel(int level);
     public void setCurrentExp(int currentExp);
-    public void setHealthpotion(HealthPotion healthpotion);
+    public void addHealthpotion(HealthPotion healthpotion);
     
     
     

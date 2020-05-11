@@ -36,7 +36,7 @@ public class InventoryFacade {
     
     public void addHealthPotion(DECharacter character, String name, int value){
         EntityManager em = getEntityManager();
-        character.setHealthpotion(new HealthPotion(name, value));
+        character.addHealthpotion(new HealthPotion(name, value));
         try{
             em.getTransaction().begin();
             em.merge(character);
@@ -46,9 +46,16 @@ public class InventoryFacade {
         }
     }
     
-    public void useHealthPotion(DECharacter character){
+//    public void getHealthPotions(){
+//        EntityManager em = getEntityManager();
+//        Query query = getEntityManager().createQuery("SELECT healthpotion FROM HEALTHPOTION ")
+//         Query query = getEntityManager().createQuery("SELECT ability FROM Ability ability WHERE ability.name = :name", Ability.class);
+//        List<Ability> ability = query.setParameter("name", name).getResultList(); 
+//    }
+//    
+    public void useHealthPotion(DECharacter character, int index){
         EntityManager em = getEntityManager();
-        character.getHealthpotion().use(character);
+        character.getHealthpotion().get(index).use(character);
         try{
             em.getTransaction().begin();
             em.merge(character);

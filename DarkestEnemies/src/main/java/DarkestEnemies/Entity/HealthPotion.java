@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -26,6 +27,8 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     private String name;
     private String info;
     private int value; 
+    @ManyToOne
+    private Player player;
 
     public HealthPotion(String name, int value) {
         this.name = name;
