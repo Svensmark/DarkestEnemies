@@ -73,9 +73,9 @@ public class InventoryFacade {
         return hp;
     }
 
-    public void useHealthPotion(DECharacter character, int index) {
+    public void useHealthPotion(DECharacter character, HealthPotion hp) {
         EntityManager em = getEntityManager();
-        character.getHealthpotion().get(index).use(character);
+        character.setHealth(character.getHealth() + hp.getValue());
         try {
             em.getTransaction().begin();
             em.merge(character);

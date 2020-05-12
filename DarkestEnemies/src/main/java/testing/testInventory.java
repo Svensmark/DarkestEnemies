@@ -30,30 +30,33 @@ public class testInventory {
         PlayerFacade pfc = PlayerFacade.getPlayerFacade(_emf);
         AccountFacade acF = AccountFacade.getAccountFacade(_emf);
         InventoryFacade ifc = InventoryFacade.getInventoryFacade(_emf);
-//        Player player1 = new Player("Emil");
-//        Account acc1 = acF.createAccount("Svense", "test");
-//        acF.addCharacterToAccount(acc1, player1);
-//
-//        //Setups an account and a character to that account:
-//        Player player2 = new Player("Asger");
-//        Account acc2 = acF.createAccount("Asger", "test");
-//        acF.addCharacterToAccount(acc2, player2);
-//        
-//        HealthPotion hp1 = new HealthPotion("smaller hp", 10);
-//        HealthPotion hp2 = new HealthPotion("small hp", 20);
-//        
-//
-//        ifc.addHealthPotion(hp1);
-//        ifc.addHealthPotion(hp2);
-        HealthPotion hp1 = ifc.getHealthPotionByID(1L);
-        HealthPotion hp2 = ifc.getHealthPotionByID(2L);
-        Player player1 = pfc.getPlayerByID(1L);
-        Player player2 = pfc.getPlayerByID(2L);
+        Player player1 = new Player("Emil");
+        Account acc1 = acF.createAccount("Svense", "test");
+        acF.addCharacterToAccount(acc1, player1);
+
+        //Setups an account and a character to that account:
+        Player player2 = new Player("Asger");
+        Account acc2 = acF.createAccount("Asger", "test");
+        acF.addCharacterToAccount(acc2, player2);
         
-        ifc.addPotionToPlayer(player1.getId(), hp1);
-        ifc.addPotionToPlayer(player1.getId(), hp2);
-        ifc.addPotionToPlayer(player2.getId(), hp1);
-        ifc.addPotionToPlayer(player2.getId(), hp2);
+        HealthPotion hp1 = new HealthPotion("smaller hp", 10);
+        HealthPotion hp2 = new HealthPotion("small hp", 20);
+        
+
+        ifc.addHealthPotion(hp1);
+        ifc.addHealthPotion(hp2);
+
+
+
+//        HealthPotion hp1 = ifc.getHealthPotionByID(1L);
+//        HealthPotion hp2 = ifc.getHealthPotionByID(2L);
+//        Player player1 = pfc.getPlayerByID(1L);
+//        Player player2 = pfc.getPlayerByID(2L);
+//        
+//        ifc.addPotionToPlayer(player1.getId(), hp1);
+//        ifc.addPotionToPlayer(player1.getId(), hp2);
+//        ifc.addPotionToPlayer(player2.getId(), hp1);
+//        ifc.addPotionToPlayer(player2.getId(), hp2);
 
     }
 }
