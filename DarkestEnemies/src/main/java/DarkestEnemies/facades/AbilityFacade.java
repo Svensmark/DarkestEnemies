@@ -64,11 +64,11 @@ public class AbilityFacade {
         try {
             getAbilityByName("slam");
         } catch (AbilityNotFoundException e) {
-            Ability slam = new Ability(8, 0, 1, 1, "Slam", "Executes the target");
-            Ability fireball = new Ability(10, 0, 1, 1, "fireball", "Hurls a conjured fireball at the target!");
+            Ability slam = new Ability(8, 0, 1, 1, "Slam", "Slams the target very hard!");
+            Ability heal = new Ability(0, 10, 1, 1, "Heal", "Heals your target, increases their current health to live longer!");
 
             persistAbility(slam);
-            persistAbility(fireball);
+            persistAbility(heal);
         }
 
     }

@@ -70,11 +70,41 @@ public class DarkestEnemiesGame implements ITextGame {
 
         }
     }
+    
+    //First method called - sets up players 
+    private List<DECharacter> playerSetup(ITextIO[] players) {
+        List<DECharacter> playerEntities = new ArrayList();
+        //Player setup
+        for (int i = 0; i < players.length; i++) {
+ 
+            //Login & Create account
+            List<String> options = Arrays.asList("Login", "Create account");
+            players[i].clear();
+            int option = players[i].select("Please choose an option", options, "");
+
+            switch (option) {
+
+                //User chooses to login
+                case 1:
+                    i = login(players, i, playerEntities);
+                    break;
+
+                //User chooses to create account    
+                case 2:
+                    createAccount(players[i]);
+                    i--;
+                    break;
+            }
+        }
+        return playerEntities;
+    }
 
     private void mainMenu(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException {
 
         //Start Announcement
         for (int i = 0; i < playersIO.length; i++) {
+            //Clears the screen
+            playersIO[i].clear();
 
             //The player in players list is in menu
             boolean menu = true;
@@ -103,6 +133,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
                             //Encounter
                             encounter(playersIO, allCharacters, players, enemies, true);
+                            i--;
                             break;
                         }
 
@@ -142,32 +173,6 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    private List<DECharacter> playerSetup(ITextIO[] players) {
-        List<DECharacter> playerEntities = new ArrayList();
-        //Player setup
-        for (int i = 0; i < players.length; i++) {
- 
-            //Login & Create account
-            List<String> options = Arrays.asList("Login", "Create account");
-            int option = players[i].select("Please choose an option", options, "");
-
-            switch (option) {
-
-                //User chooses to login
-                case 1:
-                    i = login(players, i, playerEntities);
-                    break;
-
-                //User chooses to create account    
-                case 2:
-                    createAccount(players[i]);
-                    i--;
-                    break;
-            }
-        }
-        return playerEntities;
-    }
-
     private int login(ITextIO[] players, int i, List<DECharacter> playerEntities) {
         try {
             AccountFacade af = AccountFacade.getAccountFacade(emf);
@@ -203,8 +208,9 @@ public class DarkestEnemiesGame implements ITextGame {
         //Adds the start ability to the player "slam"
         try {
             pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("slam"));
+            pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("heal"));
         } catch (AbilityNotFoundException e) {
-            playerIO.put("Something went wrong with getting the \"slam\" ability");
+            playerIO.put("Something went wrong with getting the start abilities");
         }
     }
 
@@ -238,13 +244,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
         //Introduction to encounter if it is a PVE matchup
         if (pve) {
-            for (int i = 0; i < playersIO.length; i++) {
-                playersIO[i].clear();
-                playersIO[i].put("You've encountered the following: \n");
-                for (DECharacter enemy : team2) {
-                    playersIO[i].put(enemy.getName() + "\n");
-                }
-            }
+            pveIntro(playersIO, team2);
         } else { //Introduction to encounter if it is a PVP matchup 
         }
 
@@ -305,10 +305,27 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
+    private void pveIntro(ITextIO[] playersIO, List<DECharacter> team2) {
+        for (int i = 0; i < playersIO.length; i++) {
+            playersIO[i].clear();
+            playersIO[i].put("You've encountered the following: \n");
+            for (DECharacter enemy : team2) {
+                printNPCStats(playersIO[i], enemy);
+            }
+        }        
+    }
+
+    private void printNPCStats(ITextIO playerIO, DECharacter npc) {
+        playerIO.put(npc.getName() + "\n");
+        playerIO.put("- " + npc.getHealth()+ " HP \n");
+        playerIO.put("- " + npc.getAttackDmg()+ " ATK \n\n");
+    }
+
     private void npcAction(ITextIO[] playersIO, List<DECharacter> opposingTeam, NPC npc) {
         for (int j = 0; j < playersIO.length; j++) {
             opposingTeam.get(j).setHealth(opposingTeam.get(j).getHealth() - npc.getAttackDmg());
-            playersIO[j].put(npc.getName() + " has hit you for " + npc.getAttackDmg() + ". \nYou now have " + opposingTeam.get(j).getHealth() + " hp left!\n");
+            playersIO[j].put(npc.getName() + " has hit you for " + npc.getAttackDmg() + ". \nYou now have " + opposingTeam.get(j).getHealth() + " hp left!\n\n");
+            printNPCStats(playersIO[j], npc);
         }
     }
 
@@ -323,7 +340,6 @@ public class DarkestEnemiesGame implements ITextGame {
         for (Ability ab : abilities) {
             actions.add(ab.getName() + "\n" + "  - " + ab.getDescription());
         }
-        players[i].put("\n");
         int choice = players[i].select("What do you wish to do?", actions, "");
 
         //Gets the chosen ability
@@ -361,6 +377,10 @@ public class DarkestEnemiesGame implements ITextGame {
                 players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             }
         }
+        
+        players[i].get();
+        players[i].clear();
+        players[i].put("Waiting for players..");
     }
 
 }
