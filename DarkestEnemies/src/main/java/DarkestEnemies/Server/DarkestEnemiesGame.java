@@ -160,7 +160,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
                 //User chooses to create account    
                 case 2:
-                    createAccount(players, i);
+                    createAccount(players[i]);
                     i--;
                     break;
             }
@@ -190,21 +190,21 @@ public class DarkestEnemiesGame implements ITextGame {
         return i;
     }
 
-    private void createAccount(ITextIO[] players, int i) {
+    private void createAccount(ITextIO playerIO) {
         //Creates a new player, adds it to the database and writes it out to the IO
-        String playerName = pF.createNewPlayer(players[i]).getCharacterName();
+        String playerName = pF.createNewPlayer(playerIO).getCharacterName();
         Player player = null;
         try {
             player = pF.getPlayerByName(playerName);
         } catch (PlayerNotFoundException e) {
-            players[i].put("Something went wrong with finding the player by name: " + playerName);
+            playerIO.put("Something went wrong with finding the player by name: " + playerName);
         }
 
         //Adds the start ability to the player "slam"
         try {
             pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("slam"));
         } catch (AbilityNotFoundException e) {
-            players[i].put("Something went wrong with getting the \"slam\" ability");
+            playerIO.put("Something went wrong with getting the \"slam\" ability");
         }
     }
 
