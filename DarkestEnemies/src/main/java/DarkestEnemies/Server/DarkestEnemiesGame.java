@@ -113,7 +113,7 @@ public class DarkestEnemiesGame implements ITextGame {
                         ArrayList<String> actions = new ArrayList();
                         
                         //List of all the healthpotions that the user has. 
-                        List<HealthPotion> healthpotions = playerEntities.get(i).getHealthpotion();
+                        List<HealthPotion> healthpotions = players.get(i).getHealthpotion();
                         
                         //For each health potion the user has, it is added to the action array.
                         for(HealthPotion hp : healthpotions){
@@ -121,11 +121,11 @@ public class DarkestEnemiesGame implements ITextGame {
                         }
                         
                         //User is presented with all the options it can take.
-                        int choice = players[i].select("Which potion do you wish to use?", actions, "");
+                        int choice = playersIO[i].select("Which potion do you wish to use?", actions, "");
                         
                         //Gets the chosen health potion from the database and applies it to the user. 
                         HealthPotion chosen = ifc.getHealthPotionByID(healthpotions.get(choice - 1).getId());
-                        ifc.useHealthPotion(playerEntities.get(i), chosen);
+                        ifc.useHealthPotion(players.get(i), chosen);
                         break;
                     //Player logs out
                     case 3: {
