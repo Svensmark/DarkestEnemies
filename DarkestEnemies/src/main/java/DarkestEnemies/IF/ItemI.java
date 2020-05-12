@@ -14,11 +14,15 @@ import DarkestEnemies.Entity.Player;
 public interface ItemI {
     public String getName();
     public String getInfo();
-    public int getValue();
-    public void use(DECharacter player);
+    public int getManaValue();
+    public int getHealingValue();
+    public int getDmgIncreaseValue();
+    
     public void setName(String name);
     public void setInfo(String info);
-    public void setValue(int value);
+    public void setManaValue(int value);
+    public void setHealingValue(int value);
+    public void setDmgIncreaseValue(int value);
     
     
 }
