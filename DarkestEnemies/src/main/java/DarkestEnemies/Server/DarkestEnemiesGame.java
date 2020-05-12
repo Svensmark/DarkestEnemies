@@ -90,7 +90,7 @@ public class DarkestEnemiesGame implements ITextGame {
                             break;
                         } else {
                             //enemy setup
-                            NPC enemy = enemySetup(players, playersIO);
+                            NPC enemy = createNPC(players);
 
                             //encounter setup
                             List<DECharacter> allCharacters = new ArrayList();
@@ -208,20 +208,19 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    private NPC enemySetup(List<DECharacter> playerEntities, ITextIO[] players) {
-
+    private NPC createNPC(List<DECharacter> playerEntities) {
         //Initizialation of stats
         int health = 0;
         int mana = 0;
         int attack = 0;
 
         //Scales the health up for each player in the group
-        for (int i = 0; i < players.length; i++) {
+        for (int i = 0; i < playerEntities.size(); i++) {
             health += (playerEntities.get(i).getLevel() * 5) + (playerEntities.get(i).getAttackDmg() * 2.5);
         }
 
         //Scales the attack damage up for each player in the group
-        for (int i = 0; i < players.length; i++) {
+        for (int i = 0; i < playerEntities.size(); i++) {
             attack += ((playerEntities.get(i).getLevel() * 5) / 2.5) + (health / 10);
         }
 
