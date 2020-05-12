@@ -30,24 +30,15 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     private int health;
     private int mana;
     private int attackDmg;
-    //private String role;
 
     @ManyToMany
     private List<Ability> abilities;
 
-    // Constructor for enemy NPC's
     public NPC(String name, int health, int mana, int attackDmg) {
         this.name = name;
         this.health = health;
         this.mana = mana;
         this.attackDmg = attackDmg;
-        //this.role = "Enemy";
-    }
-
-    // Constructor for friendly NPC's
-    public NPC(String name) {
-        this.name = name;
-        //this.role = "Friendly";
     }
 
     public NPC() {
@@ -100,10 +91,8 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setAttackDmg(int attackDmg) {
         this.attackDmg = attackDmg;
     }
-
-//    public void setRole(String role) {
-//        this.role = role;
-//    }
+    
+    @Override
     public Long getId() {
         return id;
     }
