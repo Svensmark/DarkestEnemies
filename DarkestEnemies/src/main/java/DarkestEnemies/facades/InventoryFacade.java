@@ -5,7 +5,7 @@
  */
 package DarkestEnemies.facades;
 
-import DarkestEnemies.Entity.HealthPotion;
+import DarkestEnemies.Entity.Potion;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.ItemNotFoundException;
@@ -36,25 +36,41 @@ public class InventoryFacade {
         return emf.createEntityManager();
     }
 
-    public void addHealthPotion(HealthPotion healthpotion) {
+    public void addPotion(Potion potion) {
         EntityManager em = getEntityManager();
-        HealthPotion hp = new HealthPotion(healthpotion.getName(), healthpotion.getValue());
+
+        Potion pot = new Potion(potion.getName(), potion.getInfo(), potion.getHealingValue(), potion.getManaValue(), potion.getDmgIncreaseValue());
+
         try {
             em.getTransaction().begin();
-            em.persist(hp);
+            em.persist(pot);
             em.getTransaction().commit();
         } finally {
             em.close();
         }
     }
 
-    public void addPotionToPlayer(Long id, HealthPotion hp) {
+    public void addDamagePotion(Potion potion) {
+        EntityManager em = getEntityManager();
+
+        Potion pot = new Potion(potion.getName(), potion.getInfo(), potion.getHealingValue(), potion.getManaValue(), potion.getDmgIncreaseValue());
+
+        try {
+            em.getTransaction().begin();
+            em.persist(pot);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+
+    public void addPotionToPlayer(Long id, Potion potion) {
         EntityManager em = getEntityManager();
         try {
             em.getTransaction().begin();
             Player player = em.find(Player.class, id);
-            HealthPotion healthpotion = em.find(HealthPotion.class, hp.getId());
-            player.addHealthpotion(healthpotion);
+            Potion pot = em.find(Potion.class, potion.getId());
+            player.addHealthpotion(pot);
 
             em.merge(player);
             em.getTransaction().commit();
@@ -63,25 +79,48 @@ public class InventoryFacade {
         }
     }
 
-    public HealthPotion getHealthPotionByID(Long id) throws ItemNotFoundException {
+    public Potion getPotionByID(Long id) throws ItemNotFoundException {
         EntityManager em = getEntityManager();
-        HealthPotion hp = em.find(HealthPotion.class, id);
-        if(hp == null){
+        Potion hp = em.find(Potion.class, id);
+        if (hp == null) {
             throw new ItemNotFoundException("Item doesn't seem to exist.");
         }
-        
+
         return hp;
     }
 
-    public void useHealthPotion(DECharacter character, HealthPotion hp) {
+    public void usePotion(DECharacter character, Potion potion) {
         EntityManager em = getEntityManager();
-        character.setHealth(character.getHealth() + hp.getValue());
+        if (potion.getHealingValue() > 0 || potion.getManaValue() > 0) {
+            
+            if ((character.getHealth() + potion.getHealingValue()) > character.getMaxHealth()) {
+                character.setHealth(character.getMaxHealth());
+            } else {
+                character.setHealth(character.getHealth() + potion.getHealingValue());
+            }
+            
+            if ((character.getMana() + potion.getManaValue()) > character.getMaxMana()) {
+                character.setMana(character.getMaxMana());
+            } else {
+                character.setMana(character.getMana() + potion.getManaValue());
+            }
+        }
+        int currentAtk = character.getAttackDmg();
+        if (character.getAttackDmg() > character.getMaxAttackDmg()) {
+            character.setAttackDmg(character.getMaxAttackDmg());
+        }
         try {
             em.getTransaction().begin();
             em.merge(character);
             em.getTransaction().commit();
         } finally {
             em.close();
+        }
+        if (potion.getDmgIncreaseValue() > 0) {
+            character.setAttackDmg(character.getAttackDmg() + potion.getDmgIncreaseValue());
+            System.out.println(character.getAttackDmg());
+        } else {
+            character.setAttackDmg(currentAtk);
         }
     }
 }

@@ -6,18 +6,12 @@
 package DarkestEnemies.Entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 
 /**
  *
@@ -35,34 +29,43 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     
     //Mandatory stats
     private int health;
+    private int maxHealth;
     private int mana;
+    private int maxMana;
     private int attackDmg;
+    private int maxAttackDmg;
     private int level;
     private int currentExp;
     private int neededExp;
     
     //Inventory
-    private List<HealthPotion> healthpotion;      //Skal ændres til en liste af ItemI på et tidspunkt i fremtiden
+    private List<Potion> healthpotion;      //Skal ændres til en liste af ItemI på et tidspunkt i fremtiden
     private int gold;
     
     //Abilities
     @ManyToMany
     private List<Ability> abilities;
 
-    public Player(String name, int health, int mana, int attackDmg, int level, List<Ability> abilities) {
+    public Player(String name, int health, int maxHealth, int mana, int maxMana, int attackDmg, int maxAttackDmg, int level, List<Ability> abilities) {
         this.name = name;
         this.health = health;
+        this.maxHealth = maxHealth;
         this.mana = mana;
+        this.maxMana = maxMana;
         this.attackDmg = attackDmg;
+        this.maxAttackDmg = maxAttackDmg;
         this.level = level;
         this.abilities = abilities;
     }
-
+    
     public Player(String name) {
         this.name = name;
         this.health = 100;
+        this.maxHealth = 100;
         this.mana = 0;
+        this.maxMana = 0;
         this.attackDmg = 2;
+        this.maxAttackDmg = 2;
         this.level = 1;
     }    
     
@@ -152,6 +155,38 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     }
 
     @Override
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+    @Override
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+    }
+
+    @Override
+    public int getMaxMana() {
+        return maxMana;
+    }
+
+    @Override
+    public void setMaxMana(int maxMana) {
+        this.maxMana = maxMana;
+    }
+
+    @Override
+    public int getMaxAttackDmg() {
+        return maxAttackDmg;
+    }
+
+    @Override
+    public void setMaxAttackDmg(int maxAttackDmg) {
+        this.maxAttackDmg = maxAttackDmg;
+    }
+    
+    
+
+    @Override
     public Long getId() {
         return id;
     }
@@ -170,11 +205,11 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
 
     
     @Override
-    public List<HealthPotion> getHealthpotion() {
+    public List<Potion> getHealthpotion() {
         return healthpotion;
     }
 
-    public void addHealthpotion(HealthPotion healthpotion) {
+    public void addHealthpotion(Potion healthpotion) {
         this.healthpotion.add(healthpotion);        
     }
 

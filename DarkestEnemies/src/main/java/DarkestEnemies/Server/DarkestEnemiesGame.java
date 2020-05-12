@@ -6,9 +6,13 @@
 package DarkestEnemies.Server;
 
 import DarkestEnemies.Entity.Ability;
-import static DarkestEnemies.Entity.Ability_.player;
+
+//HVAD ER DEN HER TIL EMIL???
+//import static DarkestEnemies.Entity.Ability_.player; 
+
+
 import DarkestEnemies.Entity.Account;
-import DarkestEnemies.Entity.HealthPotion;
+import DarkestEnemies.Entity.Potion;
 import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.exceptions.AccountNotFoundException;
@@ -144,10 +148,10 @@ public class DarkestEnemiesGame implements ITextGame {
                         ArrayList<String> actions = new ArrayList();
                         
                         //List of all the healthpotions that the user has. 
-                        List<HealthPotion> healthpotions = players.get(i).getHealthpotion();
+                        List<Potion> healthpotions = players.get(i).getHealthpotion();
                         
                         //For each health potion the user has, it is added to the action array.
-                        for(HealthPotion hp : healthpotions){
+                        for(Potion hp : healthpotions){
                             actions.add(hp.getName() + " - " + hp.getInfo());
                         }
                         
@@ -155,8 +159,8 @@ public class DarkestEnemiesGame implements ITextGame {
                         int choice = playersIO[i].select("Which potion do you wish to use?", actions, "");
                         
                         //Gets the chosen health potion from the database and applies it to the user. 
-                        HealthPotion chosen = ifc.getHealthPotionByID(healthpotions.get(choice - 1).getId());
-                        ifc.useHealthPotion(players.get(i), chosen);
+                        Potion chosen = ifc.getPotionByID(healthpotions.get(choice - 1).getId());
+                        ifc.usePotion(players.get(i), chosen);
                         break;
                     //Player logs out
                     case 3: {
@@ -294,7 +298,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
                                 //Rewards should be a new method
                                 Long potionRank = (long) team1.get(j).getLevel();
-                                HealthPotion hp = ifc.getHealthPotionByID(potionRank);
+                                Potion hp = ifc.getPotionByID(potionRank);
                                 ifc.addPotionToPlayer(team1.get(j).getId(), hp);
                             }
                             break;
