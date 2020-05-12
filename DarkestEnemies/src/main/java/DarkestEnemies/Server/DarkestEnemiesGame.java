@@ -378,6 +378,7 @@ public class DarkestEnemiesGame implements ITextGame {
             }
         }
         
+        players[i].put("Press enter to continue");
         players[i].get();
         players[i].clear();
         players[i].put("Waiting for players..");
