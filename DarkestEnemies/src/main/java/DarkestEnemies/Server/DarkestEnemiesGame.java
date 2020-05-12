@@ -71,59 +71,61 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    private void mainMenu(ITextIO[] players, List<DECharacter> playerEntities) throws ItemNotFoundException {
+    private void mainMenu(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException {
 
         //Start Announcement
-        for (int i = 0; i < players.length; i++) {
+        for (int i = 0; i < playersIO.length; i++) {
 
             //The player in players list is in menu
             boolean menu = true;
             while (menu) {
                 List<String> options = Arrays.asList("Ready to find enemy", "Inventory", "Log out");
-                int menuChoice = players[i].select("Main menu", options, "");
+                int menuChoice = playersIO[i].select("Main menu", options, "");
                 switch (menuChoice) {
 
                     //User chooses to find an enemy
                     case 1:
-                        if (i != players.length - 1) {
+                        if (i != playersIO.length - 1) {
                             menu = false;
                             break;
                         } else {
                             //enemy setup
-                            NPC enemy = enemySetup(playerEntities, players);
+                            NPC enemy = enemySetup(players, playersIO);
 
                             //encounter setup
-                            List<DECharacter> encounter = new ArrayList();
-                            for (int j = 0; j < players.length; j++) {
-                                encounter.add(playerEntities.get(j));
+                            List<DECharacter> allCharacters = new ArrayList();
+                            List<DECharacter> enemies = new ArrayList();
+                            for (int j = 0; j < playersIO.length; j++) {
+                                allCharacters.add(players.get(j));
                             }
-                            encounter.add(enemy);
+                            allCharacters.add(enemy);
+                            enemies.add(enemy);
 
                             //Encounter
-                            encounter(encounter, players, playerEntities, enemy);
+                            encounter(playersIO, allCharacters, players, enemies, true);
                             break;
                         }
 
                     //Player chooses inventory
                     case 2:
 
-                        for (int j = 0; j < playerEntities.get(i).getHealthpotion().size(); j++) {
-                            players[i].put(playerEntities.get(i).getHealthpotion().get(j).getInfo());
+                        for (int j = 0; j < players.get(i).getHealthpotion().size(); j++) {
+                            playersIO[i].put(players.get(i).getHealthpotion().get(j).getInfo());
                         }
 
                         List<String> inventoryOptions = Arrays.asList();
-                        for (int j = 0; j < playerEntities.get(i).getHealthpotion().size(); j++) {
-                            inventoryOptions.add("Use " + playerEntities.get(i).getHealthpotion().get(j).getName() + "with index" + j);
+                        for (int j = 0; j < players.get(i).getHealthpotion().size(); j++) {
+                            inventoryOptions.add("Use " + players.get(i).getHealthpotion().get(j).getName() + "with index" + j);
                         }
                         inventoryOptions.add("Go Back");
 
-                        int inventoryChoice = players[i].select("Inventory", inventoryOptions, "");
+                        int inventoryChoice = playersIO[i].select("Inventory", inventoryOptions, "");
 
                         switch (inventoryChoice) {
 
                             case 1:
-                                players[i].put("Enter the index of the potion you wish to use.");
-                                ifc.useHealthPotion(playerEntities.get(i), players[i].getInteger(0, inventoryOptions.size() - 1));
+                                playersIO[i].put("Enter the index of the potion you wish to use.");
+                                ifc.useHealthPotion(players.get(i), playersIO[i].getInteger(0, inventoryOptions.size() - 1));
                                 //playerEntities.get(i).getHealthpotion().use(playerEntities.get(i));
                                 break;
                             case 2:
@@ -133,11 +135,11 @@ public class DarkestEnemiesGame implements ITextGame {
                     //Player logs out
                     case 3: {
                         try {
-                            players[i + 1].close();
-                            players[i].close();
+                            playersIO[i + 1].close();
+                            playersIO[i].close();
                         } catch (IOException ex) {
                             Logger.getLogger(DarkestEnemiesGame.class.getName()).log(Level.SEVERE, null, ex);
-                            players[i].put("Something went wrong.");
+                            playersIO[i].put("Something went wrong.");
                         }
                     }
                 }
@@ -150,53 +152,20 @@ public class DarkestEnemiesGame implements ITextGame {
         //Player setup
         for (int i = 0; i < players.length; i++) {
 
-            //Login & Create account
+            //Login or Create account
             List<String> options = Arrays.asList("Login", "Create account");
             int option = players[i].select("Please choose an option", options, "");
+
             switch (option) {
 
                 //User chooses to login
                 case 1:
-                    boolean login = true;
-                    while (login) {
-                        try {
-                            AccountFacade af = AccountFacade.getAccountFacade(emf);
-                            players[i].put("Usename:");
-                            String username = players[i].get();
-                            players[i].put("Password:");
-                            String password = players[i].get();
-                            DECharacter player = af.login(username, password);
-
-                            //If nothing went wrong the logged in player is added to the list
-                            playerEntities.add(player);
-                            login = false;
-                        } catch (AccountNotFoundException e) {
-                            players[i].put("Something went wrong, please try again (user came back as null)");
-                            e.printStackTrace();
-                        } catch (WrongPasswordException e) {
-                            players[i].put("Username and password does not match, please try again");
-                            e.printStackTrace();
-                        }
-                    }
+                    i = login(players, i, playerEntities);
                     break;
 
                 //User chooses to create account    
                 case 2:
-                    //Creates a new player, adds it to the database and writes it out to the IO
-                    String playerName = pF.createNewPlayer(players[i]).getCharacterName();
-                    Player player = null;
-                    try {
-                        player = pF.getPlayerByName(playerName);
-                    } catch (PlayerNotFoundException e) {
-                        System.out.println("Something went wrong with finding the player by name: " + playerName);
-                    }
-
-                    //Adds the start ability to the player "slam"
-                    try {
-                        pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("slam"));
-                    } catch (AbilityNotFoundException e) {
-                        System.out.println("Something went wrong with getting the SLAM ability");
-                    }
+                    createAccount(players, i);
                     i--;
                     break;
             }
@@ -204,129 +173,198 @@ public class DarkestEnemiesGame implements ITextGame {
         return playerEntities;
     }
 
+    private int login(ITextIO[] players, int i, List<DECharacter> playerEntities) {
+        try {
+            AccountFacade af = AccountFacade.getAccountFacade(emf);
+            players[i].put("Usename:");
+            String username = players[i].get();
+            players[i].put("Password:");
+            String password = players[i].get();
+            DECharacter player = af.login(username, password);
+
+            //If nothing went wrong the logged in player is added to the list
+            playerEntities.add(player);
+
+        } catch (AccountNotFoundException e) {
+            players[i].put("Something went wrong - couldn't find an account with that username \n");
+            i--;
+        } catch (WrongPasswordException e) {
+            players[i].put("The password does not match that username \n");
+            i--;
+        }
+        return i;
+    }
+
+    private void createAccount(ITextIO[] players, int i) {
+        //Creates a new player, adds it to the database and writes it out to the IO
+        String playerName = pF.createNewPlayer(players[i]).getCharacterName();
+        Player player = null;
+        try {
+            player = pF.getPlayerByName(playerName);
+        } catch (PlayerNotFoundException e) {
+            players[i].put("Something went wrong with finding the player by name: " + playerName);
+        }
+
+        //Adds the start ability to the player "slam"
+        try {
+            pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("slam"));
+        } catch (AbilityNotFoundException e) {
+            players[i].put("Something went wrong with getting the \"slam\" ability");
+        }
+    }
+
     private NPC enemySetup(List<DECharacter> playerEntities, ITextIO[] players) {
+
+        //Initizialation of stats
         int health = 0;
         int mana = 0;
         int attack = 0;
 
+        //Scales the health up for each player in the group
         for (int i = 0; i < players.length; i++) {
             health += (playerEntities.get(i).getLevel() * 5) + (playerEntities.get(i).getAttackDmg() * 2.5);
         }
 
+        //Scales the attack damage up for each player in the group
         for (int i = 0; i < players.length; i++) {
             attack += ((playerEntities.get(i).getLevel() * 5) / 2.5) + (health / 10);
         }
 
+        //Creates a random name from elder scrolls universe
         Faker faker = new Faker();
         String name = faker.elderScrolls().creature();
+
         return new NPC(name, health, mana, attack);
     }
 
-    private void encounter(List<DECharacter> encounter, ITextIO[] players, List<DECharacter> playerEntities, NPC enemy) throws ItemNotFoundException {
+    private void encounter(ITextIO[] playersIO, List<DECharacter> allCharacters, List<DECharacter> team1, List<DECharacter> team2, boolean pve) throws ItemNotFoundException {
         //Setups bools
-        boolean playerAlive = true;
-        boolean enemyAlive = true;
-        //introduction to encounter
-        for (int i = 0; i < players.length; i++) {
-            players[i].clear();
-            players[i].put("Oh no! You've encountered a " + enemy.getCharacterName() + "!\n");
-            players[i].put("This is your first encounter, should be easy. Just wack a mole him!\n");
+        boolean team1Alive = true; //Always players when PVE - Always players when PVP
+        boolean team2Alive = true; //Always hostile NPC when PVE - Always players when PVP
+
+        //Introduction to encounter if it is a PVE matchup
+        if (pve) {
+            for (int i = 0; i < playersIO.length; i++) {
+                playersIO[i].clear();
+                playersIO[i].put("You've encountered the following: \n");
+                for (DECharacter enemy : team2) {
+                    playersIO[i].put(enemy.getName() + "\n");
+                }
+            }
+        } else { //Introduction to encounter if it is a PVP matchup 
         }
 
-        while (playerAlive == true && enemyAlive == true) {
+        //While both teams are alive the encounter is ongoing (keeps looping)
+        while (team1Alive == true && team2Alive == true) {
+            //Each character has a turn
+            for (int i = 0; i < allCharacters.size(); i++) {
 
-            //Encounter START
-            for (int i = 0; i < encounter.size(); i++) {
-                players[i].clear();
-                
                 //If the the character is an NPC                               
-                if (encounter.get(i).getClass() == NPC.class) {
-                    System.out.println("The NPC has taken their turn");
-                    for (int j = 0; j < players.length; j++) {
-                        //System monitoring.
-                        System.out.println("current player hp: " + playerEntities.get(j).getHealth());
-                        System.out.println("current player hp: " + playerEntities.get(j).getAttackDmg());
-                        System.out.println("enemy hp: " + enemy.getHealth());
-                        System.out.println("enemy atkdmg: " + enemy.getAttackDmg());
-
-                        playerEntities.get(j).setHealth(playerEntities.get(j).getHealth() - enemy.getAttackDmg());
-                        players[j].put("You've been hit! You now have: " + playerEntities.get(j).getHealth() + " hp left!\n");
-                    }
+                if (allCharacters.get(i).getClass() == NPC.class) {
+                    npcAction(playersIO, team1, (NPC) allCharacters.get(i));
                 }
 
                 //If the character is a player
-                if (encounter.get(i).getClass() != NPC.class) {
-                    //Creates an empty list of available actions
-                    ArrayList<String> actions = new ArrayList();
+                if (allCharacters.get(i).getClass() != NPC.class) {
+                    playerAction(allCharacters, i, playersIO, team1);
+                }
 
-                    //Gets the abilities of the current player
-                    List<Ability> abilities = encounter.get(i).getAbilities();
-
-                    //Adds the abils name to actions list so it can be selected
-                    for (Ability ab : abilities) {
-                        actions.add(ab.getName() + "\n" + "  - " + ab.getDescription());
-                    }
-                    int choice = players[i].select("What do you wish to do?", actions, "");
-
-                    //Gets the chosen ability
-                    Ability chosenAbility = encounter.get(i).getAbilities().get(choice - 1);
-
-                    //Creates a new list of all the names in the encounter
-                    ArrayList<String> names = new ArrayList();
-                    ArrayList<DECharacter> availableTargets = new ArrayList();
-                    for (int j = 0; j < encounter.size(); j++) {
-                        names.add(encounter.get(j).getName());
-                        availableTargets.add(encounter.get(j));
-                    }
-
-                    //Creates a new list of all the chosen targets of the ability
-                    ArrayList<Integer> targetsIndex = new ArrayList();
-                    int targetIndex = players[i].select("Who do you wish to target?", names, "");
-                    for (int j = 0; j < encounter.get(i).getAbilities().get(choice - 1).getAmountOfTargets(); ++j) {
-                        targetsIndex.add(targetIndex);
-                    }
-
-                    //Creates a list of DECharaters that is the actual targets
-                    ArrayList<DECharacter> targets = new ArrayList();
-                    for (int j = 0; j < targetsIndex.size(); ++j) {
-                        int index = targetsIndex.get(j);
-                        DECharacter targ = availableTargets.get(index - 1);
-                        targets.add(targ);
-                    }
-
-                    for (DECharacter target : targets) {
-                        if (chosenAbility.getDamage() <= 0 && chosenAbility.getHealing() > 0) {
-                            target.setHealth(target.getHealth() + chosenAbility.getHealing());
-                            players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
-                        } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
-                            target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
-                            players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
+                //Checks HP for all team2 members
+                for (DECharacter team1character : team1) {
+                    //Enters if-statement if a member of team 2 is dead
+                    if (team1character.getHealth() <= 0) {
+                        //Removes the dead member
+                        team1.remove(team1character);
+                        //Checks if the team is empty - if so, team 1 wins
+                        if (team1.isEmpty()) {
+                            team1Alive = false;
+                            for (int j = 0; j < playersIO.length; j++) {
+                                playersIO[j].put("You have all been killed by the enemy!");
+                            }
+                            break;
                         }
                     }
-
                 }
 
-                //Checks HP for NPC
-                if (enemy.getHealth() <= 0) {
-                    enemyAlive = false;
-                    for (int j = 0; j < players.length; j++) {
-                        players[i].put("You did killed the enemy");
-                        Long potionRank = (long) playerEntities.get(j).getLevel();
-                        HealthPotion hp = ifc.getHealthPotionByID(potionRank);
-                        ifc.addPotionToPlayer(playerEntities.get(j).getId(), hp);
+                //Checks HP for all team2 members
+                for (DECharacter team2character : team2) {
+                    //Enters if-statement if a member of team 2 is dead
+                    if (team2character.getHealth() <= 0) {
+                        //Removes the dead member
+                        team2.remove(team2character);
+                        //Checks if the team is empty - if so, team 1 wins
+                        if (team2.isEmpty()) {
+                            team2Alive = false;
+                            for (int j = 0; j < playersIO.length; j++) {
+                                playersIO[j].put("You killed the enemy! \n");
+
+                                //Rewards should be a new method
+                                Long potionRank = (long) team1.get(j).getLevel();
+                                HealthPotion hp = ifc.getHealthPotionByID(potionRank);
+                                ifc.addPotionToPlayer(team1.get(j).getId(), hp);
+                            }
+                            break;
+                        }
                     }
-                    break;
                 }
+            }
+        }
+    }
 
-                //Checks HP for Players
-                for (int j = 0; j < players.length; ++j) {
-                    if (playerEntities.get(j).getHealth() <= 0) {
-                        players[j].put("Oh no! You've been killed! Game over!\n");
-                        players[j + 1].put("Oh no!" + playerEntities.get(j).getCharacterName() + " has been killed! You flee in fear. Game over!\n");
-                        playerAlive = false;
-                        break;
-                    }
-                }
+    private void npcAction(ITextIO[] playersIO, List<DECharacter> opposingTeam, NPC npc) {
+        for (int j = 0; j < playersIO.length; j++) {
+            opposingTeam.get(j).setHealth(opposingTeam.get(j).getHealth() - npc.getAttackDmg());
+            playersIO[j].put(npc.getName() + " has hit you for " + npc.getAttackDmg() + ". \nYou now have " + opposingTeam.get(j).getHealth() + " hp left!\n");
+        }
+    }
+
+    private void playerAction(List<DECharacter> encounter, int i, ITextIO[] players, List<DECharacter> playerEntities) {
+        //Creates an empty list of available actions
+        ArrayList<String> actions = new ArrayList();
+
+        //Gets the abilities of the current player
+        List<Ability> abilities = encounter.get(i).getAbilities();
+
+        //Adds the abils name to actions list so it can be selected
+        for (Ability ab : abilities) {
+            actions.add(ab.getName() + "\n" + "  - " + ab.getDescription());
+        }
+        players[i].put("\n");
+        int choice = players[i].select("What do you wish to do?", actions, "");
+
+        //Gets the chosen ability
+        Ability chosenAbility = encounter.get(i).getAbilities().get(choice - 1);
+
+        //Creates a new list of all the names in the encounter
+        ArrayList<String> names = new ArrayList();
+        ArrayList<DECharacter> availableTargets = new ArrayList();
+        for (int j = 0; j < encounter.size(); j++) {
+            names.add(encounter.get(j).getName());
+            availableTargets.add(encounter.get(j));
+        }
+
+        //Creates a new list of all the chosen targets of the ability
+        ArrayList<Integer> targetsIndex = new ArrayList();
+        int targetIndex = players[i].select("Who do you wish to target?", names, "");
+        for (int j = 0; j < encounter.get(i).getAbilities().get(choice - 1).getAmountOfTargets(); ++j) {
+            targetsIndex.add(targetIndex);
+        }
+
+        //Creates a list of DECharaters that is the actual targets
+        ArrayList<DECharacter> targets = new ArrayList();
+        for (int j = 0; j < targetsIndex.size(); ++j) {
+            int index = targetsIndex.get(j);
+            DECharacter targ = availableTargets.get(index - 1);
+            targets.add(targ);
+        }
+
+        for (DECharacter target : targets) {
+            if (chosenAbility.getDamage() <= 0 && chosenAbility.getHealing() > 0) {
+                target.setHealth(target.getHealth() + chosenAbility.getHealing());
+                players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
+            } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
+                target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
+                players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             }
         }
     }
