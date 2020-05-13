@@ -44,7 +44,6 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     //Inventory
     @OneToOne(cascade = CascadeType.PERSIST)
     private Inventory inventory;
-    //private List<Potion> healthpotion;      //Skal ændres til en liste af ItemI på et tidspunkt i fremtiden
     private int gold;
 
     //Abilities
