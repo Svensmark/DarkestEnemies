@@ -83,7 +83,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
             //Login & Create account
             List<String> options = Arrays.asList("Login", "Create account");
-            players[i].clear();
+            //players[i].clear();
             int option = players[i].select("Please choose an option", options, "");
 
             switch (option) {
@@ -108,12 +108,12 @@ public class DarkestEnemiesGame implements ITextGame {
         //Start Announcement
         for (int i = 0; i < playersIO.length; i++) {
             //Clears the screen
-            playersIO[i].clear();
+            //playersIO[i].clear();
 
             //The player in players list is in menu
             boolean menu = true;
             while (menu) {
-                List<String> options = Arrays.asList("Ready to find enemy", "Inventory", "Log out");
+                List<String> options = Arrays.asList("Enter a dungeon", "Inventory", "Log out");
                 int menuChoice = playersIO[i].select("Main menu", options, "");
                 switch (menuChoice) {
 
@@ -123,44 +123,16 @@ public class DarkestEnemiesGame implements ITextGame {
                             menu = false;
                             break;
                         } else {
-                            //Creates an enemy based on the players
-                            NPC enemy = createNPC(players);
-
-                            //Puts all character in their correct list
-                            List<DECharacter> allCharacters = new ArrayList();
-                            List<DECharacter> enemies = new ArrayList();
-                            for (int j = 0; j < playersIO.length; j++) {
-                                allCharacters.add(players.get(j));
-                            }
-                            allCharacters.add(enemy);
-                            enemies.add(enemy);
-
-                            //Encounter
-                            encounter(playersIO, allCharacters, players, enemies, true);
+                            enterDungeon(playersIO, players, 5);
                             i--;
                             break;
                         }
 
                     //Player chooses inventory
                     case 2:
-
-                        //All the possible actions the user can take will be placed here.
-                        ArrayList<String> actions = new ArrayList();
-                        //List of all the potions the current player has
-                        List<Long> potionIds = players.get(i).getInventory().getPotionIds();
-                        //All of the possible actions get added
-                        //The actions include the name of the potion together with its description.
-                        for (Long longs : potionIds) {
-                            actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
-                        }
-                        //Gets player input
-                        int choice = playersIO[i].select("Which potion do you wish to use?", actions, "");
-                        //Gets selected potion from the database.
-                        Potion chosen = pfc.getPotionByID(potionIds.get(choice - 1));
-                        //Consumes potion and removes it from the players inventory.
-                        pfc.usePotion(players.get(i), chosen);
-                        ifc.removeFromInventory(players.get(i), choice - 1);
+                        showInventory(players.get(i), playersIO[i]);
                         break;
+
                     //Player logs out
                     case 3: {
                         try {
@@ -176,10 +148,37 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
+    private void showInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException {
+        //All the possible actions the user can take will be placed here.
+        ArrayList<String> actions = new ArrayList();
+        //List of all the potions the current player has
+        List<Long> potionIds = new ArrayList();
+        if (player.getInventory() != null) {
+            potionIds = player.getInventory().getPotionIds();
+            //All of the possible actions get added
+            //The actions include the name of the potion together with its description.
+            for (Long longs : potionIds) {
+                actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
+            }
+        }
+
+        actions.add("Return to menu");
+        //Gets player input
+        int choice = playerIO.select("Which potion do you wish to use?", actions, "");
+        //Gets selected potion from the database.
+        System.out.println(actions.size());
+        if (choice != actions.size()) {
+            Potion chosen = pfc.getPotionByID(potionIds.get(choice - 1));
+            //Consumes potion and removes it from the players inventory.
+            pfc.usePotion(player, chosen);
+            ifc.removeFromInventory(player, choice - 1);
+        }
+    }
+
     private int login(ITextIO[] players, int i, List<DECharacter> playerEntities) {
         try {
             AccountFacade af = AccountFacade.getAccountFacade(emf);
-            players[i].put("Usename:");
+            players[i].put("Username:");
             String username = players[i].get();
             players[i].put("Password:");
             String password = players[i].get();
@@ -275,6 +274,7 @@ public class DarkestEnemiesGame implements ITextGame {
                         //Checks if the team is empty - if so, team 1 wins
                         if (team1.isEmpty()) {
                             team1Alive = false;
+                            i = allCharacters.size();
                             for (int j = 0; j < playersIO.length; j++) {
                                 playersIO[j].put("You have all been killed by the enemy!");
                             }
@@ -292,14 +292,9 @@ public class DarkestEnemiesGame implements ITextGame {
                         //Checks if the team is empty - if so, team 1 wins
                         if (team2.isEmpty()) {
                             team2Alive = false;
+                            i = allCharacters.size();
                             for (int j = 0; j < playersIO.length; j++) {
                                 playersIO[j].put("You killed the enemy! \n");
-
-                                  //Rewards should be a new method
-                                List<Long> potionids = new ArrayList();
-                                potionids.add(2L);
-                                Inventory inventory = new Inventory(potionids);
-                                ifc.addToInventory(team1.get(j), inventory);
                             }
                             break;
                         }
@@ -311,7 +306,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
     private void pveIntro(ITextIO[] playersIO, List<DECharacter> team2) {
         for (int i = 0; i < playersIO.length; i++) {
-            playersIO[i].clear();
+            //playersIO[i].clear();
             playersIO[i].put("You've encountered the following: \n");
             for (DECharacter enemy : team2) {
                 printNPCStats(playersIO[i], enemy);
@@ -384,34 +379,39 @@ public class DarkestEnemiesGame implements ITextGame {
 
         players[i].put("Press enter to continue");
         players[i].get();
-        players[i].clear();
+        //players[i].clear();
         players[i].put("Waiting for players.. \n");
     }
 
-    private void enterDungeon(ITextIO[] playersIO, List<DECharacter> allCharacters, int amountOfRooms) {
+    private void enterDungeon(ITextIO[] playersIO, List<DECharacter> allCharacters, int amountOfRooms) throws ItemNotFoundException {
 
         printDungeonLocation(playersIO);
 
         for (int i = 0; i < amountOfRooms; ++i) {
             enterRoom(playersIO, allCharacters);
+            for (ITextIO playerIO : playersIO) {
+                playerIO.put("Press enter to move to the next room ..");
+                playerIO.get();
+            }
         }
 
     }
 
-    private void printDungeonLocation(ITextIO[] playersIO) {
+    private void printDungeonLocation(ITextIO[] playersIO) throws ItemNotFoundException {
         String[] locations = {"a cave", "an abandoned castle", "an old haunted farm house", "a sewer"};
         int rand = (int) (Math.random() * 4);
         String location = locations[rand];
         Faker faker = new Faker();
         String region = faker.elderScrolls().region();
         for (int i = 0; i < playersIO.length; ++i) {
-            playersIO[i].put("You have entered " + location + " somwhere in " + region + ".");
+            playersIO[i].put("You have entered " + location + " somwhere in " + region + ".\n\n");
         }
     }
 
-    private void enterRoom(ITextIO[] playersIO, List<DECharacter> players) {
+    private void enterRoom(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException {
         //Random generates a number of either 0 and 1
         int rand = (int) (Math.random() * 3);
+
         //66% chance of encounter
         if (rand > 0) {
             //Creates an enemy based on the players
@@ -425,14 +425,37 @@ public class DarkestEnemiesGame implements ITextGame {
             }
             allCharacters.add(enemy);
             enemies.add(enemy);
-        }
-        
-        rand = (int) (Math.random() * 3);
-        //33% chance of reward
-        if (rand == 0) {
-            
+
+            //Encounter
+            encounter(playersIO, allCharacters, players, enemies, true);
         }
 
+        for (int i = 0; i < players.size(); ++i) {
+            rand = (int) (Math.random() * 3);
+            //33% chance of reward
+            if (rand == 0) {
+                rewardPlayer(playersIO[i], players.get(i));
+            }
+        }
+    }
+
+    private void rewardPlayer(ITextIO playerIO, DECharacter player) throws ItemNotFoundException {
+        //Rewards should be a new method
+        //Determines the amount of potions the player gets as a reward
+        int amountOfPotions = (int) (Math.random() * 3) + 1;
+
+        //Adds random potions with the amount equal to the random number above
+        List<Long> potionIDs = new ArrayList();
+        for (int i = 0; i < amountOfPotions; ++i) {
+            double potionID = (Math.random() * 3) + 1;
+            playerIO.put("You found a " + pfc.getPotionByID((long) potionID).getName() + "\n");
+            potionIDs.add((long) potionID);
+        }
+        //Creates a new inventory with the potions 
+        Inventory inventory = new Inventory(potionIDs);
+
+        //Adds the items from the new inventory to the existing inventory of the player
+        ifc.addToInventory(player, inventory);
     }
 
 }

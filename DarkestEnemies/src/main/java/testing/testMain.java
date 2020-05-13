@@ -24,13 +24,13 @@ public class testMain {
 
     public static void main(String[] args) throws Exception {
 
-        int rand = (int) (Math.random() * 3);
+        int rand = (int) (Math.random()* 2)+1;
         System.out.println(rand);
-        rand = (int) (Math.random() * 3);
+        rand = (int) (Math.random() * 2)+1;
         System.out.println(rand);
-        rand = (int) (Math.random() * 3);
+        rand = (int) (Math.random() * 2)+1;
         System.out.println(rand);
-        rand = (int) (Math.random() * 3);
+        rand = (int) (Math.random() * 2)+1;
         System.out.println(rand);
 
     }

@@ -41,13 +41,13 @@ public class testInventory {
         AbilityFacade afc = AbilityFacade.getAbilityFacade(_emf);
 
         //Setup Abilities
-//        afc.setupBasicAbilities();
-//
-//        SetupPlayers(acF);
-//
-//        setupPlayerData(ifc, pfc, afc);
-//
-//        SetupPotions(potfc);
+        afc.setupBasicAbilities();
+
+        SetupPlayers(acF);
+
+        setupPlayerData(ifc, pfc, afc);
+
+        SetupPotions(potfc);
 
         setupCharacterPotions(pfc, ifc);
 

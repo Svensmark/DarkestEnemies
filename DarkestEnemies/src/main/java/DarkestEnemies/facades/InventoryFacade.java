@@ -58,15 +58,27 @@ public class InventoryFacade {
         return inventory;
     }
 
-    public void addToInventory(DECharacter character, Inventory inventory) {
+    public void addToInventory(DECharacter character, Inventory newInventory) {
         EntityManager em = getEntityManager();
-        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
-        for (Long longs : inventory.getPotionIds()) {
-            inv.getPotionIds().add(longs);
+        Inventory playerInventory = null;
+
+        //If an inventory needs to be setup
+        try {
+            playerInventory = em.find(Inventory.class, character.getInventory().getId());
+        } catch (NullPointerException e) {
+            setupInventory((Player) character);
         }
+        
+        //Adds the reward to the player
+        if (newInventory != null) {
+            for (Long longs : newInventory.getPotionIds()) {
+                playerInventory.getPotionIds().add(longs);
+            }
+        }
+
         try {
             em.getTransaction().begin();
-            em.merge(inv);
+            em.merge(playerInventory);
             em.getTransaction().commit();
         } finally {
             em.close();
