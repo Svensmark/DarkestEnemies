@@ -17,12 +17,14 @@ public interface ItemI {
     public int getManaValue();
     public int getHealingValue();
     public int getDmgIncreaseValue();
+//    public int getUseAmmount();
     
     public void setName(String name);
     public void setInfo(String info);
     public void setManaValue(int value);
     public void setHealingValue(int value);
     public void setDmgIncreaseValue(int value);
+//    public void setUseAmmount(int ammount);
     
     
 }

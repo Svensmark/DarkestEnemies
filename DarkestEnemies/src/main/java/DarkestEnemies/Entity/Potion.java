@@ -30,9 +30,8 @@ public class Potion implements DarkestEnemies.IF.ItemI, Serializable {
     private int healingValue;
     private int manaValue;
     private int dmgIncreaseValue;
-
-    @ManyToMany
-    private List<Player> player;
+    //private int useAmmount;
+    
 
     public Potion(String name, String info, int healingValue, int manaValue, int dmgIncreaseValue) {
         this.name = name;
@@ -122,5 +121,17 @@ public class Potion implements DarkestEnemies.IF.ItemI, Serializable {
     public void setDmgIncreaseValue(int dmgIncreaseValue) {
         this.dmgIncreaseValue = dmgIncreaseValue;
     }
+
+//    @Override
+//    public int getUseAmmount() {
+//        return useAmmount;
+//    }
+//
+//    @Override
+//    public void setUseAmmount(int useAmmount) {
+//        this.useAmmount = useAmmount;
+//    }
+    
+    
 
 }

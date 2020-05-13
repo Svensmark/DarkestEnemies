@@ -7,7 +7,6 @@ package DarkestEnemies.Entity;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -134,16 +133,16 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setCurrentExp(int currentExp) {
         throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
     }
-
-    @Override
-    public void addHealthpotion(Potion healthpotion) {
-        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
-    }
-
-    @Override
-    public List<Potion> getHealthpotion() {
-        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
-    }
+//
+//    @Override
+//    public void addHealthpotion(Potion healthpotion) {
+//        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
+//    }
+//
+//    @Override
+//    public List<Potion> getHealthpotion() {
+//        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
+//    }
 
     @Override
     public int getMaxHealth() {
@@ -174,5 +173,17 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setMaxAttackDmg(int atk) {
         throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
     }
+
+    @Override
+    public Inventory getInventory() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setInventory(Inventory inventory) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+  
 
 }

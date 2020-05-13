@@ -7,6 +7,7 @@ package DarkestEnemies.IF;
 
 import DarkestEnemies.Entity.Ability;
 import DarkestEnemies.Entity.Potion;
+import DarkestEnemies.Entity.Inventory;
 import java.util.List;
 
 /**
@@ -30,7 +31,8 @@ public interface DECharacter {
     public int getLevel();
     public int getCurrentExp();
     
-    public List<Potion> getHealthpotion();
+    public Inventory getInventory();
+//    public List<Potion> getHealthpotion();
     public List<Ability> getAbilities();
     
     public void setCharacterName(String name);
@@ -42,8 +44,9 @@ public interface DECharacter {
     public void setMaxAttackDmg(int atk);
     public void setLevel(int level);
     public void setCurrentExp(int currentExp);
-    public void addHealthpotion(Potion healthpotion);
+//    public void addHealthpotion(Potion healthpotion);
     
+    public void setInventory(Inventory inventory);
     
     
   

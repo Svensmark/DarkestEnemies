@@ -5,10 +5,11 @@
  */
 package DarkestEnemies.facades;
 
-import DarkestEnemies.Entity.Potion;
+import DarkestEnemies.Entity.Inventory;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
-import DarkestEnemies.exceptions.ItemNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -35,80 +36,25 @@ public class InventoryFacade {
     private EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
-
-    public void addPotion(Potion potion) {
+    
+    public void setupInventory(Player character){
         EntityManager em = getEntityManager();
-
-        Potion pot = new Potion(potion.getName(), potion.getInfo(), potion.getHealingValue(), potion.getManaValue(), potion.getDmgIncreaseValue());
-
-        try {
+        List<Long> potionIds = new ArrayList();
+        Inventory inv = new Inventory(potionIds);
+        em.find(Player.class, character.getId());
+        character.setInventory(inv);
+        try{
             em.getTransaction().begin();
-            em.persist(pot);
+            em.merge(character);
             em.getTransaction().commit();
-        } finally {
+        }finally{
             em.close();
         }
     }
 
-    public void addDamagePotion(Potion potion) {
+    public void addToInventory(DECharacter character, Inventory inventory) {
         EntityManager em = getEntityManager();
-
-        Potion pot = new Potion(potion.getName(), potion.getInfo(), potion.getHealingValue(), potion.getManaValue(), potion.getDmgIncreaseValue());
-
-        try {
-            em.getTransaction().begin();
-            em.persist(pot);
-            em.getTransaction().commit();
-        } finally {
-            em.close();
-        }
-    }
-
-    public void addPotionToPlayer(Long id, Potion potion) {
-        EntityManager em = getEntityManager();
-        try {
-            em.getTransaction().begin();
-            Player player = em.find(Player.class, id);
-            Potion pot = em.find(Potion.class, potion.getId());
-            player.addHealthpotion(pot);
-
-            em.merge(player);
-            em.getTransaction().commit();
-        } finally {
-            em.close();
-        }
-    }
-
-    public Potion getPotionByID(Long id) throws ItemNotFoundException {
-        EntityManager em = getEntityManager();
-        Potion hp = em.find(Potion.class, id);
-        if (hp == null) {
-            throw new ItemNotFoundException("Item doesn't seem to exist.");
-        }
-
-        return hp;
-    }
-
-    public void usePotion(DECharacter character, Potion potion) {
-        EntityManager em = getEntityManager();
-        if (potion.getHealingValue() > 0 || potion.getManaValue() > 0) {
-            
-            if ((character.getHealth() + potion.getHealingValue()) > character.getMaxHealth()) {
-                character.setHealth(character.getMaxHealth());
-            } else {
-                character.setHealth(character.getHealth() + potion.getHealingValue());
-            }
-            
-            if ((character.getMana() + potion.getManaValue()) > character.getMaxMana()) {
-                character.setMana(character.getMaxMana());
-            } else {
-                character.setMana(character.getMana() + potion.getManaValue());
-            }
-        }
-        int currentAtk = character.getAttackDmg();
-        if (character.getAttackDmg() > character.getMaxAttackDmg()) {
-            character.setAttackDmg(character.getMaxAttackDmg());
-        }
+        character.setInventory(inventory);
         try {
             em.getTransaction().begin();
             em.merge(character);
@@ -116,11 +62,7 @@ public class InventoryFacade {
         } finally {
             em.close();
         }
-        if (potion.getDmgIncreaseValue() > 0) {
-            character.setAttackDmg(character.getAttackDmg() + potion.getDmgIncreaseValue());
-            System.out.println(character.getAttackDmg());
-        } else {
-            character.setAttackDmg(currentAtk);
-        }
+
     }
+
 }

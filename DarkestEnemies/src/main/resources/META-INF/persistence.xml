@@ -8,6 +8,7 @@
     <class>DarkestEnemies.Entity.Account</class>
     <class>DarkestEnemies.Entity.Ability</class>
     <class>DarkestEnemies.Entity.Potion</class>
+    <class>DarkestEnemies.Entity.Inventory</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <!-- DO NOT remove the line below. It's not set by the  entityUtils.EMF_Creator -->
