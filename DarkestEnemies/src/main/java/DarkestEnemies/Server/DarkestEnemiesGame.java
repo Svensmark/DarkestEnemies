@@ -6,6 +6,7 @@
 package DarkestEnemies.Server;
 
 import DarkestEnemies.Entity.Ability;
+import DarkestEnemies.Entity.Inventory;
 
 //HVAD ER DEN HER TIL EMIL???
 //import static DarkestEnemies.Entity.Ability_.player; 
@@ -145,13 +146,18 @@ public class DarkestEnemiesGame implements ITextGame {
 
                         //All the possible actions the user can take will be placed here.
                         ArrayList<String> actions = new ArrayList();
+                        //List of all the potions the current player has
                         List<Long> potionIds = players.get(i).getInventory().getPotionIds();
+                        //All of the possible actions get added
+                        //The actions include the name of the potion together with its description.
                         for (Long longs : potionIds) {
                             actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
                         }
-
+                        //Gets player input
                         int choice = playersIO[i].select("Which potion do you wish to use?", actions, "");
+                        //Gets selected potion from the database.
                         Potion chosen = pfc.getPotionByID(potionIds.get(choice - 1));
+                        //Consumes potion and removes it from the players inventory.
                         pfc.usePotion(players.get(i), chosen);
                         ifc.removeFromInventory(players.get(i), choice - 1);
                         break;
@@ -289,10 +295,11 @@ public class DarkestEnemiesGame implements ITextGame {
                             for (int j = 0; j < playersIO.length; j++) {
                                 playersIO[j].put("You killed the enemy! \n");
 
-                                //Rewards should be a new method
-                                Long potionRank = (long) team1.get(j).getLevel();
-                                Potion hp = pfc.getPotionByID(potionRank);
-//                                pfc.addPotionToPlayer(team1.get(j).getId(), hp);
+                                  //Rewards should be a new method
+                                List<Long> potionids = new ArrayList();
+                                potionids.add(2L);
+                                Inventory inventory = new Inventory(potionids);
+                                ifc.addToInventory(team1.get(j), inventory);
                             }
                             break;
                         }
