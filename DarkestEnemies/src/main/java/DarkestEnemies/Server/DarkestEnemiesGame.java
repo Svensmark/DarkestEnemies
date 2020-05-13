@@ -6,7 +6,9 @@
 package DarkestEnemies.Server;
 
 import DarkestEnemies.Entity.Ability;
-import DarkestEnemies.Entity.Inventory;
+
+//HVAD ER DEN HER TIL EMIL???
+//import static DarkestEnemies.Entity.Ability_.player; 
 import DarkestEnemies.Entity.Potion;
 import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
@@ -120,10 +122,10 @@ public class DarkestEnemiesGame implements ITextGame {
                             menu = false;
                             break;
                         } else {
-                            //enemy setup
+                            //Creates an enemy based on the players
                             NPC enemy = createNPC(players);
 
-                            //encounter setup
+                            //Puts all character in their correct list
                             List<DECharacter> allCharacters = new ArrayList();
                             List<DECharacter> enemies = new ArrayList();
                             for (int j = 0; j < playersIO.length; j++) {
@@ -143,22 +145,16 @@ public class DarkestEnemiesGame implements ITextGame {
 
                         //All the possible actions the user can take will be placed here.
                         ArrayList<String> actions = new ArrayList();
-                        //List of all the potions the current player has
                         List<Long> potionIds = players.get(i).getInventory().getPotionIds();
-                        //All of the possible actions get added
-                        //The actions include the name of the potion together with its description.
                         for (Long longs : potionIds) {
                             actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
                         }
-                        //Gets player input
+
                         int choice = playersIO[i].select("Which potion do you wish to use?", actions, "");
-                        //Gets selected potion from the database.
                         Potion chosen = pfc.getPotionByID(potionIds.get(choice - 1));
-                        //Consumes potion and removes it from the players inventory.
                         pfc.usePotion(players.get(i), chosen);
                         ifc.removeFromInventory(players.get(i), choice - 1);
                         break;
-
                     //Player logs out
                     case 3: {
                         try {
@@ -294,10 +290,9 @@ public class DarkestEnemiesGame implements ITextGame {
                                 playersIO[j].put("You killed the enemy! \n");
 
                                 //Rewards should be a new method
-                                List<Long> potionids = new ArrayList();
-                                potionids.add(2L);
-                                Inventory inventory = new Inventory(potionids);
-                                ifc.addToInventory(team1.get(j), inventory);
+                                Long potionRank = (long) team1.get(j).getLevel();
+                                Potion hp = pfc.getPotionByID(potionRank);
+//                                pfc.addPotionToPlayer(team1.get(j).getId(), hp);
                             }
                             break;
                         }
@@ -384,6 +379,53 @@ public class DarkestEnemiesGame implements ITextGame {
         players[i].get();
         players[i].clear();
         players[i].put("Waiting for players.. \n");
+    }
+
+    private void enterDungeon(ITextIO[] playersIO, List<DECharacter> allCharacters, int amountOfRooms) {
+
+        printDungeonLocation(playersIO);
+
+        for (int i = 0; i < amountOfRooms; ++i) {
+            enterRoom(playersIO, allCharacters);
+        }
+
+    }
+
+    private void printDungeonLocation(ITextIO[] playersIO) {
+        String[] locations = {"a cave", "an abandoned castle", "an old haunted farm house", "a sewer"};
+        int rand = (int) (Math.random() * 4);
+        String location = locations[rand];
+        Faker faker = new Faker();
+        String region = faker.elderScrolls().region();
+        for (int i = 0; i < playersIO.length; ++i) {
+            playersIO[i].put("You have entered " + location + " somwhere in " + region + ".");
+        }
+    }
+
+    private void enterRoom(ITextIO[] playersIO, List<DECharacter> players) {
+        //Random generates a number of either 0 and 1
+        int rand = (int) (Math.random() * 3);
+        //66% chance of encounter
+        if (rand > 0) {
+            //Creates an enemy based on the players
+            NPC enemy = createNPC(players);
+
+            //Puts all character in their correct list
+            List<DECharacter> allCharacters = new ArrayList();
+            List<DECharacter> enemies = new ArrayList();
+            for (int j = 0; j < playersIO.length; j++) {
+                allCharacters.add(players.get(j));
+            }
+            allCharacters.add(enemy);
+            enemies.add(enemy);
+        }
+        
+        rand = (int) (Math.random() * 3);
+        //33% chance of reward
+        if (rand == 0) {
+            
+        }
+
     }
 
 }
