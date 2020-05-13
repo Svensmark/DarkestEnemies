@@ -25,14 +25,13 @@ public class Account implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
 
     private String username;
     private String password;
-    
-    @OneToOne(cascade=CascadeType.PERSIST)
+
+    @OneToOne(cascade = CascadeType.PERSIST)
     private Player character;
-    
+
     public Account() {
     }
 
@@ -40,12 +39,11 @@ public class Account implements Serializable {
         this.username = username;
         this.password = password;
     }
-    
-    
+
     public Long getId() {
         return id;
     }
-    
+
     public String getUsername() {
         return username;
     }
@@ -54,7 +52,6 @@ public class Account implements Serializable {
         return password;
     }
 
-    
     public DECharacter getCharacter() {
         return character;
     }
@@ -63,7 +60,4 @@ public class Account implements Serializable {
         this.character = character;
     }
 
-
-    
-    
 }

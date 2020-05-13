@@ -68,9 +68,6 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
         return attackDmg;
     }
 
-//    public String getRole() {
-//        return role;
-//    }
     @Override
     public void setCharacterName(String name) {
         this.name = name;
@@ -90,7 +87,7 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setAttackDmg(int attackDmg) {
         this.attackDmg = attackDmg;
     }
-    
+
     @Override
     public Long getId() {
         return id;
@@ -133,16 +130,6 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setCurrentExp(int currentExp) {
         throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
     }
-//
-//    @Override
-//    public void addHealthpotion(Potion healthpotion) {
-//        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
-//    }
-//
-//    @Override
-//    public List<Potion> getHealthpotion() {
-//        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
-//    }
 
     @Override
     public int getMaxHealth() {
@@ -183,7 +170,5 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     public void setInventory(Inventory inventory) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-  
 
 }

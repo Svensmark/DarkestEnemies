@@ -36,25 +36,13 @@ public class InventoryFacade {
     private EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
-    
-    public void setupInventory(Player character){
+
+    public void setupInventory(Player character) {
         EntityManager em = getEntityManager();
-        List<Long> potionIds = new ArrayList();
+        List<Long> potionIds = new ArrayList<Long>();
         Inventory inv = new Inventory(potionIds);
         em.find(Player.class, character.getId());
         character.setInventory(inv);
-        try{
-            em.getTransaction().begin();
-            em.merge(character);
-            em.getTransaction().commit();
-        }finally{
-            em.close();
-        }
-    }
-
-    public void addToInventory(DECharacter character, Inventory inventory) {
-        EntityManager em = getEntityManager();
-        character.setInventory(inventory);
         try {
             em.getTransaction().begin();
             em.merge(character);
@@ -62,7 +50,43 @@ public class InventoryFacade {
         } finally {
             em.close();
         }
+    }
 
+    public Inventory getInventory(DECharacter character, Long id) {
+        EntityManager em = getEntityManager();
+        Inventory inventory = em.find(Inventory.class, id);
+        return inventory;
+    }
+
+    public void addToInventory(DECharacter character, Inventory inventory) {
+        EntityManager em = getEntityManager();
+        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
+        for (Long longs : inventory.getPotionIds()) {
+            inv.getPotionIds().add(longs);
+        }
+        try {
+            em.getTransaction().begin();
+            em.merge(inv);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+
+    }
+
+    public void removeFromInventory(DECharacter character, int index) {
+        EntityManager em = getEntityManager();
+        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
+        inv.getPotionIds().remove(index);
+        character.setInventory(inv);
+        try {
+            em.getTransaction().begin();
+            em.merge(inv);
+            em.merge(character);
+            em.getTransaction().commit();
+        } finally {
+            em.close();;
+        }
     }
 
 }

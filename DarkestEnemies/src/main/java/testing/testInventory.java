@@ -18,6 +18,7 @@ import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.facades.InventoryFacade;
 import DarkestEnemies.facades.PlayerFacade;
 import DarkestEnemies.facades.PotionFacade;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
@@ -40,13 +41,13 @@ public class testInventory {
         AbilityFacade afc = AbilityFacade.getAbilityFacade(_emf);
 
         //Setup Abilities
-        afc.setupBasicAbilities();
-
-        SetupPlayers(acF);
-
-        setupPlayerData(ifc, pfc, afc);
-
-        SetupPotions(potfc);
+//        afc.setupBasicAbilities();
+//
+//        SetupPlayers(acF);
+//
+//        setupPlayerData(ifc, pfc, afc);
+//
+//        SetupPotions(potfc);
 
         setupCharacterPotions(pfc, ifc);
 
@@ -127,10 +128,23 @@ public class testInventory {
     private static void setupCharacterPotions(PlayerFacade pfc, InventoryFacade ifc) throws CharacterNotFoundException {
         DECharacter players1 = pfc.getPlayerByID(1L);
         DECharacter players2 = pfc.getPlayerByID(2L);
-        List<Long> currentPotions = Arrays.asList(1L, 5L, 9L);
-        Inventory inventory = new Inventory(currentPotions);
-        ifc.addToInventory(players1, inventory);
-        ifc.addToInventory(players2, inventory);
+        ArrayList<Long> currentPotions = new ArrayList<Long>();
+        currentPotions.add(1L);
+        currentPotions.add(5L);
+        currentPotions.add(9L);
+        Inventory inventory1 = ifc.getInventory(players1, players1.getInventory().getId());
+        Inventory inventory2 = ifc.getInventory(players2, players2.getInventory().getId());
+        for(Long longs : currentPotions){
+            inventory1.getPotionIds().add(longs);
+            inventory2.getPotionIds().add(longs);
+        }
+        
+        for(Long longs : inventory1.getPotionIds()){
+            System.out.println(longs);
+        }
+        ifc.addToInventory(players1, inventory1);
+        ifc.addToInventory(players2, inventory2);
+        
     }
 
 }

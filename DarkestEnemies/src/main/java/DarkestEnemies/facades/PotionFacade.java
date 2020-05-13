@@ -6,7 +6,6 @@
 package DarkestEnemies.facades;
 
 import DarkestEnemies.Entity.Potion;
-import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.ItemNotFoundException;
 import javax.persistence.EntityManager;
@@ -64,21 +63,6 @@ public class PotionFacade {
         }
     }
 
-//    public void addPotionToPlayer(Long id, Potion potion) {
-//        EntityManager em = getEntityManager();
-//        try {
-//            em.getTransaction().begin();
-//            Player player = em.find(Player.class, id);
-//            Potion pot = em.find(Potion.class, potion.getId());
-//            player.addHealthpotion(pot);
-//
-//            em.merge(player);
-//            em.getTransaction().commit();
-//        } finally {
-//            em.close();
-//        }
-//    }
-
     public Potion getPotionByID(Long id) throws ItemNotFoundException {
         EntityManager em = getEntityManager();
         Potion hp = em.find(Potion.class, id);
@@ -92,13 +76,13 @@ public class PotionFacade {
     public void usePotion(DECharacter character, Potion potion) {
         EntityManager em = getEntityManager();
         if (potion.getHealingValue() > 0 || potion.getManaValue() > 0) {
-            
+
             if ((character.getHealth() + potion.getHealingValue()) > character.getMaxHealth()) {
                 character.setHealth(character.getMaxHealth());
             } else {
                 character.setHealth(character.getHealth() + potion.getHealingValue());
             }
-            
+
             if ((character.getMana() + potion.getManaValue()) > character.getMaxMana()) {
                 character.setMana(character.getMaxMana());
             } else {
@@ -123,10 +107,5 @@ public class PotionFacade {
             character.setAttackDmg(currentAtk);
         }
     }
-    
-    private void removePotionFromPlayer(DECharacter player, Potion potion){
-        EntityManager em = getEntityManager();
-        em.find(Potion.class, potion.getId());
-        
-    }
+
 }

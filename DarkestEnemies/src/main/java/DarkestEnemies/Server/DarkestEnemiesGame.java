@@ -33,6 +33,7 @@ import DarkestEnemies.exceptions.PlayerNotFoundException;
 import DarkestEnemies.facades.AbilityFacade;
 import DarkestEnemies.facades.PlayerFacade;
 import DarkestEnemies.exceptions.ItemNotFoundException;
+import DarkestEnemies.facades.InventoryFacade;
 
 /**
  *
@@ -42,9 +43,10 @@ public class DarkestEnemiesGame implements ITextGame {
 
     EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.DEV, EMF_Creator.Strategy.CREATE);
     //AccountFacade facade = AccountFacade.getAccountFacade(emf);
-    PotionFacade ifc = PotionFacade.getInventoryFacade(emf);
+    PotionFacade pfc = PotionFacade.getInventoryFacade(emf);
     PlayerFacade pF = PlayerFacade.getPlayerFacade(emf);
     AbilityFacade abF = AbilityFacade.getAbilityFacade(emf);
+    InventoryFacade ifc = InventoryFacade.getInventoryFacade(emf);
 
     @Override
     public int getNumberOfPlayers() {
@@ -143,22 +145,16 @@ public class DarkestEnemiesGame implements ITextGame {
                     case 2:
 
                         //All the possible actions the user can take will be placed here.
-//////////                        ArrayList<String> actions = new ArrayList();
-//////////                        
-//////////                        //List of all the healthpotions that the user has. 
-//////////                        List<Potion> healthpotions = players.get(i).getHealthpotion();
-//////////                        
-//////////                        //For each health potion the user has, it is added to the action array.
-//////////                        for(Potion hp : healthpotions){
-//////////                            actions.add(hp.getName() + " - " + hp.getInfo());
-//////////                        }
-//////////                        
-//////////                        //User is presented with all the options it can take.
-//////////                        int choice = playersIO[i].select("Which potion do you wish to use?", actions, "");
-//////////                        
-//////////                        //Gets the chosen health potion from the database and applies it to the user. 
-//////////                        Potion chosen = ifc.getPotionByID(healthpotions.get(choice - 1).getId());
-//////////                        ifc.usePotion(players.get(i), chosen);
+                        ArrayList<String> actions = new ArrayList();
+                        List<Long> potionIds = players.get(i).getInventory().getPotionIds();
+                        for (Long longs : potionIds) {
+                            actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
+                        }
+
+                        int choice = playersIO[i].select("Which potion do you wish to use?", actions, "");
+                        Potion chosen = pfc.getPotionByID(potionIds.get(choice - 1));
+                        pfc.usePotion(players.get(i), chosen);
+                        ifc.removeFromInventory(players.get(i), choice - 1);
                         break;
                     //Player logs out
                     case 3: {
@@ -296,8 +292,8 @@ public class DarkestEnemiesGame implements ITextGame {
 
                                 //Rewards should be a new method
                                 Long potionRank = (long) team1.get(j).getLevel();
-                                Potion hp = ifc.getPotionByID(potionRank);
-//                              ifc.addPotionToPlayer(team1.get(j).getId(), hp);
+                                Potion hp = pfc.getPotionByID(potionRank);
+//                                pfc.addPotionToPlayer(team1.get(j).getId(), hp);
                             }
                             break;
                         }

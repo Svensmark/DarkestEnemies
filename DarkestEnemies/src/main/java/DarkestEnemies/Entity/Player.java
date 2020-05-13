@@ -205,31 +205,6 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         }
     }
 
-//    @Override
-//    public List<Potion> getHealthpotion() {
-//        return healthpotion;
-//    }
-//
-//    public void addHealthpotion(Potion healthpotion) {
-//        this.healthpotion.add(healthpotion);
-//    }
-//    
-//    public void removePotion(Long id){
-//        List<Potion> potions = getHealthpotion();
-//        for(int i = 0; i < potions.size(); i++){
-//            if(potions.get(i).getId() == id){
-//                this.healthpotion.remove(i);
-//            }
-//        }
-//    }
-//    public void increaseUse(Long id){
-//        List<Potion> potions = getHealthpotion();
-//        for(int i = 0; i < potions.size(); i++){
-//            if(potions.get(i).getId() == id){
-//                potions.get(i).setUseAmmount(potions.get(i).getUseAmmount() + 1);
-//            }
-//        }
-//    }
     @Override
     public Inventory getInventory() {
         return inventory;
