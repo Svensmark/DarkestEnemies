@@ -29,21 +29,19 @@ public class Ability implements DarkestEnemies.IF.AbilityI, Serializable {
 
     private int damage;
     private int healing;
-    
+
     private int amountOfTargets;
     private int abilityRank;
-    
+
     private String name;
     @Column(columnDefinition = "LONGTEXT")
     private String description;
-    
+
     @ManyToMany
-    private List<NPC> nPCs;    
+    private List<NPC> nPCs;
     @ManyToMany
     private List<Player> player;
-    
 
-    
     public Ability(int damage, int healing, int amountOfTargets, int abilityRank, String name, String description) {
         this.damage = damage;
         this.healing = healing;
@@ -55,7 +53,6 @@ public class Ability implements DarkestEnemies.IF.AbilityI, Serializable {
 
     public Ability() {
     }
-    
 
     public Long getId() {
         return this.id;
@@ -91,7 +88,4 @@ public class Ability implements DarkestEnemies.IF.AbilityI, Serializable {
         return this.abilityRank;
     }
 
-    
-    
-    
 }

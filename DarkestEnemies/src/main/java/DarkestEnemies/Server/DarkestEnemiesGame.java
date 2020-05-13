@@ -9,8 +9,6 @@ import DarkestEnemies.Entity.Ability;
 
 //HVAD ER DEN HER TIL EMIL???
 //import static DarkestEnemies.Entity.Ability_.player; 
-
-
 import DarkestEnemies.Entity.Account;
 import DarkestEnemies.Entity.Potion;
 import DarkestEnemies.Entity.NPC;
@@ -76,13 +74,13 @@ public class DarkestEnemiesGame implements ITextGame {
 
         }
     }
-    
+
     //First method called - sets up players 
     private List<DECharacter> playerSetup(ITextIO[] players) {
         List<DECharacter> playerEntities = new ArrayList();
         //Player setup
         for (int i = 0; i < players.length; i++) {
- 
+
             //Login & Create account
             List<String> options = Arrays.asList("Login", "Create account");
             players[i].clear();
@@ -145,36 +143,18 @@ public class DarkestEnemiesGame implements ITextGame {
 
                     //Player chooses inventory
                     case 2:
-                        
-                        
-                            
-                        
+
                         //All the possible actions the user can take will be placed here.
                         ArrayList<String> actions = new ArrayList();
                         List<Long> potionIds = players.get(i).getInventory().getPotionIds();
-                        for(Long longs : potionIds){
+                        for (Long longs : potionIds) {
                             actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
                         }
-                        
+
                         int choice = playersIO[i].select("Which potion do you wish to use?", actions, "");
                         Potion chosen = pfc.getPotionByID(potionIds.get(choice - 1));
                         pfc.usePotion(players.get(i), chosen);
                         ifc.removeFromInventory(players.get(i), choice - 1);
-//////////                        
-//////////                        //List of all the healthpotions that the user has. 
-//////////                        List<Potion> healthpotions = players.get(i).getHealthpotion();
-//////////                        
-//////////                        //For each health potion the user has, it is added to the action array.
-//////////                        for(Potion hp : healthpotions){
-//////////                            actions.add(hp.getName() + " - " + hp.getInfo());
-//////////                        }
-//////////                        
-//////////                        //User is presented with all the options it can take.
-//////////                        int choice = playersIO[i].select("Which potion do you wish to use?", actions, "");
-//////////                        
-//////////                        //Gets the chosen health potion from the database and applies it to the user. 
-//////////                        Potion chosen = pfc.getPotionByID(healthpotions.get(choice - 1).getId());
-//////////                        pfc.usePotion(players.get(i), chosen);
                         break;
                     //Player logs out
                     case 3: {
@@ -330,13 +310,13 @@ public class DarkestEnemiesGame implements ITextGame {
             for (DECharacter enemy : team2) {
                 printNPCStats(playersIO[i], enemy);
             }
-        }        
+        }
     }
 
     private void printNPCStats(ITextIO playerIO, DECharacter npc) {
         playerIO.put(npc.getName() + "\n");
-        playerIO.put("- " + npc.getHealth()+ " HP \n");
-        playerIO.put("- " + npc.getAttackDmg()+ " ATK \n\n");
+        playerIO.put("- " + npc.getHealth() + " HP \n");
+        playerIO.put("- " + npc.getAttackDmg() + " ATK \n\n");
     }
 
     private void npcAction(ITextIO[] playersIO, List<DECharacter> opposingTeam, NPC npc) {
@@ -395,7 +375,7 @@ public class DarkestEnemiesGame implements ITextGame {
                 players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             }
         }
-        
+
         players[i].put("Press enter to continue");
         players[i].get();
         players[i].clear();

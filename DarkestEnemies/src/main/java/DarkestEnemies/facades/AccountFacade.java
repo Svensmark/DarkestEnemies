@@ -15,7 +15,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import org.mindrot.jbcrypt.BCrypt;
-import utils.EMF_Creator;
 
 /**
  *
@@ -54,7 +53,7 @@ public class AccountFacade {
             em.close();
         }
     }
-    
+
     public Account addCharacterToAccount(Account account, Player character) {
         EntityManager em = getEntityManager();
         account.setCharacter(character);
@@ -68,16 +67,16 @@ public class AccountFacade {
         }
     }
 
-    public DECharacter login(String username, String password) throws AccountNotFoundException, WrongPasswordException{        
+    public DECharacter login(String username, String password) throws AccountNotFoundException, WrongPasswordException {
         Query query = getEntityManager().createQuery("SELECT account FROM Account account WHERE account.username = :username", Account.class);
-        List<Account> account = query.setParameter("username", username).getResultList();     
+        List<Account> account = query.setParameter("username", username).getResultList();
         //The account was not found
         if (account.isEmpty()) {
             throw new AccountNotFoundException("Something went wrong, the account returned null\n");
         }
-        
+
         //If the password is correct
-        if(checkPassword(password, account.get(0).getPassword())) {
+        if (checkPassword(password, account.get(0).getPassword())) {
             return account.get(0).getCharacter();
         } else {
             throw new WrongPasswordException("The password does not match the usename, check if either is correct\n");
@@ -127,6 +126,5 @@ public class AccountFacade {
 
         return (password_verified);
     }
-        
-    
+
 }

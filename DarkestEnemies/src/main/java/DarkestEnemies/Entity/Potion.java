@@ -5,14 +5,11 @@
  */
 package DarkestEnemies.Entity;
 
-import DarkestEnemies.IF.DECharacter;
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 
 /**
  *
@@ -31,7 +28,6 @@ public class Potion implements DarkestEnemies.IF.ItemI, Serializable {
     private int manaValue;
     private int dmgIncreaseValue;
     //private int useAmmount;
-    
 
     public Potion(String name, String info, int healingValue, int manaValue, int dmgIncreaseValue) {
         this.name = name;
@@ -40,26 +36,6 @@ public class Potion implements DarkestEnemies.IF.ItemI, Serializable {
         this.manaValue = manaValue;
         this.dmgIncreaseValue = dmgIncreaseValue;
     }
-    
-    
-
-//    public Potion(String name, int healingValue, int manaValue) {
-//        this.name = name;
-//        if (healingValue > 0 && manaValue > 0) {
-//            this.info = "Restores " + healingValue + " health and " + manaValue + " mana.";
-//        } else if (healingValue > 0 && manaValue <= 0) {
-//            this.info = "Restores " + healingValue + " health.";
-//        } else if(healingValue <= 0 && manaValue > 0) {
-//            this.info = "Restores " + manaValue + " mana.";
-//        }
-//
-//    }
-//    
-//     public Potion(String name, int dmgIncreaseValue) {
-//        this.name = name;
-//        this.info = "increrases your attack damage stat by " + dmgIncreaseValue + " for this encounter.";
-//        this.dmgIncreaseValue = dmgIncreaseValue;
-//    }
 
     public Potion() {
     }
@@ -121,17 +97,5 @@ public class Potion implements DarkestEnemies.IF.ItemI, Serializable {
     public void setDmgIncreaseValue(int dmgIncreaseValue) {
         this.dmgIncreaseValue = dmgIncreaseValue;
     }
-
-//    @Override
-//    public int getUseAmmount() {
-//        return useAmmount;
-//    }
-//
-//    @Override
-//    public void setUseAmmount(int useAmmount) {
-//        this.useAmmount = useAmmount;
-//    }
-    
-    
 
 }
