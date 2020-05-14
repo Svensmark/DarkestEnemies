@@ -7,16 +7,16 @@ package DarkestEnemies.Server;
 
 import DarkestEnemies.Entity.Ability;
 import DarkestEnemies.Entity.Inventory;
-
-//HVAD ER DEN HER TIL EMIL???
-//import static DarkestEnemies.Entity.Ability_.player; 
 import DarkestEnemies.Entity.Potion;
 import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
-import DarkestEnemies.exceptions.AccountNotFoundException;
 import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.facades.PotionFacade;
+import DarkestEnemies.facades.InventoryFacade;
+import DarkestEnemies.facades.AbilityFacade;
+import DarkestEnemies.facades.PlayerFacade;
 import DarkestEnemies.textio.ITextIO;
+import DarkestEnemies.IF.DECharacter;
 import com.github.javafaker.Faker;
 import entities.exceptions.WrongPasswordException;
 import java.io.IOException;
@@ -25,15 +25,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.persistence.EntityManagerFactory;
 import utils.EMF_Creator;
-import DarkestEnemies.IF.DECharacter;
+import javax.persistence.EntityManagerFactory;
+import DarkestEnemies.exceptions.AccountNotFoundException;
 import DarkestEnemies.exceptions.AbilityNotFoundException;
 import DarkestEnemies.exceptions.PlayerNotFoundException;
-import DarkestEnemies.facades.AbilityFacade;
-import DarkestEnemies.facades.PlayerFacade;
 import DarkestEnemies.exceptions.ItemNotFoundException;
-import DarkestEnemies.facades.InventoryFacade;
+import DarkestEnemies.exceptions.InventorySetupFailure;
 
 /**
  *
@@ -153,13 +151,12 @@ public class DarkestEnemiesGame implements ITextGame {
         ArrayList<String> actions = new ArrayList();
         //List of all the potions the current player has
         List<Long> potionIds = new ArrayList();
-        if (player.getInventory() != null) {
-            potionIds = player.getInventory().getPotionIds();
-            //All of the possible actions get added
-            //The actions include the name of the potion together with its description.
-            for (Long longs : potionIds) {
-                actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
-            }
+        Inventory inventory = ifc.getInventory(player, player.getInventory().getId());
+        potionIds = inventory.getPotionIds();
+        //All of the possible actions get added
+        //The actions include the name of the potion together with its description.
+        for (Long longs : potionIds) {
+            actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
         }
 
         actions.add("Return to menu");
@@ -213,6 +210,12 @@ public class DarkestEnemiesGame implements ITextGame {
             pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("heal"));
         } catch (AbilityNotFoundException e) {
             playerIO.put("Something went wrong with getting the start abilities");
+        }
+        //Adds an empty inventory to the player.
+        try {
+            ifc.setupInventory(player);
+        } catch (PlayerNotFoundException ex) {
+            playerIO.put("Something went wrong while trying to setup your inventory for this character.");
         }
     }
 
@@ -337,7 +340,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
         //Adds the abils name to actions list so it can be selected
         for (Ability ab : abilities) {
-            actions.add(ab.getName() + "\n" + "  - " + ab.getDescription());
+            actions.add(ab.getName() + "\n" + "  - " + ab.getDescription() + "\n");
         }
         int choice = players[i].select("What do you wish to do?", actions, "");
 
@@ -428,6 +431,10 @@ public class DarkestEnemiesGame implements ITextGame {
 
             //Encounter
             encounter(playersIO, allCharacters, players, enemies, true);
+        } else {
+            for (int i = 0; i < players.size(); i++) {
+                playersIO[i].put("No enemies in sight, it's safe to move on to the next room.\n");
+            }
         }
 
         for (int i = 0; i < players.size(); ++i) {

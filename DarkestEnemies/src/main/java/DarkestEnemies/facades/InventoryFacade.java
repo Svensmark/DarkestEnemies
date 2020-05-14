@@ -8,6 +8,7 @@ package DarkestEnemies.facades;
 import DarkestEnemies.Entity.Inventory;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
+import DarkestEnemies.exceptions.PlayerNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -37,15 +38,20 @@ public class InventoryFacade {
         return emf.createEntityManager();
     }
 
-    public void setupInventory(Player character) {
+    public void setupInventory(Player character) throws PlayerNotFoundException {
         EntityManager em = getEntityManager();
+
         List<Long> potionIds = new ArrayList<Long>();
         Inventory inv = new Inventory(potionIds);
-        em.find(Player.class, character.getId());
-        character.setInventory(inv);
+
+        Player player = em.find(Player.class, character.getId());
+        if (player == null) {
+            throw new PlayerNotFoundException("Character with id:" + character.getId() + " and named: " + character.getName() + "was not found.");
+        }
+        player.setInventory(inv);
         try {
             em.getTransaction().begin();
-            em.merge(character);
+            em.merge(player);
             em.getTransaction().commit();
         } finally {
             em.close();
@@ -58,27 +64,17 @@ public class InventoryFacade {
         return inventory;
     }
 
-    public void addToInventory(DECharacter character, Inventory newInventory) {
+    public void addToInventory(DECharacter character, Inventory inventory) {
         EntityManager em = getEntityManager();
-        Inventory playerInventory = null;
 
-        //If an inventory needs to be setup
-        try {
-            playerInventory = em.find(Inventory.class, character.getInventory().getId());
-        } catch (NullPointerException e) {
-            setupInventory((Player) character);
-        }
-        
-        //Adds the reward to the player
-        if (newInventory != null) {
-            for (Long longs : newInventory.getPotionIds()) {
-                playerInventory.getPotionIds().add(longs);
-            }
+        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
+        for (Long longs : inventory.getPotionIds()) {
+            inv.getPotionIds().add(longs);
         }
 
         try {
             em.getTransaction().begin();
-            em.merge(playerInventory);
+            em.merge(inv);
             em.getTransaction().commit();
         } finally {
             em.close();
