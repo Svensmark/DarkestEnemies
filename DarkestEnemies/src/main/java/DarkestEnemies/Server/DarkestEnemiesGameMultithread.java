@@ -129,7 +129,6 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
                 //Player chooses inventory
                 case 2:
-
                     for (int j = 0; j < playerCharacter.getHealthpotion().size(); j++) {
                         playerIO.put(playerCharacter.getHealthpotion().get(j).getInfo());
                     }
