@@ -17,6 +17,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,11 +46,11 @@ public class GameServerMultithread implements Runnable {
             System.out.println("Server started on " + adr + ":" + port);
 
             //SyncBoxes
-            ArrayList<SyncBox> allSyncBoxes = new ArrayList();
+            SyncBox<HashMap> allSyncBoxes = new SyncBox();
             SyncBox<ArrayList<ITextIO>> allPlayersSB = new SyncBox();
 
             //Adding SyncBoxes to the list of all SyncBoxes
-            allSyncBoxes.add(allPlayersSB);
+            allSyncBoxes.peek().put("allPlayersSB",allPlayersSB);
 
             //Main server loop
             boolean serverUp = true;

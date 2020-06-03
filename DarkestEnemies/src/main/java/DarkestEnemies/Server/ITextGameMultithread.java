@@ -15,6 +15,6 @@ import java.util.ArrayList;
  */
 public interface ITextGameMultithread {
     
-    public void startGame(ITextIO player, ArrayList<SyncBox> syncBoxes);
+    public void startGame(ITextIO player, SyncBox allSyncBoxes);
     
 }
