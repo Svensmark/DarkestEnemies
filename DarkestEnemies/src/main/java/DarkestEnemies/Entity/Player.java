@@ -6,18 +6,15 @@
 package DarkestEnemies.Entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -25,35 +22,42 @@ import javax.persistence.OneToMany;
  */
 @Entity
 public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-        
+
     private String name;
-    
+
     //Mandatory stats
     private int health;
+    private int maxHealth;
     private int mana;
+    private int maxMana;
     private int attackDmg;
+    private int maxAttackDmg;
     private int level;
     private int currentExp;
     private int neededExp;
-    
+
     //Inventory
-    private List<HealthPotion> healthpotion;      //Skal ændres til en liste af ItemI på et tidspunkt i fremtiden
+    @OneToOne(cascade = CascadeType.PERSIST)
+    private Inventory inventory;
     private int gold;
-    
+
     //Abilities
     @ManyToMany
     private List<Ability> abilities;
 
-    public Player(String name, int health, int mana, int attackDmg, int level, List<Ability> abilities) {
+    public Player(String name, int health, int maxHealth, int mana, int maxMana, int attackDmg, int maxAttackDmg, int level, List<Ability> abilities) {
         this.name = name;
         this.health = health;
+        this.maxHealth = maxHealth;
         this.mana = mana;
+        this.maxMana = maxMana;
         this.attackDmg = attackDmg;
+        this.maxAttackDmg = maxAttackDmg;
         this.level = level;
         this.abilities = abilities;
     }
@@ -61,15 +65,18 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     public Player(String name) {
         this.name = name;
         this.health = 100;
+        this.maxHealth = 100;
         this.mana = 0;
+        this.maxMana = 0;
         this.attackDmg = 2;
+        this.maxAttackDmg = 2;
         this.level = 1;
-    }    
-    
-    public Player() {
-        
     }
-    
+
+    public Player() {
+
+    }
+
     @Override
     public ENUMTYPE getType() {
         return ENUMTYPE.PLAYER;
@@ -152,45 +159,74 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     }
 
     @Override
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+    @Override
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+    }
+
+    @Override
+    public int getMaxMana() {
+        return maxMana;
+    }
+
+    @Override
+    public void setMaxMana(int maxMana) {
+        this.maxMana = maxMana;
+    }
+
+    @Override
+    public int getMaxAttackDmg() {
+        return maxAttackDmg;
+    }
+
+    @Override
+    public void setMaxAttackDmg(int maxAttackDmg) {
+        this.maxAttackDmg = maxAttackDmg;
+    }
+
+    @Override
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }    
-    
+    }
+
     public void checkExp() {
         if (this.currentExp >= this.neededExp) {
             this.level = this.level + 1;
             this.currentExp = this.currentExp - this.neededExp;
-            this.neededExp = (int) Math.pow(0.8, this.level)*1000;
+            this.neededExp = (int) Math.pow(0.8, this.level) * 1000;
         }
     }
 
-    
     @Override
-    public List<HealthPotion> getHealthpotion() {
-        return healthpotion;
+    public Inventory getInventory() {
+        return inventory;
     }
 
-    public void addHealthpotion(HealthPotion healthpotion) {
-        this.healthpotion.add(healthpotion);        
+    @Override
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
     }
 
-    
     public int getGold() {
         return this.gold;
     }
-    
+
     public void addGold(int amount) {
         this.gold += amount;
     }
-    
+
     public void removeGold(int amount) {
         this.gold -= amount;
     }
-    
+
     public void addAbility(Ability ability) {
         abilities.add(ability);
     }
@@ -199,10 +235,5 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     public List<Ability> getAbilities() {
         return abilities;
     }
-
-
-    
-    
-    
 
 }

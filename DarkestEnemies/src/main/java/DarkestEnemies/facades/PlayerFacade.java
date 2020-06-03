@@ -86,16 +86,15 @@ public class PlayerFacade {
         return players.get(0);
     }
 
-    
-    public Player getPlayerByID(Long id) throws CharacterNotFoundException{
+    public Player getPlayerByID(Long id) throws CharacterNotFoundException {
         EntityManager em = getEntityManager();
         Player player = em.find(Player.class, id);
-        if(player == null){
+        if (player == null) {
             throw new CharacterNotFoundException("Character with that ID was not found.");
         }
         return player;
     }
-    
+
     public void addAbilityToPlayer(Long playerID, Ability ability) {
         EntityManager em = getEntityManager();
 

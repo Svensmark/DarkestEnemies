@@ -7,7 +7,6 @@ package DarkestEnemies.Entity;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,24 +29,15 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     private int health;
     private int mana;
     private int attackDmg;
-    //private String role;
 
     @ManyToMany
     private List<Ability> abilities;
 
-    // Constructor for enemy NPC's
     public NPC(String name, int health, int mana, int attackDmg) {
         this.name = name;
         this.health = health;
         this.mana = mana;
         this.attackDmg = attackDmg;
-        //this.role = "Enemy";
-    }
-
-    // Constructor for friendly NPC's
-    public NPC(String name) {
-        this.name = name;
-        //this.role = "Friendly";
     }
 
     public NPC() {
@@ -78,9 +68,6 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
         return attackDmg;
     }
 
-//    public String getRole() {
-//        return role;
-//    }
     @Override
     public void setCharacterName(String name) {
         this.name = name;
@@ -101,9 +88,7 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
         this.attackDmg = attackDmg;
     }
 
-//    public void setRole(String role) {
-//        this.role = role;
-//    }
+    @Override
     public Long getId() {
         return id;
     }
@@ -113,47 +98,77 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     }
 
     @Override
+    public List<Ability> getAbilities() {
+        return this.abilities;
+    }
+
+    public void addAbilities(Ability ability) {
+        this.abilities.add(ability);
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
     public int getLevel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
     }
 
     @Override
     public int getCurrentExp() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
     }
 
     @Override
     public void setLevel(int level) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
     }
 
     @Override
     public void setCurrentExp(int currentExp) {
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
+    }
+
+    @Override
+    public int getMaxHealth() {
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
+    }
+
+    @Override
+    public int getMaxMana() {
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
+    }
+
+    @Override
+    public int getMaxAttackDmg() {
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
+    }
+
+    @Override
+    public void setMaxHealth(int health) {
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
+    }
+
+    @Override
+    public void setMaxMana(int mana) {
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
+    }
+
+    @Override
+    public void setMaxAttackDmg(int atk) {
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
+    }
+
+    @Override
+    public Inventory getInventory() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void addHealthpotion(HealthPotion healthpotion) {
+    public void setInventory(Inventory inventory) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<HealthPotion> getHealthpotion() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<Ability> getAbilities() {
-        return this.abilities;
-    }
-    
-     public void addAbilities(Ability ability) {
-        this.abilities.add(ability);
-    }
-    
-    @Override
-    public String getName() {
-        return this.name;
     }
 
 }

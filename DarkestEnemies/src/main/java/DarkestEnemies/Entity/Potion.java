@@ -5,21 +5,18 @@
  */
 package DarkestEnemies.Entity;
 
-import DarkestEnemies.IF.DECharacter;
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 
 /**
  *
  * @author Asger
  */
 @Entity
-public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
+public class Potion implements DarkestEnemies.IF.ItemI, Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -27,18 +24,20 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     private Long id;
     private String name;
     private String info;
-    private int value;
+    private int healingValue;
+    private int manaValue;
+    private int dmgIncreaseValue;
+    //private int useAmmount;
 
-    @ManyToMany
-    private List<Player> player;
-
-    public HealthPotion(String name, int value) {
+    public Potion(String name, String info, int healingValue, int manaValue, int dmgIncreaseValue) {
         this.name = name;
-        this.info = "Potion that heals you for " + value;
-        this.value = value;
+        this.info = info;
+        this.healingValue = healingValue;
+        this.manaValue = manaValue;
+        this.dmgIncreaseValue = dmgIncreaseValue;
     }
 
-    public HealthPotion() {
+    public Potion() {
     }
 
     public Long getId() {
@@ -70,24 +69,33 @@ public class HealthPotion implements DarkestEnemies.IF.ItemI, Serializable {
     }
 
     @Override
-    public int getValue() {
-        return value;
+    public int getHealingValue() {
+        return healingValue;
     }
 
     @Override
-    public void setValue(int value) {
-        this.value = value;
+    public void setHealingValue(int healingValue) {
+        this.healingValue = healingValue;
     }
-    
-    
 
     @Override
-    public void use(DECharacter player) {
-        player.setHealth(player.getHealth() + value);
-        System.out.println("Healed for " + value);
-        System.out.println("You now have: " + player.getHealth() + "hp.");
+    public int getManaValue() {
+        return manaValue;
     }
 
-   
+    @Override
+    public void setManaValue(int manaValue) {
+        this.manaValue = manaValue;
+    }
+
+    @Override
+    public int getDmgIncreaseValue() {
+        return dmgIncreaseValue;
+    }
+
+    @Override
+    public void setDmgIncreaseValue(int dmgIncreaseValue) {
+        this.dmgIncreaseValue = dmgIncreaseValue;
+    }
 
 }

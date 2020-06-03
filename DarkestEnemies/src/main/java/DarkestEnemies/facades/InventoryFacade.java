@@ -5,10 +5,12 @@
  */
 package DarkestEnemies.facades;
 
-import DarkestEnemies.Entity.HealthPotion;
+import DarkestEnemies.Entity.Inventory;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.IF.DECharacter;
-import DarkestEnemies.exceptions.ItemNotFoundException;
+import DarkestEnemies.exceptions.PlayerNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -36,26 +38,19 @@ public class InventoryFacade {
         return emf.createEntityManager();
     }
 
-    public void addHealthPotion(HealthPotion healthpotion) {
+    public void setupInventory(Player character) throws PlayerNotFoundException {
         EntityManager em = getEntityManager();
-        HealthPotion hp = new HealthPotion(healthpotion.getName(), healthpotion.getValue());
-        try {
-            em.getTransaction().begin();
-            em.persist(hp);
-            em.getTransaction().commit();
-        } finally {
-            em.close();
+
+        List<Long> potionIds = new ArrayList<Long>();
+        Inventory inv = new Inventory(potionIds);
+
+        Player player = em.find(Player.class, character.getId());
+        if (player == null) {
+            throw new PlayerNotFoundException("Character with id:" + character.getId() + " and named: " + character.getName() + "was not found.");
         }
-    }
-
-    public void addPotionToPlayer(Long id, HealthPotion hp) {
-        EntityManager em = getEntityManager();
+        player.setInventory(inv);
         try {
             em.getTransaction().begin();
-            Player player = em.find(Player.class, id);
-            HealthPotion healthpotion = em.find(HealthPotion.class, hp.getId());
-            player.addHealthpotion(healthpotion);
-
             em.merge(player);
             em.getTransaction().commit();
         } finally {
@@ -63,25 +58,43 @@ public class InventoryFacade {
         }
     }
 
-    public HealthPotion getHealthPotionByID(Long id) throws ItemNotFoundException {
+    public Inventory getInventory(DECharacter character, Long id) {
         EntityManager em = getEntityManager();
-        HealthPotion hp = em.find(HealthPotion.class, id);
-        if(hp == null){
-            throw new ItemNotFoundException("Item doesn't seem to exist.");
-        }
-        
-        return hp;
+        Inventory inventory = em.find(Inventory.class, id);
+        return inventory;
     }
 
-    public void useHealthPotion(DECharacter character, int index) {
+    public void addToInventory(DECharacter character, Inventory inventory) {
         EntityManager em = getEntityManager();
-        character.getHealthpotion().get(index).use(character);
+
+        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
+        for (Long longs : inventory.getPotionIds()) {
+            inv.getPotionIds().add(longs);
+        }
+
         try {
             em.getTransaction().begin();
-            em.merge(character);
+            em.merge(inv);
             em.getTransaction().commit();
         } finally {
             em.close();
         }
+
     }
+
+    public void removeFromInventory(DECharacter character, int index) {
+        EntityManager em = getEntityManager();
+        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
+        inv.getPotionIds().remove(index);
+        character.setInventory(inv);
+        try {
+            em.getTransaction().begin();
+            em.merge(inv);
+            em.merge(character);
+            em.getTransaction().commit();
+        } finally {
+            em.close();;
+        }
+    }
+
 }
