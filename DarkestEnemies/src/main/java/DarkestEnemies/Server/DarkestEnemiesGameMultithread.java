@@ -125,9 +125,8 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             switch (menuChoice) {
 
                 //User chooses to find an enemy
-                case 1:
+                case 1: //Something here with syncboxes
 
-                //Something here with syncboxes
                 //Player chooses inventory
                 case 2:
 
@@ -148,7 +147,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                             case 1:
                                 break;
                         }
-                        break;                       
+                        break;
                     } else { //If theres more than 1 option, the inventory isn't empty
                         int inventoryChoice = playerIO.select("Inventory", inventoryOptions, "");
                         switch (inventoryChoice) {
