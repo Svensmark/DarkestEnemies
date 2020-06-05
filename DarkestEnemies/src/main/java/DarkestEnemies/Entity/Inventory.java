@@ -23,9 +23,11 @@ public class Inventory implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private List<Long> potionIds;
+    private List<Long> trinketIds;
 
-    public Inventory(List<Long> potionIds) {
+    public Inventory(List<Long> potionIds, List<Long> trinketIds) {
         this.potionIds = potionIds;
+        this.trinketIds = trinketIds;
     }
 
     public Inventory() {
@@ -45,6 +47,14 @@ public class Inventory implements Serializable {
 
     public void setPotionIds(List<Long> potionIds) {
         this.potionIds = potionIds;
+    }
+    
+    public List<Long> getTrinketIds() {
+        return trinketIds;
+    }
+    
+    public void setTrinketIds(List<Long> trinketIds) {
+        this.trinketIds = trinketIds;
     }
 
 }

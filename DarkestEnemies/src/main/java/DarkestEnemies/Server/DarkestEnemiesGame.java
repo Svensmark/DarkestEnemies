@@ -12,6 +12,7 @@ import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.facades.PotionFacade;
+import DarkestEnemies.facades.TrinketFacade;
 import DarkestEnemies.facades.InventoryFacade;
 import DarkestEnemies.facades.AbilityFacade;
 import DarkestEnemies.facades.PlayerFacade;
@@ -42,6 +43,7 @@ public class DarkestEnemiesGame implements ITextGame {
     EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.DEV, EMF_Creator.Strategy.CREATE);
     //AccountFacade facade = AccountFacade.getAccountFacade(emf);
     PotionFacade pfc = PotionFacade.getInventoryFacade(emf);
+    TrinketFacade tfc = TrinketFacade.getInventoryFacade(emf);
     PlayerFacade pF = PlayerFacade.getPlayerFacade(emf);
     AbilityFacade abF = AbilityFacade.getAbilityFacade(emf);
     InventoryFacade ifc = InventoryFacade.getInventoryFacade(emf);
@@ -450,6 +452,16 @@ public class DarkestEnemiesGame implements ITextGame {
         //Rewards should be a new method
         //Determines the amount of potions the player gets as a reward
         int amountOfPotions = (int) (Math.random() * 3) + 1;
+        
+        //Adds single random trinket
+        List<Long> trinketIds = new ArrayList();
+        if ((Math.random() * 10) > 6) {
+            double trinketID = (Math.random() * 3) + 1;
+            playerIO.put("You found a " + tfc.getTrinketById((long) trinketID).getName() + "\n");
+            trinketIds.add((long) trinketID);
+        } else {
+            trinketIds = null;
+        }
 
         //Adds random potions with the amount equal to the random number above
         List<Long> potionIDs = new ArrayList();
@@ -459,7 +471,7 @@ public class DarkestEnemiesGame implements ITextGame {
             potionIDs.add((long) potionID);
         }
         //Creates a new inventory with the potions 
-        Inventory inventory = new Inventory(potionIDs);
+        Inventory inventory = new Inventory(potionIDs, trinketIds);
 
         //Adds the items from the new inventory to the existing inventory of the player
         ifc.addToInventory(player, inventory);
