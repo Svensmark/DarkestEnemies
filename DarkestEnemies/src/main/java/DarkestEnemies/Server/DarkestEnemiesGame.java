@@ -453,6 +453,14 @@ public class DarkestEnemiesGame implements ITextGame {
         //Determines the amount of potions the player gets as a reward
         int amountOfPotions = (int) (Math.random() * 3) + 1;
         
+        //Adds random potions with the amount equal to the random number above
+        List<Long> potionIDs = new ArrayList();
+        for (int i = 0; i < amountOfPotions; ++i) {
+            double potionID = (Math.random() * 3) + 1;
+            playerIO.put("You found a " + pfc.getPotionByID((long) potionID).getName() + "\n");
+            potionIDs.add((long) potionID);
+        }
+        
         //Adds single random trinket
         List<Long> trinketIds = new ArrayList();
         int trinketChance = (int) Math.random() * 10;
@@ -462,14 +470,6 @@ public class DarkestEnemiesGame implements ITextGame {
             trinketIds.add((long) trinketID);
         } else {
             trinketIds = null;
-        }
-
-        //Adds random potions with the amount equal to the random number above
-        List<Long> potionIDs = new ArrayList();
-        for (int i = 0; i < amountOfPotions; ++i) {
-            double potionID = (Math.random() * 3) + 1;
-            playerIO.put("You found a " + pfc.getPotionByID((long) potionID).getName() + "\n");
-            potionIDs.add((long) potionID);
         }
         //Creates a new inventory with the potions 
         Inventory inventory = new Inventory(potionIDs, trinketIds);
