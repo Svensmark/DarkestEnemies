@@ -151,7 +151,7 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
     
-    private void showInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException {
+    private void showInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException, CharacterNotFoundException {
         ArrayList<String> actions = new ArrayList();
         actions.add("Potions");
         actions.add("Trinkets");
@@ -167,9 +167,8 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    private void showPotionInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException {
+    private void showPotionInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException, CharacterNotFoundException {
 
-    private void showInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException, CharacterNotFoundException {
         //All the possible actions the user can take will be placed here.
         ArrayList<String> actions = new ArrayList();
         //List of all the potions the current player has
