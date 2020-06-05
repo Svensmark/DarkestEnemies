@@ -46,4 +46,15 @@ public class SyncBox<E>
         this.obj = obj;
         notifyAll();
     }
+    
+    public synchronized E peek() {
+        while (this.obj == null) {
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                //Do nothing...
+            }
+        }
+        return this.obj;
+    }
 }

@@ -3,20 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package testing;
+package DarkestEnemies.Server;
 
-import DarkestEnemies.Server.AsciiArt;
+import DarkestEnemies.syncbox.SyncBox;
 import DarkestEnemies.textio.ITextIO;
+import java.util.ArrayList;
 
 /**
  *
  * @author Gamer
  */
-public class testMain {
-
-    public static void main(String[] args) throws Exception {
-        AsciiArt aa = new AsciiArt();
-        
-    }
-
+public interface ITextGameMultithread {
+    
+    public void startGame(ITextIO player, SyncBox allSyncBoxes);
+    
 }

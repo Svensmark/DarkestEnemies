@@ -65,7 +65,6 @@ public class DarkestEnemiesGame implements ITextGame {
 
         //Main loop
         while (true) {
-
             try {
                 //Main menu
                 mainMenu(players, playerEntities);

@@ -23,6 +23,8 @@ import DarkestEnemies.facades.PotionFacade;
 import DarkestEnemies.facades.TrinketFacade;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
 import utils.EMF_Creator;
 
@@ -48,15 +50,26 @@ public class testInventory {
 
         SetupPlayers(acF);
 
-        setupPlayerData(ifc, pfc, afc);
+        try {
+            setupPlayerData(_emf);
+        } catch (PlayerNotFoundException ex) {
+            Logger.getLogger(testInventory.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AbilityNotFoundException ex) {
+            Logger.getLogger(testInventory.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CharacterNotFoundException ex) {
+            Logger.getLogger(testInventory.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         SetupPotions(potfc);
         
         setupTrinkets(trf);
 
-        setupCharacterPotions(pfc, ifc);
-
-        //testUsePotion(pfc, potfc);
+        try {
+            setupCharacterPotions(pfc, ifc);
+            //testUsePotion(pfc, potfc);
+        } catch (CharacterNotFoundException ex) {
+            Logger.getLogger(testInventory.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private static void testUsePotion(PlayerFacade pfc, PotionFacade potfc) throws CharacterNotFoundException, ItemNotFoundException {
@@ -82,17 +95,17 @@ public class testInventory {
         acF.addCharacterToAccount(acc2, player2);
     }
 
-    private static void setupPlayerData(InventoryFacade ifc, PlayerFacade pfc, AbilityFacade afc) throws AbilityNotFoundException, CharacterNotFoundException, PlayerNotFoundException {
-        Player player1 = pfc.getPlayerByID(1L);
-        Player player2 = pfc.getPlayerByID(2L);
-        ifc.setupInventory(player1);
-        pfc.addAbilityToPlayer(1L, afc.getAbilityByName("slam"));
-        pfc.addAbilityToPlayer(1L, afc.getAbilityByName("heal"));
+    private static void setupPlayerData(EntityManagerFactory _emf) throws AbilityNotFoundException, CharacterNotFoundException, PlayerNotFoundException {
+        Player player1 = PlayerFacade.getPlayerFacade(_emf).getPlayerByID(1L);
+        Player player2 = PlayerFacade.getPlayerFacade(_emf).getPlayerByID(2L);
+        InventoryFacade.getInventoryFacade(_emf).setupInventory(player1);
+        PlayerFacade.getPlayerFacade(_emf).addAbilityToPlayer(1L, AbilityFacade.getAbilityFacade(_emf).getAbilityByName("slam"));
+        PlayerFacade.getPlayerFacade(_emf).addAbilityToPlayer(1L, AbilityFacade.getAbilityFacade(_emf).getAbilityByName("heal"));
 
-        ifc.setupInventory(player2);
+        InventoryFacade.getInventoryFacade(_emf).setupInventory(player2);
 
-        pfc.addAbilityToPlayer(2L, afc.getAbilityByName("slam"));
-        pfc.addAbilityToPlayer(2L, afc.getAbilityByName("heal"));
+        PlayerFacade.getPlayerFacade(_emf).addAbilityToPlayer(2L, AbilityFacade.getAbilityFacade(_emf).getAbilityByName("slam"));
+        PlayerFacade.getPlayerFacade(_emf).addAbilityToPlayer(2L, AbilityFacade.getAbilityFacade(_emf).getAbilityByName("heal"));
     }
 
     private static void SetupPotions(PotionFacade potfc) {
@@ -193,3 +206,4 @@ public class testInventory {
     }
     
 }
+
