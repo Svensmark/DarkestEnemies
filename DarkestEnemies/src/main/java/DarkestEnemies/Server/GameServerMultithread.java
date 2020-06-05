@@ -18,8 +18,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -47,10 +45,13 @@ public class GameServerMultithread implements Runnable {
 
             //SyncBoxes
             SyncBox<HashMap> allSyncBoxes = new SyncBox();
-            SyncBox<ArrayList<ITextIO>> allPlayersSB = new SyncBox();
-
+            allSyncBoxes.put(new HashMap());
+            
             //Adding SyncBoxes to the list of all SyncBoxes
-            allSyncBoxes.peek().put("allPlayersSB",allPlayersSB);
+            //All playerIO hosting a multiplayer game as a list in a syncbox
+            SyncBox<ArrayList<ITextIO>> allPlayersSB = new SyncBox();
+            allPlayersSB.put(new ArrayList<>());
+            allSyncBoxes.peek().put("hostingPlayersSB", allPlayersSB);
 
             //Main server loop
             boolean serverUp = true;

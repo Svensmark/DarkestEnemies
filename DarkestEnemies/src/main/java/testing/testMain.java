@@ -5,16 +5,8 @@
  */
 package testing;
 
-import DarkestEnemies.Entity.Ability;
-import DarkestEnemies.Entity.Player;
-import DarkestEnemies.facades.AbilityFacade;
-import DarkestEnemies.facades.AccountFacade;
-import DarkestEnemies.facades.PlayerFacade;
-import com.github.javafaker.Faker;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.EntityManagerFactory;
-import utils.EMF_Creator;
+import DarkestEnemies.Server.AsciiArt;
+import DarkestEnemies.textio.ITextIO;
 
 /**
  *
@@ -23,16 +15,8 @@ import utils.EMF_Creator;
 public class testMain {
 
     public static void main(String[] args) throws Exception {
-
-        int rand = (int) (Math.random()* 2)+1;
-        System.out.println(rand);
-        rand = (int) (Math.random() * 2)+1;
-        System.out.println(rand);
-        rand = (int) (Math.random() * 2)+1;
-        System.out.println(rand);
-        rand = (int) (Math.random() * 2)+1;
-        System.out.println(rand);
-
+        AsciiArt aa = new AsciiArt();
+        
     }
 
 }

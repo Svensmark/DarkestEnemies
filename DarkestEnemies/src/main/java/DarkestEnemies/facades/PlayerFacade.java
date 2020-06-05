@@ -8,6 +8,7 @@ package DarkestEnemies.facades;
 import DarkestEnemies.Entity.Ability;
 import DarkestEnemies.Entity.Account;
 import DarkestEnemies.Entity.Player;
+import DarkestEnemies.Server.AsciiArt;
 import DarkestEnemies.exceptions.PlayerNotFoundException;
 import DarkestEnemies.textio.ITextIO;
 import java.util.List;
@@ -61,7 +62,11 @@ public class PlayerFacade {
 
     public Player createNewPlayer(ITextIO user) {
         AccountFacade af = AccountFacade.getAccountFacade(emf);
-        user.put("New usename:");
+        user.clear();
+        AsciiArt aa = new AsciiArt();
+        aa.printRandom(user);
+        user.put("\n\n[Create account]\n\n");
+        user.put("New username:");
         String username = user.get();
         user.put("New password:");
         String password = user.get();
@@ -72,7 +77,10 @@ public class PlayerFacade {
         Player player = new Player(playerName);
 
         af.addCharacterToAccount(a, player);
-        user.put("Succes - you can now login with your account");
+        user.put("\nSucces - you can now login with your account\n");
+        user.put("Press enter to return ..");
+        user.get();
+        user.clear();
         return player;
     }
 

@@ -44,6 +44,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     InventoryFacade ifc = InventoryFacade.getInventoryFacade(emf);
     PlayerFacade pF = PlayerFacade.getPlayerFacade(emf);
     AbilityFacade abF = AbilityFacade.getAbilityFacade(emf);
+    AsciiArt aa = new AsciiArt();
 
     @Override
     public void startGame(ITextIO playerIO, SyncBox allSyncBoxes) {
@@ -62,14 +63,14 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
     private DECharacter login(ITextIO playerIO) {
         DECharacter playerCharacter = null;
-
         //Login & Create account
         List<String> options = Arrays.asList("Login", "Create account");
 
         //While the playerIO is setting up their account/logging in
         boolean settingUp = true;
         while (settingUp) {
-            int option = playerIO.select("Please choose an option", options, "");
+            printServerIntroScreen(playerIO);
+            int option = playerIO.select("[Login screen]", options, "");
 
             switch (option) {
                 //User chooses to login
@@ -78,22 +79,26 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                     while (login) {
                         try {
                             AccountFacade af = AccountFacade.getAccountFacade(emf);
-                            playerIO.put("Usename:");
+                            playerIO.put("Username:");
                             String username = playerIO.get();
                             playerIO.put("Password:");
                             String password = playerIO.get();
                             playerCharacter = af.login(username, password);
                             //If nothing went wrong the logged in player is added to the list
                             login = false;
+                            settingUp = false;
                         } catch (AccountNotFoundException e) {
-                            playerIO.put("Something went wrong, please try again (user came back as null)");
+                            playerIO.put("We could not find an account with that name and password combination.\nPress enter to return ..");
+                            playerIO.get();
+                            login=false;
                             e.printStackTrace();
                         } catch (WrongPasswordException e) {
-                            playerIO.put("Username and password does not match, please try again");
+                            playerIO.put("We could not find an account with that name and password combination.\nPress enter to return ..");
+                            playerIO.get();
+                            login=false;
                             e.printStackTrace();
                         }
                     }
-                    settingUp = false;
                     break;
 
                 //User chooses to create account    
@@ -105,6 +110,13 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                         player = pF.getPlayerByName(playerName);
                     } catch (PlayerNotFoundException e) {
                         System.out.println("Something went wrong with finding the player by name: " + playerName);
+                    }
+
+                    //Adds an inventory to the player 
+                    try {
+                        ifc.setupInventory(player);
+                    } catch (PlayerNotFoundException ex) {
+                        System.out.println("Something went wrong with adding an inventory to the player");
                     }
 
                     //Adds the start ability to the player "slam"
@@ -119,29 +131,59 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         return playerCharacter;
     }
 
-    private void mainMenu(ITextIO playerIO, DECharacter playerCharacter, SyncBox allSyncBoxes) {
+    private void printServerIntroScreen(ITextIO playerIO) {
+        playerIO.clear();
+        aa.printRandom(playerIO);
+        playerIO.put("\n\n                            Welcome to Darkest Enemies game server!\n\n");
+    }
 
+    private void mainMenu(ITextIO playerIO, DECharacter playerCharacter, SyncBox allSyncBoxes) {
         //The player in players list is in menu
         boolean menu = true;
         while (menu) {
+            playerIO.clear();
+            aa.printRandom(playerIO);
             List<String> options = Arrays.asList("Find enemy", "Inventory", "Log out");
-            int choice = playerIO.select("Main menu", options, "");
-            switch (choice) {
+            int choiceMainMenu = playerIO.select("\n\n[Main menu]", options, "");
+            switch (choiceMainMenu) {
 
                 //User chooses to find an enemy
                 case 1: //Something here with syncboxes
-                    options = Arrays.asList("Solo", "Multiplayer");
-                    choice = playerIO.select("How do you wish to play", options, "");
+                    playerIO.clear();
+                    options = Arrays.asList("Solo", "Multiplayer", "Go back");
+                    int choiceFindEnemy = playerIO.select("[Game menu]", options, "");
 
-                    switch (choice) {
+                    switch (choiceFindEnemy) {
                         case 1: //Player wishes to play solo
-                            
+                            playerIO.clear();
+                            playerIO.put("How many rooms should the dungeon be?");
+                            int amount = playerIO.getInteger();
+                            ITextIO[] test = {playerIO};
+                            enterDungeon(test, Arrays.asList(playerCharacter), amount);
                             break;
 
                         case 2: //Player wishes to play multiplayer
+                            playerIO.clear();
+                            options = Arrays.asList("Host a game", "Join a game", "Go back");
+                            int choiceMultiplayer = playerIO.select("[Multiplayer menu]", options, "");
+                            switch (choiceMultiplayer) {
+                                case 1://Player wishes to host a game for someone to join
 
+                                    break;
+
+                                case 2://Player wishes to join a hosted game
+
+                                    break;
+
+                                case 3: //Player wants to go back
+                                    break;
+                            }
+                            break;
+
+                        case 3: //Player wants to go back
                             break;
                     }
+                    break;
 
                 //Player chooses inventory
                 case 2:
@@ -163,6 +205,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     }
 
     private void showInventory(DECharacter player, ITextIO playerIO) {
+        playerIO.clear();
         //All the possible actions the user can take will be placed here.
         ArrayList<String> actions = new ArrayList();
         //List of all the potions the current player has
@@ -196,7 +239,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             ifc.removeFromInventory(player, choice - 1);
         }
     }
-    
+
     private NPC createNPC(List<DECharacter> playerCharacters) {
         //Initizialation of stats
         int health = 0;
@@ -219,5 +262,239 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
         return new NPC(name, health, mana, attack);
     }
-    
+
+    private void encounter(ITextIO[] playersIO, List<DECharacter> allCharacters, List<DECharacter> team1, List<DECharacter> team2, boolean pve) {
+        //Setups bools
+        boolean team1Alive = true; //Always players when PVE - Always players when PVP
+        boolean team2Alive = true; //Always hostile NPC when PVE - Always players when PVP
+
+        //Introduction to encounter if it is a PVE matchup
+        if (pve) {
+            pveIntro(playersIO, team2);
+        } else { //Introduction to encounter if it is a PVP matchup 
+        }
+
+        //While both teams are alive the encounter is ongoing (keeps looping)
+        while (team1Alive == true && team2Alive == true) {
+            //Each character has a turn
+            for (int i = 0; i < allCharacters.size(); i++) {
+
+                //If the the character is an NPC                               
+                if (allCharacters.get(i).getClass() == NPC.class) {
+                    npcAction(playersIO, team1, (NPC) allCharacters.get(i));
+                }
+
+                //If the character is a player
+                if (allCharacters.get(i).getClass() != NPC.class) {
+                    playerAction(allCharacters, i, playersIO, team1);
+                }
+
+                //Checks HP for all team2 members
+                for (DECharacter team1character : team1) {
+                    //Enters if-statement if a member of team 2 is dead
+                    if (team1character.getHealth() <= 0) {
+                        //Removes the dead member
+                        team1.remove(team1character);
+                        //Checks if the team is empty - if so, team 1 wins
+                        if (team1.isEmpty()) {
+                            team1Alive = false;
+                            i = allCharacters.size();
+                            for (int j = 0; j < playersIO.length; j++) {
+                                playersIO[j].put("You have all been killed by the enemy!");
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                //Checks HP for all team2 members
+                for (DECharacter team2character : team2) {
+                    //Enters if-statement if a member of team 2 is dead
+                    if (team2character.getHealth() <= 0) {
+                        //Removes the dead member
+                        team2.remove(team2character);
+                        //Checks if the team is empty - if so, team 1 wins
+                        if (team2.isEmpty()) {
+                            team2Alive = false;
+                            i = allCharacters.size();
+                            for (int j = 0; j < playersIO.length; j++) {
+                                playersIO[j].put("You killed the enemy! \n");
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void pveIntro(ITextIO[] playersIO, List<DECharacter> team2) {
+        for (int i = 0; i < playersIO.length; i++) {
+            playersIO[i].clear();
+            playersIO[i].put("You've encountered the following: \n");
+            for (DECharacter enemy : team2) {
+                printNPCStats(playersIO[i], enemy);
+            }
+        }
+    }
+
+    private void printNPCStats(ITextIO playerIO, DECharacter npc) {
+        playerIO.put(npc.getName() + "\n");
+        playerIO.put("- " + npc.getHealth() + " HP \n");
+        playerIO.put("- " + npc.getAttackDmg() + " ATK \n\n");
+    }
+
+    private void npcAction(ITextIO[] playersIO, List<DECharacter> opposingTeam, NPC npc) {
+        for (int j = 0; j < playersIO.length; j++) {
+            opposingTeam.get(j).setHealth(opposingTeam.get(j).getHealth() - npc.getAttackDmg());
+            playersIO[j].put(npc.getName() + " has hit you for " + npc.getAttackDmg() + ". \nYou now have " + opposingTeam.get(j).getHealth() + " hp left!\n\n");
+            printNPCStats(playersIO[j], npc);
+        }
+    }
+
+    private void playerAction(List<DECharacter> encounter, int i, ITextIO[] players, List<DECharacter> playerEntities) {
+        //Creates an empty list of available actions
+        ArrayList<String> actions = new ArrayList();
+
+        //Gets the abilities of the current player
+        List<Ability> abilities = encounter.get(i).getAbilities();
+
+        //Adds the abils name to actions list so it can be selected
+        for (Ability ab : abilities) {
+            actions.add(ab.getName() + "\n" + "  - " + ab.getDescription() + "\n");
+        }
+        int choice = players[i].select("What do you wish to do?", actions, "");
+
+        //Gets the chosen ability
+        Ability chosenAbility = encounter.get(i).getAbilities().get(choice - 1);
+
+        //Creates a new list of all the names in the encounter
+        ArrayList<String> names = new ArrayList();
+        ArrayList<DECharacter> availableTargets = new ArrayList();
+        for (int j = 0; j < encounter.size(); j++) {
+            names.add(encounter.get(j).getName());
+            availableTargets.add(encounter.get(j));
+        }
+
+        //Creates a new list of all the chosen targets of the ability
+        ArrayList<Integer> targetsIndex = new ArrayList();
+        int targetIndex = players[i].select("Who do you wish to target?", names, "");
+        for (int j = 0; j < encounter.get(i).getAbilities().get(choice - 1).getAmountOfTargets(); ++j) {
+            targetsIndex.add(targetIndex);
+        }
+
+        //Creates a list of DECharaters that is the actual targets
+        ArrayList<DECharacter> targets = new ArrayList();
+        for (int j = 0; j < targetsIndex.size(); ++j) {
+            int index = targetsIndex.get(j);
+            DECharacter targ = availableTargets.get(index - 1);
+            targets.add(targ);
+        }
+
+        for (DECharacter target : targets) {
+            if (chosenAbility.getDamage() <= 0 && chosenAbility.getHealing() > 0) {
+                target.setHealth(target.getHealth() + chosenAbility.getHealing());
+                players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
+            } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
+                target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
+                players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
+            }
+        }
+
+        players[i].put("Press enter to continue");
+        players[i].get();
+        players[i].clear();
+    }
+
+    private void enterDungeon(ITextIO[] playersIO, List<DECharacter> allCharacters, int amountOfRooms) {
+
+        printDungeonLocation(playersIO);
+
+        for (int i = 0; i < amountOfRooms; ++i) {
+            enterRoom(playersIO, allCharacters);
+            if (i != amountOfRooms - 1) {
+                for (ITextIO playerIO : playersIO) {
+                    playerIO.put("Press enter to move to the next room ..");
+                    playerIO.get();
+                }
+            } else {
+                for (ITextIO playerIO : playersIO) {
+                    playerIO.put("You finished the dungeon! Press enter to return ..");
+                    playerIO.get();
+                }
+            }
+        }
+    }
+
+    private void printDungeonLocation(ITextIO[] playersIO) {
+        String[] locations = {"a cave", "an abandoned castle", "an old haunted farm house", "a sewer", "a razed city", "a forgotten bunker"};
+        int rand = (int) (Math.random() * 4);
+        String location = locations[rand];
+        Faker faker = new Faker();
+        String region = faker.elderScrolls().region();
+        for (int i = 0; i < playersIO.length; ++i) {
+            playersIO[i].clear();
+            playersIO[i].put("You have entered " + location + " somwhere in " + region + ".\n\n");
+        }
+    }
+
+    private void enterRoom(ITextIO[] playersIO, List<DECharacter> players) {
+        //Random generates a number of either 0 and 1
+        int rand = (int) (Math.random() * 3);
+
+        //66% chance of encounter
+        if (rand > 0) {
+            //Creates an enemy based on the players
+            NPC enemy = createNPC(players);
+
+            //Puts all character in their correct list
+            List<DECharacter> allCharacters = new ArrayList();
+            List<DECharacter> enemies = new ArrayList();
+            for (int j = 0; j < playersIO.length; j++) {
+                allCharacters.add(players.get(j));
+            }
+            allCharacters.add(enemy);
+            enemies.add(enemy);
+
+            //Encounter
+            encounter(playersIO, allCharacters, players, enemies, true);
+        } else {
+            for (int i = 0; i < players.size(); i++) {
+                playersIO[i].clear();
+                playersIO[i].put("No enemies in sight, it's safe to move on to the next room.\n");
+            }
+        }
+
+        for (int i = 0; i < players.size(); ++i) {
+            rand = (int) (Math.random() * 3);
+            //33% chance of reward
+            if (rand == 0) {
+                rewardPlayer(playersIO[i], players.get(i));
+            }
+        }
+    }
+
+    private void rewardPlayer(ITextIO playerIO, DECharacter player) {
+        //Rewards should be a new method
+        //Determines the amount of potions the player gets as a reward
+        int amountOfPotions = (int) (Math.random() * 3) + 1;
+
+        //Adds random potions with the amount equal to the random number above
+        List<Long> potionIDs = new ArrayList();
+        for (int i = 0; i < amountOfPotions; ++i) {
+            double potionID = (Math.random() * 3) + 1;
+            try {
+                playerIO.put("You found a " + pfc.getPotionByID((long) potionID).getName() + "\n");
+            } catch (ItemNotFoundException ex) {
+                //Item not found
+            }
+            potionIDs.add((long) potionID);
+        }
+        //Creates a new inventory with the potions 
+        Inventory inventory = new Inventory(potionIDs);
+
+        //Adds the items from the new inventory to the existing inventory of the player
+        ifc.addToInventory(player, inventory);
+    }
+
 }
