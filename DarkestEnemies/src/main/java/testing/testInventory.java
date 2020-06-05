@@ -9,15 +9,18 @@ import DarkestEnemies.Entity.Account;
 import DarkestEnemies.Entity.Inventory;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.Entity.Potion;
+import DarkestEnemies.Entity.Trinket;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.AbilityNotFoundException;
 import DarkestEnemies.exceptions.CharacterNotFoundException;
 import DarkestEnemies.exceptions.ItemNotFoundException;
+import DarkestEnemies.exceptions.PlayerNotFoundException;
 import DarkestEnemies.facades.AbilityFacade;
 import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.facades.InventoryFacade;
 import DarkestEnemies.facades.PlayerFacade;
 import DarkestEnemies.facades.PotionFacade;
+import DarkestEnemies.facades.TrinketFacade;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +33,7 @@ import utils.EMF_Creator;
  */
 public class testInventory {
 
-    public static void main(String[] args) throws AbilityNotFoundException, CharacterNotFoundException, ItemNotFoundException {
+    public static void main(String[] args) throws AbilityNotFoundException, CharacterNotFoundException, ItemNotFoundException, PlayerNotFoundException {
         EntityManagerFactory _emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.DEV, EMF_Creator.Strategy.CREATE);
 
         //Setups an account and a character to that account:
@@ -39,6 +42,7 @@ public class testInventory {
         PotionFacade potfc = PotionFacade.getInventoryFacade(_emf);
         InventoryFacade ifc = InventoryFacade.getInventoryFacade(_emf);
         AbilityFacade afc = AbilityFacade.getAbilityFacade(_emf);
+        TrinketFacade trf = TrinketFacade.getInventoryFacade(_emf);
 
         //Setup Abilities
         afc.setupBasicAbilities();
@@ -48,6 +52,8 @@ public class testInventory {
         setupPlayerData(ifc, pfc, afc);
 
         SetupPotions(potfc);
+        
+        setupTrinkets(trf);
 
         setupCharacterPotions(pfc, ifc);
 
@@ -80,7 +86,7 @@ public class testInventory {
         acF.addCharacterToAccount(acc2, player2);
     }
 
-    private static void setupPlayerData(InventoryFacade ifc, PlayerFacade pfc, AbilityFacade afc) throws AbilityNotFoundException, CharacterNotFoundException {
+    private static void setupPlayerData(InventoryFacade ifc, PlayerFacade pfc, AbilityFacade afc) throws AbilityNotFoundException, CharacterNotFoundException, PlayerNotFoundException {
         Player player1 = pfc.getPlayerByID(1L);
         Player player2 = pfc.getPlayerByID(2L);
         ifc.setupInventory(player1);
@@ -124,14 +130,47 @@ public class testInventory {
         potfc.addPotion(ap3);
         potfc.addPotion(ap4);
     }
+    
+    private static void setupTrinkets(TrinketFacade trf) {
+        Trinket th1 = new Trinket("Trinket of health", "Increases max health by 10", 10, 0, 0);
+        Trinket th2 = new Trinket("Great trinket of health", "Increases max health by 30", 30, 0, 0);
+        Trinket th3 = new Trinket("Superior trinket of health", "Increases max health by 50", 50, 0, 0);
+        
+        Trinket tm1 = new Trinket("Trinket of mana", "Increases max mana by 10", 0, 10, 0);
+        Trinket tm2 = new Trinket("Great trinket of mana", "Increases max mana by 30", 0, 30, 0);
+        Trinket tm3 = new Trinket("Superior trinket of mana", "Increases max mana by 50", 0, 50, 0);
+        
+        Trinket ta1 = new Trinket("Trinket of damage", "Increases attack damage by 3", 0, 0, 3);
+        Trinket ta2 = new Trinket("Great trinket of damage", "Increases attack damage by 3", 0, 0, 6);
+        Trinket ta3 = new Trinket("Superior trinket of damage", "Increases attack damage by 3", 0, 0, 10);
+        
+        trf.addTrinket(th1);
+        trf.addTrinket(th2);
+        trf.addTrinket(th3);
+        
+        trf.addTrinket(tm1);
+        trf.addTrinket(tm2);
+        trf.addTrinket(tm3);
+        
+        trf.addTrinket(ta1);
+        trf.addTrinket(ta2);
+        trf.addTrinket(ta3);
+    }
 
     private static void setupCharacterPotions(PlayerFacade pfc, InventoryFacade ifc) throws CharacterNotFoundException {
         DECharacter players1 = pfc.getPlayerByID(1L);
         DECharacter players2 = pfc.getPlayerByID(2L);
+        
         ArrayList<Long> currentPotions = new ArrayList<Long>();
         currentPotions.add(1L);
         currentPotions.add(5L);
         currentPotions.add(9L);
+        
+        ArrayList<Long> currentTrinkets = new ArrayList<Long>();
+        currentTrinkets.add(1L);
+        currentTrinkets.add(4L);
+        currentTrinkets.add(8L);
+        
         Inventory inventory1 = ifc.getInventory(players1, players1.getInventory().getId());
         Inventory inventory2 = ifc.getInventory(players2, players2.getInventory().getId());
         for(Long longs : currentPotions){
@@ -139,12 +178,22 @@ public class testInventory {
             inventory2.getPotionIds().add(longs);
         }
         
+        for (Long longs : currentTrinkets) {
+            inventory1.getTrinketIds().add(longs);
+            inventory2.getTrinketIds().add(longs);
+        }
+        
         for(Long longs : inventory1.getPotionIds()){
             System.out.println(longs);
         }
+        
+        for (Long longs : inventory1.getTrinketIds()) {
+            System.out.println(longs);
+        }
+        
         ifc.addToInventory(players1, inventory1);
         ifc.addToInventory(players2, inventory2);
         
     }
-
+    
 }

@@ -10,6 +10,7 @@ import DarkestEnemies.Entity.Inventory;
 import DarkestEnemies.Entity.Potion;
 import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
+import DarkestEnemies.Entity.Trinket;
 import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.facades.PotionFacade;
 import DarkestEnemies.facades.TrinketFacade;
@@ -147,8 +148,24 @@ public class DarkestEnemiesGame implements ITextGame {
             }
         }
     }
-
+    
     private void showInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException {
+        ArrayList<String> actions = new ArrayList();
+        actions.add("Potions");
+        actions.add("Trinkets");
+        int choice = playerIO.select("What inventory do you want to see?", actions, "");
+        
+        switch (choice) {
+            case 1:
+                showPotionInventory(player, playerIO);
+                break;
+            case 2:
+                showTrinketInventory(player, playerIO);
+                break;
+        }
+    }
+
+    private void showPotionInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException {
         //All the possible actions the user can take will be placed here.
         ArrayList<String> actions = new ArrayList();
         //List of all the potions the current player has
@@ -173,6 +190,49 @@ public class DarkestEnemiesGame implements ITextGame {
             ifc.removeFromInventory(player, choice - 1);
         }
     }
+    
+    private void showTrinketInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException {
+        ArrayList<String> actions = new ArrayList();
+        List<Long> trinketIds = new ArrayList();
+
+        Inventory inv = ifc.getInventory(player, player.getInventory().getId());
+        trinketIds = inv.getTrinketIds();
+        
+        for (Long longs : trinketIds) {
+            actions.add(tfc.getTrinketById(longs).getName() + " - " + tfc.getTrinketById(longs).getInfo());
+        }
+        actions.add("Return to menu");
+        
+        int choice = playerIO.select("Which potion do you wish to use?", actions, "");
+        
+        ArrayList<String> use = new ArrayList();
+        use.add("Equip");
+        use.add("Drop");
+        use.add("Return to menu");
+        
+        //Gets selected potion from the database.
+        System.out.println(actions.size());
+        if (choice != actions.size()) {
+            Trinket chosen = tfc.getTrinketById(trinketIds.get(choice - 1));
+            
+            int useChoice = playerIO.select("What will you do?", use, "");
+            if (useChoice != use.size()) {
+                switch(useChoice) {
+                    case 1:
+                        tfc.equipTrinket(player, chosen);
+                        break;
+                    case 2:
+                        ifc.removeTrinketFromInventory(player, choice - 1);
+                        break;
+                    case 3:
+                        break;
+                }
+                        
+            }
+            
+        }
+    }
+    
 
     private int login(ITextIO[] players, int i, List<DECharacter> playerEntities) {
         try {
@@ -377,7 +437,7 @@ public class DarkestEnemiesGame implements ITextGame {
                 target.setHealth(target.getHealth() + chosenAbility.getHealing());
                 players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
-                target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
+                target.setHealth(target.getHealth() - (chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg()));
                 players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             }
         }
@@ -463,13 +523,11 @@ public class DarkestEnemiesGame implements ITextGame {
         
         //Adds single random trinket
         List<Long> trinketIds = new ArrayList();
-        int trinketChance = (int) Math.random() * 10;
+        int trinketChance = (int) (Math.random() * 10);
         if (trinketChance > 6) {
             double trinketID = (Math.random() * 3) + 1;
             playerIO.put("You found a " + tfc.getTrinketById((long) trinketID).getName() + "\n");
             trinketIds.add((long) trinketID);
-        } else {
-            trinketIds = null;
         }
         //Creates a new inventory with the potions 
         Inventory inventory = new Inventory(potionIDs, trinketIds);

@@ -33,6 +33,9 @@ public class Trinket implements Serializable, ItemI {
         this.manaValue = manaValue;
         this.dmgIncreaseValue = dmgIncreaseValue;
     }
+
+    public Trinket() {
+    }
     
     
         
