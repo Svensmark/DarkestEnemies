@@ -518,6 +518,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 }
             } else {
                 for (ITextIO playerIO : playersIO) {
+                    pF.updatePlayer(allCharacters.get(i));
                     playerIO.put("You finished the dungeon! Press enter to return ..");
                     playerIO.get();
                 }

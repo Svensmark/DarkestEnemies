@@ -464,9 +464,7 @@ public class DarkestEnemiesGame implements ITextGame {
                 playerIO.get();
             }
         }
-        for(int i = 0; i < playersIO.length; i ++){
-            pF.updatePlayer(allCharacters.get(i));
-        }
+        
         
 
     }
