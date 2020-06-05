@@ -65,7 +65,7 @@ public class AbilityFacade {
             getAbilityByName("slam");
         } catch (AbilityNotFoundException e) {
             Ability slam = new Ability(8, 0, 1, 1, "Slam", "Slams the target very hard!");
-            Ability heal = new Ability(0, 10, 1, 1, "Heal", "Heals your target, increases their current health to live longer!");
+            Ability heal = new Ability(0, 30, 1, 1, "Heal", "Heals your target, increases their current health to live longer!");
 
             persistAbility(slam);
             persistAbility(heal);

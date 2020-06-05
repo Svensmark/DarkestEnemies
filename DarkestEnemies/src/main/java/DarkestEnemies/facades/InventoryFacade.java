@@ -51,7 +51,7 @@ public class InventoryFacade {
         player.setInventory(inv);
         try {
             em.getTransaction().begin();
-            em.merge(player);
+            em.persist(player);
             em.getTransaction().commit();
         } finally {
             em.close();

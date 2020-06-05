@@ -29,9 +29,9 @@ import utils.EMF_Creator;
 import javax.persistence.EntityManagerFactory;
 import DarkestEnemies.exceptions.AccountNotFoundException;
 import DarkestEnemies.exceptions.AbilityNotFoundException;
+import DarkestEnemies.exceptions.CharacterNotFoundException;
 import DarkestEnemies.exceptions.PlayerNotFoundException;
 import DarkestEnemies.exceptions.ItemNotFoundException;
-import DarkestEnemies.exceptions.InventorySetupFailure;
 
 /**
  *
@@ -68,13 +68,15 @@ public class DarkestEnemiesGame implements ITextGame {
                 mainMenu(players, playerEntities);
             } catch (ItemNotFoundException ex) {
                 Logger.getLogger(DarkestEnemiesGame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CharacterNotFoundException ex) {
+                Logger.getLogger(DarkestEnemiesGame.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }
     }
 
     //First method called - sets up players 
-    private List<DECharacter> playerSetup(ITextIO[] players) {
+    private List<DECharacter> playerSetup(ITextIO[] players)  {
         List<DECharacter> playerEntities = new ArrayList();
         //Player setup
         for (int i = 0; i < players.length; i++) {
@@ -101,7 +103,7 @@ public class DarkestEnemiesGame implements ITextGame {
         return playerEntities;
     }
 
-    private void mainMenu(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException {
+    private void mainMenu(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException, CharacterNotFoundException {
 
         //Start Announcement
         for (int i = 0; i < playersIO.length; i++) {
@@ -146,7 +148,7 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    private void showInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException {
+    private void showInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException, CharacterNotFoundException {
         //All the possible actions the user can take will be placed here.
         ArrayList<String> actions = new ArrayList();
         //List of all the potions the current player has
@@ -166,8 +168,11 @@ public class DarkestEnemiesGame implements ITextGame {
         System.out.println(actions.size());
         if (choice != actions.size()) {
             Potion chosen = pfc.getPotionByID(potionIds.get(choice - 1));
+            Player currentPlayer = pF.getPlayerByID(player.getId());
             //Consumes potion and removes it from the players inventory.
             pfc.usePotion(player, chosen);
+            playerIO.put("\nYou have consumed " + chosen.getName() +"\nhp: " + currentPlayer.getHealth()
+                    + "dmg: " + currentPlayer.getAttackDmg() + "\n");
             ifc.removeFromInventory(player, choice - 1);
         }
     }
@@ -194,7 +199,7 @@ public class DarkestEnemiesGame implements ITextGame {
         return i;
     }
 
-    private void createAccount(ITextIO playerIO) {
+    private void createAccount(ITextIO playerIO){
         //Creates a new player, adds it to the database and writes it out to the IO
         String playerName = pF.createNewPlayer(playerIO).getCharacterName();
         Player player = null;
@@ -210,7 +215,7 @@ public class DarkestEnemiesGame implements ITextGame {
             pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("heal"));
         } catch (AbilityNotFoundException e) {
             playerIO.put("Something went wrong with getting the start abilities");
-        }
+        } 
         //Adds an empty inventory to the player.
         try {
             ifc.setupInventory(player);
@@ -227,12 +232,12 @@ public class DarkestEnemiesGame implements ITextGame {
 
         //Scales the health up for each player in the group
         for (int i = 0; i < playerEntities.size(); i++) {
-            health += (playerEntities.get(i).getLevel() * 5) + (playerEntities.get(i).getAttackDmg() * 2.5);
+            health += (playerEntities.get(i).getLevel() * 10) + (playerEntities.get(i).getMaxAttackDmg() * 3);
         }
 
         //Scales the attack damage up for each player in the group
         for (int i = 0; i < playerEntities.size(); i++) {
-            attack += ((playerEntities.get(i).getLevel() * 5) / 2.5) + (health / 10);
+            attack += ((playerEntities.get(i).getLevel() * 5) / 2.5) + (health / 8);
         }
 
         //Creates a random name from elder scrolls universe
@@ -375,7 +380,7 @@ public class DarkestEnemiesGame implements ITextGame {
                 target.setHealth(target.getHealth() + chosenAbility.getHealing());
                 players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
-                target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
+                target.setHealth(target.getHealth() - (chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg()));
                 players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             }
         }
@@ -386,7 +391,7 @@ public class DarkestEnemiesGame implements ITextGame {
         players[i].put("Waiting for players.. \n");
     }
 
-    private void enterDungeon(ITextIO[] playersIO, List<DECharacter> allCharacters, int amountOfRooms) throws ItemNotFoundException {
+    private void enterDungeon(ITextIO[] playersIO, List<DECharacter> allCharacters, int amountOfRooms) throws ItemNotFoundException, CharacterNotFoundException {
 
         printDungeonLocation(playersIO);
 
@@ -397,6 +402,10 @@ public class DarkestEnemiesGame implements ITextGame {
                 playerIO.get();
             }
         }
+        for(int i = 0; i < playersIO.length; i ++){
+            pF.updatePlayer(allCharacters.get(i));
+        }
+        
 
     }
 
@@ -411,12 +420,13 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    private void enterRoom(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException {
+    private void enterRoom(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException, CharacterNotFoundException {
         //Random generates a number of either 0 and 1
         int rand = (int) (Math.random() * 3);
 
         //66% chance of encounter
         if (rand > 0) {
+            int xpGain = 0;
             //Creates an enemy based on the players
             NPC enemy = createNPC(players);
 
@@ -431,6 +441,28 @@ public class DarkestEnemiesGame implements ITextGame {
 
             //Encounter
             encounter(playersIO, allCharacters, players, enemies, true);
+            int avrgLevel = 0;
+            int avrgRequiredXp = 0;
+            for (DECharacter p : players) {
+                Player character = pF.getPlayerByID(p.getId());
+                avrgLevel += p.getLevel();
+                avrgRequiredXp += character.getNeededExp();
+            }
+            avrgLevel = avrgLevel / players.size();
+            avrgRequiredXp = avrgRequiredXp / players.size();
+            
+            if (avrgLevel == 1) {
+                xpGain += Math.pow(avrgLevel + 1, (avrgRequiredXp/(avrgRequiredXp/3)));
+            } else {
+                xpGain += avrgLevel * Math.pow(avrgLevel, 3);
+            }
+            for (DECharacter p : players) {
+                pF.recieveExperience(p.getId(), xpGain);
+            }
+            for (int i = 0; i < players.size(); i++) {
+                playersIO[i].put("You have gained " + xpGain + " XP.\n");
+            }
+
         } else {
             for (int i = 0; i < players.size(); i++) {
                 playersIO[i].put("No enemies in sight, it's safe to move on to the next room.\n");
@@ -444,6 +476,7 @@ public class DarkestEnemiesGame implements ITextGame {
                 rewardPlayer(playersIO[i], players.get(i));
             }
         }
+
     }
 
     private void rewardPlayer(ITextIO playerIO, DECharacter player) throws ItemNotFoundException {

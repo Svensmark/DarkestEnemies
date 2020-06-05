@@ -13,13 +13,13 @@ import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.AbilityNotFoundException;
 import DarkestEnemies.exceptions.CharacterNotFoundException;
 import DarkestEnemies.exceptions.ItemNotFoundException;
+import DarkestEnemies.exceptions.PlayerNotFoundException;
 import DarkestEnemies.facades.AbilityFacade;
 import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.facades.InventoryFacade;
 import DarkestEnemies.facades.PlayerFacade;
 import DarkestEnemies.facades.PotionFacade;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import utils.EMF_Creator;
@@ -30,7 +30,7 @@ import utils.EMF_Creator;
  */
 public class testInventory {
 
-    public static void main(String[] args) throws AbilityNotFoundException, CharacterNotFoundException, ItemNotFoundException {
+    public static void main(String[] args) throws AbilityNotFoundException, CharacterNotFoundException, ItemNotFoundException, PlayerNotFoundException {
         EntityManagerFactory _emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.DEV, EMF_Creator.Strategy.CREATE);
 
         //Setups an account and a character to that account:
@@ -52,9 +52,6 @@ public class testInventory {
         setupCharacterPotions(pfc, ifc);
 
         //testUsePotion(pfc, potfc);
-        
-        
-
     }
 
     private static void testUsePotion(PlayerFacade pfc, PotionFacade potfc) throws CharacterNotFoundException, ItemNotFoundException {
@@ -64,7 +61,7 @@ public class testInventory {
             System.out.println(longs);
         }
         Long selected = inventory.get(0);
-            
+
         Potion pot = potfc.getPotionByID(selected);
         potfc.usePotion(player1, pot);
     }
@@ -80,7 +77,7 @@ public class testInventory {
         acF.addCharacterToAccount(acc2, player2);
     }
 
-    private static void setupPlayerData(InventoryFacade ifc, PlayerFacade pfc, AbilityFacade afc) throws AbilityNotFoundException, CharacterNotFoundException {
+    private static void setupPlayerData(InventoryFacade ifc, PlayerFacade pfc, AbilityFacade afc) throws AbilityNotFoundException, CharacterNotFoundException, PlayerNotFoundException {
         Player player1 = pfc.getPlayerByID(1L);
         Player player2 = pfc.getPlayerByID(2L);
         ifc.setupInventory(player1);
@@ -134,17 +131,17 @@ public class testInventory {
         currentPotions.add(9L);
         Inventory inventory1 = ifc.getInventory(players1, players1.getInventory().getId());
         Inventory inventory2 = ifc.getInventory(players2, players2.getInventory().getId());
-        for(Long longs : currentPotions){
+        for (Long longs : currentPotions) {
             inventory1.getPotionIds().add(longs);
             inventory2.getPotionIds().add(longs);
         }
-        
-        for(Long longs : inventory1.getPotionIds()){
+
+        for (Long longs : inventory1.getPotionIds()) {
             System.out.println(longs);
         }
         ifc.addToInventory(players1, inventory1);
         ifc.addToInventory(players2, inventory2);
-        
+
     }
 
 }
