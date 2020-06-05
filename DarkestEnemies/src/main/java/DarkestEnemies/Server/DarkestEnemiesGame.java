@@ -455,7 +455,8 @@ public class DarkestEnemiesGame implements ITextGame {
         
         //Adds single random trinket
         List<Long> trinketIds = new ArrayList();
-        if ((Math.random() * 10) > 6) {
+        int trinketChance = (int) Math.random() * 10;
+        if (trinketChance > 6) {
             double trinketID = (Math.random() * 3) + 1;
             playerIO.put("You found a " + tfc.getTrinketById((long) trinketID).getName() + "\n");
             trinketIds.add((long) trinketID);
