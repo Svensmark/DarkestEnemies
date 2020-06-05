@@ -163,12 +163,12 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
 
     @Override
     public Inventory getInventory() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
     }
 
     @Override
     public void setInventory(Inventory inventory) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
     }
 
 }

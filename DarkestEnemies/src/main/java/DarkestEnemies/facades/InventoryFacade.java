@@ -42,7 +42,8 @@ public class InventoryFacade {
         EntityManager em = getEntityManager();
 
         List<Long> potionIds = new ArrayList<Long>();
-        Inventory inv = new Inventory(potionIds);
+        List<Long> trinketIds = new ArrayList<Long>();
+        Inventory inv = new Inventory(potionIds, trinketIds);
 
         Player player = em.find(Player.class, character.getId());
         if (player == null) {
@@ -51,7 +52,7 @@ public class InventoryFacade {
         player.setInventory(inv);
         try {
             em.getTransaction().begin();
-            em.merge(player);
+            em.persist(player);
             em.getTransaction().commit();
         } finally {
             em.close();
@@ -70,6 +71,12 @@ public class InventoryFacade {
         Inventory inv = em.find(Inventory.class, character.getInventory().getId());
         for (Long longs : inventory.getPotionIds()) {
             inv.getPotionIds().add(longs);
+        }
+
+        if (inventory.getTrinketIds().size() != 0) {
+            for (Long longs : inventory.getTrinketIds()) {
+                inv.getTrinketIds().add(longs);
+            }
         }
 
         try {
@@ -94,6 +101,21 @@ public class InventoryFacade {
             em.getTransaction().commit();
         } finally {
             em.close();;
+        }
+    }
+
+    public void removeTrinketFromInventory(DECharacter character, int index) {
+        EntityManager em = getEntityManager();
+        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
+        inv.getTrinketIds().remove(index);
+        character.setInventory(inv);
+        try {
+            em.getTransaction().begin();
+            em.merge(inv);
+            em.merge(character);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
         }
     }
 

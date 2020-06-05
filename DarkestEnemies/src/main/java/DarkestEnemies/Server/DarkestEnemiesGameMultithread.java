@@ -10,9 +10,11 @@ import DarkestEnemies.Entity.Inventory;
 import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.Entity.Potion;
+import DarkestEnemies.Entity.Trinket;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.AbilityNotFoundException;
 import DarkestEnemies.exceptions.AccountNotFoundException;
+import DarkestEnemies.exceptions.CharacterNotFoundException;
 import DarkestEnemies.exceptions.ItemNotFoundException;
 import DarkestEnemies.exceptions.PlayerNotFoundException;
 import DarkestEnemies.facades.AbilityFacade;
@@ -20,6 +22,7 @@ import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.facades.InventoryFacade;
 import DarkestEnemies.facades.PlayerFacade;
 import DarkestEnemies.facades.PotionFacade;
+import DarkestEnemies.facades.TrinketFacade;
 import DarkestEnemies.syncbox.SyncBox;
 import DarkestEnemies.textio.ITextIO;
 import com.github.javafaker.Faker;
@@ -44,6 +47,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     InventoryFacade ifc = InventoryFacade.getInventoryFacade(emf);
     PlayerFacade pF = PlayerFacade.getPlayerFacade(emf);
     AbilityFacade abF = AbilityFacade.getAbilityFacade(emf);
+    TrinketFacade tfc = TrinketFacade.getInventoryFacade(emf);
     AsciiArt aa = new AsciiArt();
 
     @Override
@@ -70,7 +74,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         boolean settingUp = true;
         while (settingUp) {
             printServerIntroScreen(playerIO);
-            int option = playerIO.select("[Login screen]", options, "");
+            int option = playerIO.select("                                                        [Login screen]", options, "");
 
             switch (option) {
                 //User chooses to login
@@ -90,12 +94,12 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                         } catch (AccountNotFoundException e) {
                             playerIO.put("We could not find an account with that name and password combination.\nPress enter to return ..");
                             playerIO.get();
-                            login=false;
+                            login = false;
                             e.printStackTrace();
                         } catch (WrongPasswordException e) {
                             playerIO.put("We could not find an account with that name and password combination.\nPress enter to return ..");
                             playerIO.get();
-                            login=false;
+                            login = false;
                             e.printStackTrace();
                         }
                     }
@@ -133,8 +137,8 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
     private void printServerIntroScreen(ITextIO playerIO) {
         playerIO.clear();
-        aa.printRandom(playerIO);
-        playerIO.put("\n\n                            Welcome to Darkest Enemies game server!\n\n");
+        aa.printTitle(playerIO);
+        playerIO.put("\n\n                                           Welcome to Darkest Enemies game server!\n\n");
     }
 
     private void mainMenu(ITextIO playerIO, DECharacter playerCharacter, SyncBox allSyncBoxes) {
@@ -142,30 +146,45 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         boolean menu = true;
         while (menu) {
             playerIO.clear();
-            aa.printRandom(playerIO);
+            aa.printTitle(playerIO);
             List<String> options = Arrays.asList("Find enemy", "Inventory", "Log out");
-            int choiceMainMenu = playerIO.select("\n\n[Main menu]", options, "");
+            int choiceMainMenu = playerIO.select("\n\n                                                        [Main menu]", options, "");
             switch (choiceMainMenu) {
 
                 //User chooses to find an enemy
                 case 1: //Something here with syncboxes
                     playerIO.clear();
+                    aa.printRandom(playerIO);
                     options = Arrays.asList("Solo", "Multiplayer", "Go back");
-                    int choiceFindEnemy = playerIO.select("[Game menu]", options, "");
+                    int choiceFindEnemy = playerIO.select("\n                                                    [Game menu]", options, "");
 
                     switch (choiceFindEnemy) {
                         case 1: //Player wishes to play solo
                             playerIO.clear();
-                            playerIO.put("How many rooms should the dungeon be?");
-                            int amount = playerIO.getInteger();
-                            ITextIO[] test = {playerIO};
-                            enterDungeon(test, Arrays.asList(playerCharacter), amount);
+                            aa.printRandom(playerIO);
+                            options = Arrays.asList("Short - (3 rooms)", "Medium - (6 rooms)", "Long - (10 rooms)", "Go back");
+                            int choiceDifficulty = playerIO.select("\n                                                    [Difficulty]", options, "");
+                            ITextIO[] test = {playerIO};                            
+                            switch(choiceDifficulty) {//Player chooses dungeon size (Amount of rooms)
+                                case 1: 
+                                    enterDungeon(test, Arrays.asList(playerCharacter), 3);
+                                    break;
+                                case 2:
+                                    enterDungeon(test, Arrays.asList(playerCharacter), 6);
+                                    break;
+                                case 3:
+                                    enterDungeon(test, Arrays.asList(playerCharacter), 10);
+                                    break;
+                                case 4:
+                                    break;
+                            }
                             break;
 
                         case 2: //Player wishes to play multiplayer
                             playerIO.clear();
+                            aa.printMultiplayer(playerIO);
                             options = Arrays.asList("Host a game", "Join a game", "Go back");
-                            int choiceMultiplayer = playerIO.select("[Multiplayer menu]", options, "");
+                            int choiceMultiplayer = playerIO.select("\n                                 [Multiplayer menu]", options, "");
                             switch (choiceMultiplayer) {
                                 case 1://Player wishes to host a game for someone to join
 
@@ -206,6 +225,25 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
     private void showInventory(DECharacter player, ITextIO playerIO) {
         playerIO.clear();
+        aa.printTreasure(playerIO);
+        List actions = Arrays.asList("Show potions", "Show trinkets", "Go back");
+        int choice = playerIO.select("\n\n                       [Inventory]\n", actions, "");
+
+        switch (choice) {
+            case 1:
+                showPotionInventory(player, playerIO);
+                break;
+            case 2:
+                showTrinketInventory(player, playerIO);
+                break;
+            case 3:
+                break;
+        }
+    }
+
+    private void showPotionInventory(DECharacter player, ITextIO playerIO) {
+        playerIO.clear();
+        aa.printPotion(playerIO);
         //All the possible actions the user can take will be placed here.
         ArrayList<String> actions = new ArrayList();
         //List of all the potions the current player has
@@ -222,9 +260,9 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             }
         }
 
-        actions.add("Return to menu");
+        actions.add("Go back");
         //Gets player input
-        int choice = playerIO.select("Which potion do you wish to use?", actions, "");
+        int choice = playerIO.select("\n\n                            [Potion inventory]\n", actions, "");
         //Gets selected potion from the database.
         System.out.println(actions.size());
         if (choice != actions.size()) {
@@ -234,9 +272,70 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             } catch (ItemNotFoundException ex) {
                 Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
             }
+            Player currentPlayer = null;
+            try {
+                currentPlayer = pF.getPlayerByID(player.getId());
+            } catch (CharacterNotFoundException ex) {
+                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+            }
             //Consumes potion and removes it from the players inventory.
             pfc.usePotion(player, chosen);
+            playerIO.put("\nYou have consumed " + chosen.getName() + "\nhp: " + currentPlayer.getHealth()
+                    + "dmg: " + currentPlayer.getAttackDmg() + "\n");
             ifc.removeFromInventory(player, choice - 1);
+        }
+    }
+
+    private void showTrinketInventory(DECharacter player, ITextIO playerIO) {
+        playerIO.clear();
+        aa.printTrinket(playerIO);
+        ArrayList<String> actions = new ArrayList();
+        List<Long> trinketIds = new ArrayList();
+
+        Inventory inv = ifc.getInventory(player, player.getInventory().getId());
+        trinketIds = inv.getTrinketIds();
+
+        for (Long longs : trinketIds) {
+            try {
+                actions.add(tfc.getTrinketById(longs).getName() + " - " + tfc.getTrinketById(longs).getInfo());
+            } catch (ItemNotFoundException ex) {
+                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        actions.add("Go back");
+
+        int choice = playerIO.select("\n\n                              [Trinket inventory]\n", actions, "");
+
+        ArrayList<String> use = new ArrayList();
+        use.add("Equip");
+        use.add("Drop");
+        use.add("Return to menu");
+
+        //Gets selected potion from the database.
+        System.out.println(actions.size());
+        if (choice != actions.size()) {
+            Trinket chosen = null;
+            try {
+                chosen = tfc.getTrinketById(trinketIds.get(choice - 1));
+            } catch (ItemNotFoundException ex) {
+                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            int useChoice = playerIO.select("What will you do?", use, "");
+            if (useChoice != use.size()) {
+                switch (useChoice) {
+                    case 1:
+                        tfc.equipTrinket(player, chosen);
+                        break;
+                    case 2:
+                        ifc.removeTrinketFromInventory(player, choice - 1);
+                        break;
+                    case 3:
+                        break;
+                }
+
+            }
+
         }
     }
 
@@ -339,7 +438,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     }
 
     private void printNPCStats(ITextIO playerIO, DECharacter npc) {
-        playerIO.put(npc.getName() + "\n");
+        playerIO.put("["+npc.getName() + "] - Stats\n");
         playerIO.put("- " + npc.getHealth() + " HP \n");
         playerIO.put("- " + npc.getAttackDmg() + " ATK \n\n");
     }
@@ -363,7 +462,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         for (Ability ab : abilities) {
             actions.add(ab.getName() + "\n" + "  - " + ab.getDescription() + "\n");
         }
-        int choice = players[i].select("What do you wish to do?", actions, "");
+        int choice = players[i].select("\n[Action menu]", actions, "");
 
         //Gets the chosen ability
         Ability chosenAbility = encounter.get(i).getAbilities().get(choice - 1);
@@ -378,7 +477,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
         //Creates a new list of all the chosen targets of the ability
         ArrayList<Integer> targetsIndex = new ArrayList();
-        int targetIndex = players[i].select("Who do you wish to target?", names, "");
+        int targetIndex = players[i].select("\n[Choose your target]", names, "");
         for (int j = 0; j < encounter.get(i).getAbilities().get(choice - 1).getAmountOfTargets(); ++j) {
             targetsIndex.add(targetIndex);
         }
@@ -427,6 +526,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     }
 
     private void printDungeonLocation(ITextIO[] playersIO) {
+        AsciiArt aa = new AsciiArt();
         String[] locations = {"a cave", "an abandoned castle", "an old haunted farm house", "a sewer", "a razed city", "a forgotten bunker"};
         int rand = (int) (Math.random() * 4);
         String location = locations[rand];
@@ -434,7 +534,10 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         String region = faker.elderScrolls().region();
         for (int i = 0; i < playersIO.length; ++i) {
             playersIO[i].clear();
-            playersIO[i].put("You have entered " + location + " somwhere in " + region + ".\n\n");
+            aa.printDungeon(playersIO[i]);
+            playersIO[i].put("\n\nYou found " + location + " somwhere in " + region + ".\n\n");
+            playersIO[i].put("Press enter to enter the dungeon..");
+            playersIO[i].get();
         }
     }
 
@@ -478,21 +581,36 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         //Rewards should be a new method
         //Determines the amount of potions the player gets as a reward
         int amountOfPotions = (int) (Math.random() * 3) + 1;
-
+        playerIO.put("\nYou found some items!\n");
         //Adds random potions with the amount equal to the random number above
         List<Long> potionIDs = new ArrayList();
         for (int i = 0; i < amountOfPotions; ++i) {
             double potionID = (Math.random() * 3) + 1;
             try {
-                playerIO.put("You found a " + pfc.getPotionByID((long) potionID).getName() + "\n");
+                playerIO.put("\nYou found a " + pfc.getPotionByID((long) potionID).getName() + "\n");
             } catch (ItemNotFoundException ex) {
-                //Item not found
+                //Couldnt find the item exception
+                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
             }
             potionIDs.add((long) potionID);
         }
-        //Creates a new inventory with the potions 
-        Inventory inventory = new Inventory(potionIDs);
 
+        //Adds single random trinket
+        List<Long> trinketIds = new ArrayList();
+        int trinketChance = (int) (Math.random() * 10);
+        if (trinketChance > 6) {
+            double trinketID = (Math.random() * 3) + 1;
+            try {
+                playerIO.put("You found a " + tfc.getTrinketById((long) trinketID).getName() + "\n");
+            } catch (ItemNotFoundException ex) {
+                //Couldnt find the item exception
+                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            trinketIds.add((long) trinketID);
+        }
+        //Creates a new inventory with the potions 
+        Inventory inventory = new Inventory(potionIDs, trinketIds);
+        playerIO.put("\n");
         //Adds the items from the new inventory to the existing inventory of the player
         ifc.addToInventory(player, inventory);
     }

@@ -10,8 +10,10 @@ import DarkestEnemies.Entity.Inventory;
 import DarkestEnemies.Entity.Potion;
 import DarkestEnemies.Entity.NPC;
 import DarkestEnemies.Entity.Player;
+import DarkestEnemies.Entity.Trinket;
 import DarkestEnemies.facades.AccountFacade;
 import DarkestEnemies.facades.PotionFacade;
+import DarkestEnemies.facades.TrinketFacade;
 import DarkestEnemies.facades.InventoryFacade;
 import DarkestEnemies.facades.AbilityFacade;
 import DarkestEnemies.facades.PlayerFacade;
@@ -29,9 +31,9 @@ import utils.EMF_Creator;
 import javax.persistence.EntityManagerFactory;
 import DarkestEnemies.exceptions.AccountNotFoundException;
 import DarkestEnemies.exceptions.AbilityNotFoundException;
+import DarkestEnemies.exceptions.CharacterNotFoundException;
 import DarkestEnemies.exceptions.PlayerNotFoundException;
 import DarkestEnemies.exceptions.ItemNotFoundException;
-import DarkestEnemies.exceptions.InventorySetupFailure;
 
 /**
  *
@@ -42,6 +44,7 @@ public class DarkestEnemiesGame implements ITextGame {
     EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory(EMF_Creator.DbSelector.DEV, EMF_Creator.Strategy.CREATE);
     //AccountFacade facade = AccountFacade.getAccountFacade(emf);
     PotionFacade pfc = PotionFacade.getInventoryFacade(emf);
+    TrinketFacade tfc = TrinketFacade.getInventoryFacade(emf);
     PlayerFacade pF = PlayerFacade.getPlayerFacade(emf);
     AbilityFacade abF = AbilityFacade.getAbilityFacade(emf);
     InventoryFacade ifc = InventoryFacade.getInventoryFacade(emf);
@@ -67,13 +70,15 @@ public class DarkestEnemiesGame implements ITextGame {
                 mainMenu(players, playerEntities);
             } catch (ItemNotFoundException ex) {
                 Logger.getLogger(DarkestEnemiesGame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CharacterNotFoundException ex) {
+                Logger.getLogger(DarkestEnemiesGame.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }
     }
 
     //First method called - sets up players 
-    private List<DECharacter> playerSetup(ITextIO[] players) {
+    private List<DECharacter> playerSetup(ITextIO[] players)  {
         List<DECharacter> playerEntities = new ArrayList();
         //Player setup
         for (int i = 0; i < players.length; i++) {
@@ -100,7 +105,7 @@ public class DarkestEnemiesGame implements ITextGame {
         return playerEntities;
     }
 
-    private void mainMenu(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException {
+    private void mainMenu(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException, CharacterNotFoundException {
 
         //Start Announcement
         for (int i = 0; i < playersIO.length; i++) {
@@ -144,8 +149,25 @@ public class DarkestEnemiesGame implements ITextGame {
             }
         }
     }
+    
+    private void showInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException, CharacterNotFoundException {
+        ArrayList<String> actions = new ArrayList();
+        actions.add("Potions");
+        actions.add("Trinkets");
+        int choice = playerIO.select("What inventory do you want to see?", actions, "");
+        
+        switch (choice) {
+            case 1:
+                showPotionInventory(player, playerIO);
+                break;
+            case 2:
+                showTrinketInventory(player, playerIO);
+                break;
+        }
+    }
 
-    private void showInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException {
+    private void showPotionInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException, CharacterNotFoundException {
+
         //All the possible actions the user can take will be placed here.
         ArrayList<String> actions = new ArrayList();
         //List of all the potions the current player has
@@ -165,11 +187,57 @@ public class DarkestEnemiesGame implements ITextGame {
         System.out.println(actions.size());
         if (choice != actions.size()) {
             Potion chosen = pfc.getPotionByID(potionIds.get(choice - 1));
+            Player currentPlayer = pF.getPlayerByID(player.getId());
             //Consumes potion and removes it from the players inventory.
             pfc.usePotion(player, chosen);
+            playerIO.put("\nYou have consumed " + chosen.getName() +"\nhp: " + currentPlayer.getHealth()
+                    + "dmg: " + currentPlayer.getAttackDmg() + "\n");
             ifc.removeFromInventory(player, choice - 1);
         }
     }
+    
+    private void showTrinketInventory(DECharacter player, ITextIO playerIO) throws ItemNotFoundException {
+        ArrayList<String> actions = new ArrayList();
+        List<Long> trinketIds = new ArrayList();
+
+        Inventory inv = ifc.getInventory(player, player.getInventory().getId());
+        trinketIds = inv.getTrinketIds();
+        
+        for (Long longs : trinketIds) {
+            actions.add(tfc.getTrinketById(longs).getName() + " - " + tfc.getTrinketById(longs).getInfo());
+        }
+        actions.add("Return to menu");
+        
+        int choice = playerIO.select("Which potion do you wish to use?", actions, "");
+        
+        ArrayList<String> use = new ArrayList();
+        use.add("Equip");
+        use.add("Drop");
+        use.add("Return to menu");
+        
+        //Gets selected potion from the database.
+        System.out.println(actions.size());
+        if (choice != actions.size()) {
+            Trinket chosen = tfc.getTrinketById(trinketIds.get(choice - 1));
+            
+            int useChoice = playerIO.select("What will you do?", use, "");
+            if (useChoice != use.size()) {
+                switch(useChoice) {
+                    case 1:
+                        tfc.equipTrinket(player, chosen);
+                        break;
+                    case 2:
+                        ifc.removeTrinketFromInventory(player, choice - 1);
+                        break;
+                    case 3:
+                        break;
+                }
+                        
+            }
+            
+        }
+    }
+    
 
     private int login(ITextIO[] players, int i, List<DECharacter> playerEntities) {
         try {
@@ -193,7 +261,7 @@ public class DarkestEnemiesGame implements ITextGame {
         return i;
     }
 
-    private void createAccount(ITextIO playerIO) {
+    private void createAccount(ITextIO playerIO){
         //Creates a new player, adds it to the database and writes it out to the IO
         String playerName = pF.createNewPlayer(playerIO).getCharacterName();
         Player player = null;
@@ -209,7 +277,7 @@ public class DarkestEnemiesGame implements ITextGame {
             pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("heal"));
         } catch (AbilityNotFoundException e) {
             playerIO.put("Something went wrong with getting the start abilities");
-        }
+        } 
         //Adds an empty inventory to the player.
         try {
             ifc.setupInventory(player);
@@ -226,12 +294,12 @@ public class DarkestEnemiesGame implements ITextGame {
 
         //Scales the health up for each player in the group
         for (int i = 0; i < playerEntities.size(); i++) {
-            health += (playerEntities.get(i).getLevel() * 5) + (playerEntities.get(i).getAttackDmg() * 2.5);
+            health += (playerEntities.get(i).getLevel() * 10) + (playerEntities.get(i).getMaxAttackDmg() * 3);
         }
 
         //Scales the attack damage up for each player in the group
         for (int i = 0; i < playerEntities.size(); i++) {
-            attack += ((playerEntities.get(i).getLevel() * 5) / 2.5) + (health / 10);
+            attack += ((playerEntities.get(i).getLevel() * 5) / 2.5) + (health / 8);
         }
 
         //Creates a random name from elder scrolls universe
@@ -374,7 +442,7 @@ public class DarkestEnemiesGame implements ITextGame {
                 target.setHealth(target.getHealth() + chosenAbility.getHealing());
                 players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
-                target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
+                target.setHealth(target.getHealth() - (chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg()));
                 players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             }
         }
@@ -385,7 +453,7 @@ public class DarkestEnemiesGame implements ITextGame {
         players[i].put("Waiting for players.. \n");
     }
 
-    private void enterDungeon(ITextIO[] playersIO, List<DECharacter> allCharacters, int amountOfRooms) throws ItemNotFoundException {
+    private void enterDungeon(ITextIO[] playersIO, List<DECharacter> allCharacters, int amountOfRooms) throws ItemNotFoundException, CharacterNotFoundException {
 
         printDungeonLocation(playersIO);
 
@@ -396,6 +464,10 @@ public class DarkestEnemiesGame implements ITextGame {
                 playerIO.get();
             }
         }
+        for(int i = 0; i < playersIO.length; i ++){
+            pF.updatePlayer(allCharacters.get(i));
+        }
+        
 
     }
 
@@ -410,12 +482,13 @@ public class DarkestEnemiesGame implements ITextGame {
         }
     }
 
-    private void enterRoom(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException {
+    private void enterRoom(ITextIO[] playersIO, List<DECharacter> players) throws ItemNotFoundException, CharacterNotFoundException {
         //Random generates a number of either 0 and 1
         int rand = (int) (Math.random() * 3);
 
         //66% chance of encounter
         if (rand > 0) {
+            int xpGain = 0;
             //Creates an enemy based on the players
             NPC enemy = createNPC(players);
 
@@ -430,6 +503,28 @@ public class DarkestEnemiesGame implements ITextGame {
 
             //Encounter
             encounter(playersIO, allCharacters, players, enemies, true);
+            int avrgLevel = 0;
+            int avrgRequiredXp = 0;
+            for (DECharacter p : players) {
+                Player character = pF.getPlayerByID(p.getId());
+                avrgLevel += p.getLevel();
+                avrgRequiredXp += character.getNeededExp();
+            }
+            avrgLevel = avrgLevel / players.size();
+            avrgRequiredXp = avrgRequiredXp / players.size();
+            
+            if (avrgLevel == 1) {
+                xpGain += Math.pow(avrgLevel + 1, (avrgRequiredXp/(avrgRequiredXp/3)));
+            } else {
+                xpGain += avrgLevel * Math.pow(avrgLevel, 3);
+            }
+            for (DECharacter p : players) {
+                pF.recieveExperience(p.getId(), xpGain);
+            }
+            for (int i = 0; i < players.size(); i++) {
+                playersIO[i].put("You have gained " + xpGain + " XP.\n");
+            }
+
         } else {
             for (int i = 0; i < players.size(); i++) {
                 playersIO[i].put("No enemies in sight, it's safe to move on to the next room.\n");
@@ -443,13 +538,14 @@ public class DarkestEnemiesGame implements ITextGame {
                 rewardPlayer(playersIO[i], players.get(i));
             }
         }
+
     }
 
     private void rewardPlayer(ITextIO playerIO, DECharacter player) throws ItemNotFoundException {
         //Rewards should be a new method
         //Determines the amount of potions the player gets as a reward
         int amountOfPotions = (int) (Math.random() * 3) + 1;
-
+        
         //Adds random potions with the amount equal to the random number above
         List<Long> potionIDs = new ArrayList();
         for (int i = 0; i < amountOfPotions; ++i) {
@@ -457,8 +553,17 @@ public class DarkestEnemiesGame implements ITextGame {
             playerIO.put("You found a " + pfc.getPotionByID((long) potionID).getName() + "\n");
             potionIDs.add((long) potionID);
         }
+        
+        //Adds single random trinket
+        List<Long> trinketIds = new ArrayList();
+        int trinketChance = (int) (Math.random() * 10);
+        if (trinketChance > 6) {
+            double trinketID = (Math.random() * 3) + 1;
+            playerIO.put("You found a " + tfc.getTrinketById((long) trinketID).getName() + "\n");
+            trinketIds.add((long) trinketID);
+        }
         //Creates a new inventory with the potions 
-        Inventory inventory = new Inventory(potionIDs);
+        Inventory inventory = new Inventory(potionIDs, trinketIds);
 
         //Adds the items from the new inventory to the existing inventory of the player
         ifc.addToInventory(player, inventory);

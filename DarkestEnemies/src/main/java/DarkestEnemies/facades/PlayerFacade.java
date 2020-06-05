@@ -9,6 +9,7 @@ import DarkestEnemies.Entity.Ability;
 import DarkestEnemies.Entity.Account;
 import DarkestEnemies.Entity.Player;
 import DarkestEnemies.Server.AsciiArt;
+import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.PlayerNotFoundException;
 import DarkestEnemies.textio.ITextIO;
 import java.util.List;
@@ -38,11 +39,14 @@ public class PlayerFacade {
         return emf.createEntityManager();
     }
 
-    private void updatePlayer(Player player) {
+    public void updatePlayer(DECharacter player) {
         EntityManager em = getEntityManager();
         try {
             em.getTransaction().begin();
-            em.merge(player);
+            Player p = em.find(Player.class, player.getId());
+            p.setHealth(player.getHealth());
+            p.setAttackDmg(player.getMaxAttackDmg());
+            em.merge(p);
             em.getTransaction().commit();
         } finally {
             em.close();
@@ -64,8 +68,8 @@ public class PlayerFacade {
         AccountFacade af = AccountFacade.getAccountFacade(emf);
         user.clear();
         AsciiArt aa = new AsciiArt();
-        aa.printRandom(user);
-        user.put("\n\n[Create account]\n\n");
+        aa.printTitle(user);
+        user.put("\n\n                                                        [Create account]\n\n");
         user.put("New username:");
         String username = user.get();
         user.put("New password:");
@@ -116,6 +120,40 @@ public class PlayerFacade {
             em.merge(foundPlayer);
             em.getTransaction().commit();
         } finally {
+            em.close();
+        }
+    }
+    
+    public void recieveExperience(long id, int xp){
+        EntityManager em = getEntityManager();
+        int totalXp;
+        try{
+            em.getTransaction().begin();
+            Player p = em.find(Player.class, id);
+            if((p.getCurrentExp() + xp) > p.getNeededExp()){
+                totalXp = (p.getCurrentExp() + xp) - p.getNeededExp();
+                levelUp(id);
+                p.setCurrentExp(totalXp);
+                em.merge(p);
+            }else{
+            p.setCurrentExp(p.getCurrentExp() + xp);
+            }
+            em.getTransaction().commit();
+        }finally{
+            em.close();
+        }
+    }
+    
+    private void levelUp(long id){
+        EntityManager em = getEntityManager();
+        try{
+            em.getTransaction().begin();
+            Player p = em.find(Player.class, id);
+            p.setLevel(p.getLevel() + 1);
+            p.levelUp();
+            em.merge(p);
+            em.getTransaction().commit();
+        }finally{
             em.close();
         }
     }

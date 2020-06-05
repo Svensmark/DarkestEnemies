@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 /**
@@ -59,18 +58,20 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         this.attackDmg = attackDmg;
         this.maxAttackDmg = maxAttackDmg;
         this.level = level;
+        this.neededExp = (int) (((Math.pow(this.level, 2) + (this.level + 1)) / 2 * 100) - (this.level * 100));
         this.abilities = abilities;
     }
 
     public Player(String name) {
         this.name = name;
-        this.health = 100;
-        this.maxHealth = 100;
+        this.level = 1;
+        this.health = 100 * this.level;
+        this.maxHealth = 100 * this.level;
         this.mana = 0;
         this.maxMana = 0;
-        this.attackDmg = 2;
-        this.maxAttackDmg = 2;
-        this.level = 1;
+        this.attackDmg = 2 * this.level;
+        this.maxAttackDmg = 2 * this.level;
+        this.neededExp = (int) ((Math.pow(this.level, 2) + this.level + 1) / 2 * 100 - (this.level * 100));
     }
 
     public Player() {
@@ -149,8 +150,8 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         return neededExp;
     }
 
-    public void setNeededExp(int neededExp) {
-        this.neededExp = neededExp;
+    public void setNeededExp() {
+        this.neededExp = (int) ((Math.pow(this.level, 2) + this.level) / 2 * 100 - (this.level * 100));
     }
 
     @Override
@@ -234,6 +235,16 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     @Override
     public List<Ability> getAbilities() {
         return abilities;
+    }
+
+    public void levelUp() {
+        this.health = 100 * this.level;
+        this.maxHealth = 100 * this.level;
+        this.mana = 0;
+        this.maxMana = 0;
+        this.attackDmg = 2 * this.level;
+        this.maxAttackDmg = 2 * this.level;
+        this.neededExp = (int) ((Math.pow(this.level, 2) + this.level + 1) / 2 * 100 - (this.level * 100));
     }
 
 }
