@@ -51,6 +51,19 @@ public class PlayerFacade {
             em.close();
         }
     }
+    
+    public void lootGold(DECharacter player, int gold){
+        EntityManager em = getEntityManager();
+        try{
+            em.getTransaction().begin();
+            Player p = em.find(Player.class, player.getId());
+            p.addGold(gold);
+            em.merge(p);
+            em.getTransaction().commit();
+        }finally{
+            em.close();
+        }
+    }
 
     public void persistPlayer(Player player) {
         EntityManager em = getEntityManager();
@@ -150,10 +163,7 @@ public class PlayerFacade {
         }
     }
 
-    public void addGoldToPlayer(Player player, int amount) {
-        player.addGold(amount);
-        updatePlayer(player);
-    }
+ 
 
     public void removeGoldFromPlayer(Player player, int amount) {
         player.removeGold(amount);
