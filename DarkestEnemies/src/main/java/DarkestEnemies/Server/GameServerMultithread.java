@@ -7,7 +7,7 @@ package DarkestEnemies.Server;
 
 import DarkestEnemies.syncbox.SyncBox;
 import DarkestEnemies.textio.ITextIO;
-import HelpingClasses.HostingPlayer;
+import DarkestEnemies.HelpingClasses.HostingPlayer;
 import java.io.BufferedInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;

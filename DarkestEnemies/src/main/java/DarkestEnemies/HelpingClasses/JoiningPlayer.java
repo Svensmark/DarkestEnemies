@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package HelpingClasses;
+package DarkestEnemies.HelpingClasses;
 
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.textio.ITextIO;

@@ -25,8 +25,8 @@ import DarkestEnemies.facades.PotionFacade;
 import DarkestEnemies.facades.TrinketFacade;
 import DarkestEnemies.syncbox.SyncBox;
 import DarkestEnemies.textio.ITextIO;
-import HelpingClasses.HostingPlayer;
-import HelpingClasses.JoiningPlayer;
+import DarkestEnemies.HelpingClasses.HostingPlayer;
+import DarkestEnemies.HelpingClasses.JoiningPlayer;
 import com.github.javafaker.Faker;
 import entities.exceptions.WrongPasswordException;
 import java.io.IOException;
@@ -587,7 +587,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         return new NPC(name, health, mana, attack);
     }
 
-    private void encounter(ITextIO[] playersIO, List<DECharacter> allCharacters, List<DECharacter> team1, List<DECharacter> team2, boolean pve) {
+    private boolean encounter(ITextIO[] playersIO, List<DECharacter> allCharacters, List<DECharacter> team1, List<DECharacter> team2, boolean pve) {
         //Setups bools
         boolean team1Alive = true; //Always players when PVE - Always players when PVP
         boolean team2Alive = true; //Always hostile NPC when PVE - Always players when PVP
@@ -602,6 +602,9 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 //If the the character is an NPC                               
                 if (allCharacters.get(i).getClass() == NPC.class) {
                     npcAction(playersIO, team1, (NPC) allCharacters.get(i), random);
+                    for (int j = 0; j < team1.size(); ++j) {
+                        visualCandy1(playersIO[j], team2, random);
+                    }
                 }
 
                 //If the character is a player
@@ -612,20 +615,16 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                     playerAction(playersIO[i], allCharacters.get(i), team1, team2, random);
                 }
 
-                //Checks HP for all team2 members
+                //Checks HP for all team1 members
                 for (DECharacter team1character : team1) {
-                    //Enters if-statement if a member of team 2 is dead
+                    //Enters if-statement if a member of team 1 is dead
                     if (team1character.getHealth() <= 0) {
                         //Removes the dead member
-                        team1.remove(team1character);
-                        //Checks if the team is empty - if so, team 1 wins
-                        if (team1.isEmpty()) {
-                            team1Alive = false;
-                            i = allCharacters.size();
-                            for (int j = 0; j < playersIO.length; j++) {
-                                playersIO[j].put("You have all been killed by the enemy!");
-                            }
-                            break;
+
+                        for (int j = 0; j < playersIO.length; j++) {
+                            playersIO[j].put("A teammember has been killed - the party runs away!\n"
+                                    + "You will be returned to the menu!");
+                            return true;
                         }
                     }
                 }
@@ -649,6 +648,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 }
             }
         }
+        return false;
     }
 
     private void printNPCStats(ITextIO playerIO, DECharacter npc, int i) {
@@ -668,7 +668,6 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             playersIO[j].put(npc.getCharacterName() + " has hit you for " + npc.getAttackDmg() + ". \nYou now have " + opposingTeam.get(j).getHealth() + " hp left!\n\n");
             playersIO[j].put("Press enter to continue");
             playersIO[j].get();
-            playersIO[j].clear();
         }
     }
 
@@ -741,7 +740,6 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
         playerIO.put("Press enter to continue");
         playerIO.get();
-        playerIO.clear();
     }
 
     private void visualCandy1(ITextIO playerIO, List<DECharacter> enemies, int random) {
@@ -757,7 +755,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         printDungeonLocation(playersIO);
 
         for (int i = 0; i < amountOfRooms; ++i) {
-            enterRoom(playersIO, allCharacters);
+            boolean deadTeammate = enterRoom(playersIO, allCharacters);
             if (i != amountOfRooms - 1) {
                 for (ITextIO playerIO : playersIO) {
                     playerIO.put("Press enter to move to the next room ..");
@@ -768,6 +766,10 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                     playersIO[j].put("You finished the dungeon! Press enter to return ..");
                     playersIO[j].get();
                 }
+            }
+
+            if (deadTeammate) {
+                break;
             }
         }
     }
@@ -788,9 +790,10 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         }
     }
 
-    private void enterRoom(ITextIO[] playersIO, List<DECharacter> players) {
+    private boolean enterRoom(ITextIO[] playersIO, List<DECharacter> players) {
         //Random generates a number of either 0 and 1
         int rand = (int) (Math.random() * 3);
+        boolean deadTeammate = false;
 
         //66% chance of encounter
         if (rand > 0) {
@@ -807,10 +810,12 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             enemies.add(enemy);
 
             //Encounter
-            encounter(playersIO, allCharacters, players, enemies, true);
+            deadTeammate = encounter(playersIO, allCharacters, players, enemies, true);
             //Reward from encounter
-            for (int i = 0; i < playersIO.length; ++i) {
-                rewardPlayer(playersIO[i], players.get(i));
+            if (!deadTeammate) {
+                for (int i = 0; i < playersIO.length; ++i) {
+                    rewardPlayer(playersIO[i], players.get(i));
+                }
             }
 
         } else {
@@ -822,7 +827,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 playersIO[i].put("\n--------------------------------------------------------------------------------------------------\n\n");
             }
         }
-
+        return deadTeammate;
     }
 
     private void rewardPlayer(ITextIO playerIO, DECharacter playerDE) {
