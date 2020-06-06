@@ -729,6 +729,9 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         for (DECharacter target : targets) {
             if (chosenAbility.getDamage() <= 0 && chosenAbility.getHealing() > 0) {
                 target.setHealth(target.getHealth() + chosenAbility.getHealing());
+                if (target.getHealth() > target.getMaxHealth()) {
+                    target.setHealth(target.getMaxHealth());
+                }
                 visualCandy1(playerIO, enemies, random);
                 playerIO.put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
