@@ -43,7 +43,8 @@ public class InventoryFacade {
 
         List<Long> potionIds = new ArrayList<Long>();
         List<Long> trinketIds = new ArrayList<Long>();
-        Inventory inv = new Inventory(potionIds, trinketIds);
+        List<Long> equippedTrinketIds = new ArrayList<Long>();
+        Inventory inv = new Inventory(potionIds, trinketIds, equippedTrinketIds);
 
         Player player = em.find(Player.class, character.getId());
         if (player == null) {
@@ -108,6 +109,51 @@ public class InventoryFacade {
         EntityManager em = getEntityManager();
         Inventory inv = em.find(Inventory.class, character.getInventory().getId());
         inv.getTrinketIds().remove(index);
+        character.setInventory(inv);
+        try {
+            em.getTransaction().begin();
+            em.merge(inv);
+            em.merge(character);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public void removeTrinketFromEquippedInventory(DECharacter character, int index) {
+        EntityManager em = getEntityManager();
+        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
+        inv.getEquippedTrinketIds().remove(index);
+        character.setInventory(inv);
+        try {
+            em.getTransaction().begin();
+            em.merge(inv);
+            em.merge(character);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public void equipTrinket(DECharacter character, int index) {
+        EntityManager em = getEntityManager();
+        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
+        inv.getEquippedTrinketIds().add((long) index);
+        character.setInventory(inv);
+        try {
+            em.getTransaction().begin();
+            em.merge(inv);
+            em.merge(character);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public void unequipTrinket(DECharacter character, int index) {
+        EntityManager em = getEntityManager();
+        Inventory inv = em.find(Inventory.class, character.getInventory().getId());
+        inv.getTrinketIds().add((long) index);
         character.setInventory(inv);
         try {
             em.getTransaction().begin();

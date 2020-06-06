@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
@@ -52,6 +53,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     AbilityFacade abF = AbilityFacade.getAbilityFacade(emf);
     TrinketFacade tfc = TrinketFacade.getInventoryFacade(emf);
     AsciiArt aa = new AsciiArt();
+    boolean equipped = false;
 
     @Override
     public void startGame(ITextIO playerIO, SyncBox allSyncBoxes) {
@@ -261,7 +263,13 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         ArrayList joiningPlayersList = (ArrayList) joiningPlayersSB.peek();
         System.out.println(joiningPlayersList.size());
         System.out.println(amount);
-        while (joiningPlayersList.size() < amount - 1) {
+        while (joiningPlayersList.size() < (amount - 1)) {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+                System.out.println(joiningPlayersList.size());
+            } catch (InterruptedException ex) {
+                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } //Locking the thread untill someone joins
 
         ArrayList<ITextIO> playersIOList = new ArrayList();
@@ -374,7 +382,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     private void showInventory(DECharacter playerCharacter, ITextIO playerIO) {
         playerIO.clear();
         aa.printTreasure(playerIO);
-        List actions = Arrays.asList("Show potions", "Show trinkets", "Go back");
+        List actions = Arrays.asList("Show potions", "Show equipped trinkets", "Show unequipped trinkets", "Go back");
         Player p = null;
         try {
             p = pF.getPlayerByID(playerCharacter.getId());
@@ -388,9 +396,12 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 showPotionInventory(playerCharacter, playerIO);
                 break;
             case 2:
-                showTrinketInventory(playerCharacter, playerIO);
+                showEquippedTrinketInventory(playerCharacter, playerIO);
                 break;
             case 3:
+                showUnequippedTrinketInventory(playerCharacter, playerIO);
+                break;
+            case 4:
                 break;
         }
     }
@@ -443,7 +454,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         }
     }
 
-    private void showTrinketInventory(DECharacter player, ITextIO playerIO) {
+    private void showUnequippedTrinketInventory(DECharacter player, ITextIO playerIO) {
         playerIO.clear();
         aa.printTrinket(playerIO);
         ArrayList<String> actions = new ArrayList();
@@ -483,9 +494,66 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 switch (useChoice) {
                     case 1:
                         tfc.equipTrinket(player, chosen);
+                        ifc.equipTrinket(player, chosen.getId().intValue());
+                        ifc.removeTrinketFromInventory(player, choice - 1);
                         break;
                     case 2:
                         ifc.removeTrinketFromInventory(player, choice - 1);
+                        break;
+                    case 3:
+                        break;
+                }
+
+            }
+
+        }
+    }
+    
+    private void showEquippedTrinketInventory(DECharacter player, ITextIO playerIO) {
+        playerIO.clear();
+        aa.printTrinket(playerIO);
+        ArrayList<String> actions = new ArrayList();
+        List<Long> trinketIds = new ArrayList();
+
+        Inventory inv = ifc.getInventory(player, player.getInventory().getId());
+        trinketIds = inv.getEquippedTrinketIds();
+
+        for (Long longs : trinketIds) {
+            try {
+                actions.add(tfc.getTrinketById(longs).getName() + " - " + tfc.getTrinketById(longs).getInfo());
+            } catch (ItemNotFoundException ex) {
+                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        actions.add("Go back");
+
+        int choice = playerIO.select("\n\n                              [Trinket inventory]\n", actions, "");
+
+        ArrayList<String> use = new ArrayList();
+        use.add("Unequip");
+        use.add("Drop");
+        use.add("Return to menu");
+
+        //Gets selected potion from the database.
+        System.out.println(actions.size());
+        if (choice != actions.size()) {
+            Trinket chosen = null;
+            try {
+                chosen = tfc.getTrinketById(trinketIds.get(choice - 1));
+            } catch (ItemNotFoundException ex) {
+                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            int useChoice = playerIO.select("What will you do?", use, "");
+            if (useChoice != use.size()) {
+                switch (useChoice) {
+                    case 1:
+                        tfc.unequipTrinket(player, chosen);
+                        ifc.unequipTrinket(player, chosen.getId().intValue());
+                        ifc.removeTrinketFromEquippedInventory(player, choice -1);
+                        break;
+                    case 2:
+                        ifc.removeTrinketFromEquippedInventory(player, choice - 1);
                         break;
                     case 3:
                         break;
@@ -800,6 +868,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
             //Adds single random trinket
             List<Long> trinketIds = new ArrayList();
+            List<Long> equippedTrinketIds = new ArrayList();
             int trinketChance = (int) (Math.random() * 10);
             if (trinketChance > 6) {
                 double trinketID = (Math.random() * 3) + 1;
@@ -812,7 +881,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 trinketIds.add((long) trinketID);
             }
             //Creates a new inventory with the potions 
-            Inventory inventory = new Inventory(potionIDs, trinketIds);
+            Inventory inventory = new Inventory(potionIDs, trinketIds, equippedTrinketIds);
             playerIO.put("\n");
             //Adds the items from the new inventory to the existing inventory of the player
             ifc.addToInventory(player, inventory);

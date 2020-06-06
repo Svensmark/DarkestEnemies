@@ -97,5 +97,5 @@ public class Trinket implements Serializable, ItemI {
     public void setDmgIncreaseValue(int value) {
         this.dmgIncreaseValue = value;
     }
-    
+
 }

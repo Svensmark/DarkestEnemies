@@ -73,7 +73,7 @@ public class TrinketFacade {
 
         // Mana increase
         character.setMaxMana(character.getMaxMana() + trinket.getManaValue());
-
+        
         try {
             em.getTransaction().begin();
             em.merge(character);
@@ -96,7 +96,7 @@ public class TrinketFacade {
 
         // Mana decrease
         character.setMaxMana(character.getMaxMana() - trinket.getManaValue());
-
+        
         try {
             em.getTransaction().begin();
             em.merge(character);

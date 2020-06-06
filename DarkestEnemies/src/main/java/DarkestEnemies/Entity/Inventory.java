@@ -24,10 +24,12 @@ public class Inventory implements Serializable {
     private Long id;
     private List<Long> potionIds;
     private List<Long> trinketIds;
+    private List<Long> equippedTrinketIds;
 
-    public Inventory(List<Long> potionIds, List<Long> trinketIds) {
+    public Inventory(List<Long> potionIds, List<Long> trinketIds, List<Long> equippedTrinketIds) {
         this.potionIds = potionIds;
         this.trinketIds = trinketIds;
+        this.equippedTrinketIds = equippedTrinketIds;
     }
 
     public Inventory() {
@@ -56,5 +58,15 @@ public class Inventory implements Serializable {
     public void setTrinketIds(List<Long> trinketIds) {
         this.trinketIds = trinketIds;
     }
+
+    public List<Long> getEquippedTrinketIds() {
+        return equippedTrinketIds;
+    }
+
+    public void setEquippedTrinketIds(List<Long> equippedTrinketIds) {
+        this.equippedTrinketIds = equippedTrinketIds;
+    }
+    
+    
 
 }

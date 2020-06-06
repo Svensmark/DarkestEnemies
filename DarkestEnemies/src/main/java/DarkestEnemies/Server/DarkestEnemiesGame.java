@@ -570,6 +570,7 @@ public class DarkestEnemiesGame implements ITextGame {
 
         //Adds single random trinket
         List<Long> trinketIds = new ArrayList();
+        List<Long> equippedTrinketIds = new ArrayList();
         int trinketChance = (int) (Math.random() * 10);
         if (trinketChance > 6) {
             double trinketID = (Math.random() * 3) + 1;
@@ -577,7 +578,7 @@ public class DarkestEnemiesGame implements ITextGame {
             trinketIds.add((long) trinketID);
         }
         //Creates a new inventory with the potions 
-        Inventory inventory = new Inventory(potionIDs, trinketIds);
+        Inventory inventory = new Inventory(potionIDs, trinketIds, equippedTrinketIds);
 
         //Adds the items from the new inventory to the existing inventory of the player
         ifc.addToInventory(player, inventory);
