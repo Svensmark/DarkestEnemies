@@ -340,7 +340,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             playerIO.clear();
             aa.printMultiplayer(playerIO);
             playerIO.put("\n\n                                 [Joined room]\n");
-            playerIO.put("W\n - Waiting for players to join");
+            playerIO.put("\n - Waiting for players ..");
 
             JoiningPlayer joiningPlayer = new JoiningPlayer(playerIO, playerCharacter);
             joiningPlayers.add(joiningPlayer);
@@ -697,7 +697,6 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 }
             } else {
                 for (int j = 0; j < playersIO.length; ++j) {
-                    pF.updatePlayer(allCharacters.get(j));
                     playersIO[j].put("You finished the dungeon! Press enter to return ..");
                     playersIO[j].get();
                 }
@@ -819,23 +818,29 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             ifc.addToInventory(player, inventory);
         }
 
+        pF.updatePlayer(player);
+
     }
 
     private void showCharacter(DECharacter playerCharacterDE, ITextIO playerIO) {
-        Player playerCharacter = (Player) playerCharacterDE;
-        playerIO.clear();
-        aa.printCharacter(playerIO);
-        playerIO.put("\n\n                                      [Character]\n\n");
-        playerIO.put(">------------------------------------\n");
-        playerIO.put("[Character name]  - " + playerCharacter.getCharacterName() + "\n");
-        playerIO.put("[Level]           - " + playerCharacter.getLevel() + "\n");
-        playerIO.put("[Exp Points]      - (" + playerCharacter.getCurrentExp() + " / " + playerCharacter.getNeededExp() + ")\n\n");
-        playerIO.put("[Health Points]   - (" + playerCharacter.getHealth() + " / " + playerCharacter.getMaxHealth() + ")\n");
-        playerIO.put("[Mana Points]     - (" + playerCharacter.getMana() + " / " + playerCharacter.getMaxMana() + ")\n\n");
-        playerIO.put("[Atk Dmg]         - " + playerCharacter.getAttackDmg() + "\n");
-        playerIO.put(">------------------------------------");
-        List choices = Arrays.asList("Go back");
-        playerIO.select("", choices, "");
+        try {
+            Player playerCharacter = pF.getPlayerByID(playerCharacterDE.getId());
+            playerIO.clear();
+            aa.printCharacter(playerIO);
+            playerIO.put("\n\n                                      [Character]\n\n");
+            playerIO.put(">------------------------------------\n");
+            playerIO.put("[Character name]  - " + playerCharacter.getCharacterName() + "\n");
+            playerIO.put("[Level]           - " + playerCharacter.getLevel() + "\n");
+            playerIO.put("[Exp Points]      - (" + playerCharacter.getCurrentExp() + " / " + playerCharacter.getNeededExp() + ")\n\n");
+            playerIO.put("[Health Points]   - (" + playerCharacter.getHealth() + " / " + playerCharacter.getMaxHealth() + ")\n");
+            playerIO.put("[Mana Points]     - (" + playerCharacter.getMana() + " / " + playerCharacter.getMaxMana() + ")\n\n");
+            playerIO.put("[Atk Dmg]         - " + playerCharacter.getAttackDmg() + "\n");
+            playerIO.put(">------------------------------------");
+            List choices = Arrays.asList("Go back");
+            playerIO.select("", choices, "");
+        } catch (CharacterNotFoundException ex) {
+            Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }
