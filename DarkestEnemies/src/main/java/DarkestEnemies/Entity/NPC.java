@@ -107,11 +107,6 @@ public class NPC implements DarkestEnemies.IF.DECharacter, Serializable {
     }
 
     @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
     public int getLevel() {
         throw new UnsupportedOperationException("This Class does not use this method. Not allowed to be used.");
     }

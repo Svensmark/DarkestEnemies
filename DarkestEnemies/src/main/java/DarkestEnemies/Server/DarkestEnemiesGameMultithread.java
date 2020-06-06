@@ -154,7 +154,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         while (menu) {
             playerIO.clear();
             aa.printTitle(playerIO);
-            List<String> options = Arrays.asList("Find dungeon", "Inventory", "Log out");
+            List<String> options = Arrays.asList("Find dungeon", "Inventory", "Character", "Log out");
             int choiceMainMenu = playerIO.select("\n\n                                                        [Main menu]", options, "");
             switch (choiceMainMenu) {
 
@@ -184,8 +184,12 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                     showInventory(playerCharacter, playerIO);
                     break;
 
+                //Player chooses inventory
+                case 3:
+                    showCharacter(playerCharacter, playerIO);
+                    break;
                 //Player logs out
-                case 3: {
+                case 4: {
                     try {
                         playerIO.put("You have been logged out!");
                         playerIO.close();
@@ -392,47 +396,50 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     }
 
     private void showPotionInventory(DECharacter player, ITextIO playerIO) {
-        playerIO.clear();
-        aa.printPotion(playerIO);
-        //All the possible actions the user can take will be placed here.
-        ArrayList<String> actions = new ArrayList();
-        //List of all the potions the current player has
-        List<Long> potionIds = new ArrayList();
-        Inventory inventory = ifc.getInventory(player, player.getInventory().getId());
-        potionIds = inventory.getPotionIds();
-        //All of the possible actions get added
-        //The actions include the name of the potion together with its description.
-        for (Long longs : potionIds) {
-            try {
-                actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
-            } catch (ItemNotFoundException ex) {
-                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+        while (true) {
+            playerIO.clear();
+            aa.printPotion(playerIO);
+            //All the possible actions the user can take will be placed here.
+            ArrayList<String> actions = new ArrayList();
+            //List of all the potions the current player has
+            List<Long> potionIds = new ArrayList();
+            Inventory inventory = ifc.getInventory(player, player.getInventory().getId());
+            potionIds = inventory.getPotionIds();
+            //All of the possible actions get added
+            //The actions include the name of the potion together with its description.
+            for (Long longs : potionIds) {
+                try {
+                    actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
+                } catch (ItemNotFoundException ex) {
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-        }
 
-        actions.add("Go back");
-        //Gets player input
-        int choice = playerIO.select("\n\n                            [Potion inventory]\n", actions, "");
-        //Gets selected potion from the database.
-        System.out.println(actions.size());
-        if (choice != actions.size()) {
-            Potion chosen = null;
-            try {
-                chosen = pfc.getPotionByID(potionIds.get(choice - 1));
-            } catch (ItemNotFoundException ex) {
-                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+            actions.add("Go back");
+            //Gets player input
+            int choice = playerIO.select("\n\n                            [Potion inventory]\n", actions, "");
+            //Gets selected potion from the database.
+            if (choice != actions.size()) {
+                Potion chosen = null;
+                try {
+                    chosen = pfc.getPotionByID(potionIds.get(choice - 1));
+                } catch (ItemNotFoundException ex) {
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                Player currentPlayer = null;
+                try {
+                    currentPlayer = pF.getPlayerByID(player.getId());
+                } catch (CharacterNotFoundException ex) {
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //Consumes potion and removes it from the players inventory.
+                pfc.usePotion(player, chosen);
+                playerIO.put("\nYou have consumed " + chosen.getName() + "\nhp: " + currentPlayer.getHealth()
+                        + "dmg: " + currentPlayer.getAttackDmg() + "\n");
+                ifc.removeFromInventory(player, choice - 1);
+            } else {
+                break;
             }
-            Player currentPlayer = null;
-            try {
-                currentPlayer = pF.getPlayerByID(player.getId());
-            } catch (CharacterNotFoundException ex) {
-                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            //Consumes potion and removes it from the players inventory.
-            pfc.usePotion(player, chosen);
-            playerIO.put("\nYou have consumed " + chosen.getName() + "\nhp: " + currentPlayer.getHealth()
-                    + "dmg: " + currentPlayer.getAttackDmg() + "\n");
-            ifc.removeFromInventory(player, choice - 1);
         }
     }
 
@@ -517,11 +524,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         boolean team1Alive = true; //Always players when PVE - Always players when PVP
         boolean team2Alive = true; //Always hostile NPC when PVE - Always players when PVP
 
-        //Introduction to encounter if it is a PVE matchup
-        if (pve) {
-            pveIntro(playersIO, team2);
-        } else { //Introduction to encounter if it is a PVP matchup 
-        }
+        int random = 1 + (int) (Math.random() * 4);
 
         //While both teams are alive the encounter is ongoing (keeps looping)
         while (team1Alive == true && team2Alive == true) {
@@ -530,12 +533,15 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
                 //If the the character is an NPC                               
                 if (allCharacters.get(i).getClass() == NPC.class) {
-                    npcAction(playersIO, team1, (NPC) allCharacters.get(i));
+                    npcAction(playersIO, team1, (NPC) allCharacters.get(i), random);
                 }
 
                 //If the character is a player
                 if (allCharacters.get(i).getClass() != NPC.class) {
-                    playerAction(allCharacters, i, playersIO, team1);
+                    for (DECharacter npc : team2) {
+                        printNPCStats(playersIO[i], npc, random);
+                    }
+                    playerAction(playersIO[i], allCharacters.get(i), team1, team2, random);
                 }
 
                 //Checks HP for all team2 members
@@ -577,58 +583,71 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         }
     }
 
-    private void pveIntro(ITextIO[] playersIO, List<DECharacter> team2) {
-        for (int i = 0; i < playersIO.length; i++) {
-            playersIO[i].clear();
-            playersIO[i].put("You've encountered the following: \n");
-            for (DECharacter enemy : team2) {
-                printNPCStats(playersIO[i], enemy);
-            }
-        }
-    }
-
-    private void printNPCStats(ITextIO playerIO, DECharacter npc) {
-        playerIO.put("[" + npc.getName() + "] - Stats\n");
+    private void printNPCStats(ITextIO playerIO, DECharacter npc, int i) {
+        playerIO.clear();
+        aa.printSpecifc(playerIO, i);
+        playerIO.put("\n---------------------------------------------------------------------------------------------------\n\n");
+        playerIO.put("[" + npc.getCharacterName() + "] - Stats\n");
         playerIO.put("- " + npc.getHealth() + " HP \n");
         playerIO.put("- " + npc.getAttackDmg() + " ATK \n\n");
+        playerIO.put("---------------------------------------------------------------------------------------------------\n\n");
     }
 
-    private void npcAction(ITextIO[] playersIO, List<DECharacter> opposingTeam, NPC npc) {
+    private void npcAction(ITextIO[] playersIO, List<DECharacter> opposingTeam, NPC npc, int random) {
         for (int j = 0; j < playersIO.length; j++) {
+            visualCandy1(playersIO[j], Arrays.asList(npc), random);
             opposingTeam.get(j).setHealth(opposingTeam.get(j).getHealth() - npc.getAttackDmg());
-            playersIO[j].put(npc.getName() + " has hit you for " + npc.getAttackDmg() + ". \nYou now have " + opposingTeam.get(j).getHealth() + " hp left!\n\n");
-            printNPCStats(playersIO[j], npc);
+            playersIO[j].put(npc.getCharacterName() + " has hit you for " + npc.getAttackDmg() + ". \nYou now have " + opposingTeam.get(j).getHealth() + " hp left!\n\n");
+            playersIO[j].put("Press enter to continue");
+            playersIO[j].get();
+            playersIO[j].clear();
         }
     }
 
-    private void playerAction(List<DECharacter> encounter, int i, ITextIO[] players, List<DECharacter> playerEntities) {
+    private void playerAction(ITextIO playerIO, DECharacter playerCharacter, List<DECharacter> allies, List<DECharacter> enemies, int random) {
+        //printNPCStats(playerIO, randomPrintID);
+
         //Creates an empty list of available actions
         ArrayList<String> actions = new ArrayList();
 
         //Gets the abilities of the current player
-        List<Ability> abilities = encounter.get(i).getAbilities();
+        List<Ability> abilities = playerCharacter.getAbilities();
 
         //Adds the abils name to actions list so it can be selected
         for (Ability ab : abilities) {
             actions.add(ab.getName() + "\n" + "  - " + ab.getDescription() + "\n");
         }
-        int choice = players[i].select("\n[Action menu]", actions, "");
+        int choice = playerIO.select("[Action menu]", actions, "");
 
         //Gets the chosen ability
-        Ability chosenAbility = encounter.get(i).getAbilities().get(choice - 1);
+        Ability chosenAbility = playerCharacter.getAbilities().get(choice - 1);
 
         //Creates a new list of all the names in the encounter
         ArrayList<String> names = new ArrayList();
         ArrayList<DECharacter> availableTargets = new ArrayList();
-        for (int j = 0; j < encounter.size(); j++) {
-            names.add(encounter.get(j).getName());
-            availableTargets.add(encounter.get(j));
+
+        //Only adds the valid targets to the list of names
+        //If the chosen ability is a healing ability adds names from the enemy team
+        if (chosenAbility.getDamage() <= 0 && chosenAbility.getHealing() > 0) {
+            for (int j = 0; j < allies.size(); j++) {
+                names.add(allies.get(j).getCharacterName());
+                availableTargets.add(allies.get(j));
+            }
+            //Else if the chosen abilty is a damage ability adds names from the ally team
+        } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
+            for (int i = 0; i < enemies.size(); i++) {
+                names.add(enemies.get(i).getCharacterName());
+                availableTargets.add(enemies.get(i));
+            }
         }
+
+        //Visual candy
+        visualCandy1(playerIO, enemies, random);
 
         //Creates a new list of all the chosen targets of the ability
         ArrayList<Integer> targetsIndex = new ArrayList();
-        int targetIndex = players[i].select("\n[Choose your target]", names, "");
-        for (int j = 0; j < encounter.get(i).getAbilities().get(choice - 1).getAmountOfTargets(); ++j) {
+        int targetIndex = playerIO.select("\n[Choose your target]", names, "");
+        for (int j = 0; j < playerCharacter.getAbilities().get(choice - 1).getAmountOfTargets(); ++j) {
             targetsIndex.add(targetIndex);
         }
 
@@ -643,16 +662,26 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         for (DECharacter target : targets) {
             if (chosenAbility.getDamage() <= 0 && chosenAbility.getHealing() > 0) {
                 target.setHealth(target.getHealth() + chosenAbility.getHealing());
-                players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
+                visualCandy1(playerIO, enemies, random);
+                playerIO.put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             } else if (chosenAbility.getHealing() <= 0 && chosenAbility.getDamage() > 0) {
-                target.setHealth(target.getHealth() - chosenAbility.getDamage() + playerEntities.get(i).getAttackDmg());
-                players[i].put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
+                target.setHealth(target.getHealth() - (chosenAbility.getDamage() + playerCharacter.getAttackDmg()));
+                visualCandy1(playerIO, enemies, random);
+                playerIO.put("Hit! " + target.getCharacterName() + " now has " + target.getHealth() + " HP left!\n\n");
             }
         }
 
-        players[i].put("Press enter to continue");
-        players[i].get();
-        players[i].clear();
+        playerIO.put("Press enter to continue");
+        playerIO.get();
+        playerIO.clear();
+    }
+
+    private void visualCandy1(ITextIO playerIO, List<DECharacter> enemies, int random) {
+        //Visual candy
+        playerIO.clear();
+        for (DECharacter npc : enemies) {
+            printNPCStats(playerIO, npc, random);
+        }
     }
 
     private void enterDungeon(ITextIO[] playersIO, List<DECharacter> allCharacters, int amountOfRooms) {
@@ -667,9 +696,10 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                     playerIO.get();
                 }
             } else {
-                for (ITextIO playerIO : playersIO) {
-                    playerIO.put("You finished the dungeon! Press enter to return ..");
-                    playerIO.get();
+                for (int j = 0; j < playersIO.length; ++j) {
+                    pF.updatePlayer(allCharacters.get(j));
+                    playersIO[j].put("You finished the dungeon! Press enter to return ..");
+                    playersIO[j].get();
                 }
             }
         }
@@ -711,92 +741,101 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
             //Encounter
             encounter(playersIO, allCharacters, players, enemies, true);
-
-            //Variables for gold and xp rewards
-            int xpGain = 0;
-            int avrgLevel = 0;
-            int avrgRequiredXp = 0;
-
-            for (DECharacter p : players) {
-                Player character = null;
-                try {
-                    character = pF.getPlayerByID(p.getId());
-                } catch (CharacterNotFoundException ex) {
-                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                avrgLevel += p.getLevel();
-                avrgRequiredXp += character.getNeededExp();
-            }
-            avrgLevel = avrgLevel / players.size();
-            avrgRequiredXp = avrgRequiredXp / players.size();
-            int goldDrop = (int) ((Math.random() * 10) * avrgLevel);
-            if (avrgLevel == 1) {
-                xpGain += Math.pow(avrgLevel + 1, (avrgRequiredXp / (avrgRequiredXp / 3)));
-            } else {
-                xpGain += avrgLevel * Math.pow(avrgLevel, 3);
-            }
-
-            for (DECharacter p : players) {
-                pF.recieveExperience(p.getId(), xpGain);
-                pF.lootGold(p, goldDrop);
-            }
-
-            for (int i = 0; i < players.size(); i++) {
-                playersIO[i].put("You have gained " + xpGain + " XP and " + goldDrop + " Gold.\n");
+            //Reward from encounter
+            for (int i = 0; i < playersIO.length; ++i) {
+                rewardPlayer(playersIO[i], players.get(i));
             }
 
         } else {
             for (int i = 0; i < players.size(); i++) {
                 playersIO[i].clear();
-                playersIO[i].put("No enemies in sight, it's safe to move on to the next room.\n");
+                aa.printEmptyRoom(playersIO[i]);
+                playersIO[i].put("\n--------------------------------------------------------------------------------------------------");
+                playersIO[i].put("\n\nNo enemies in sight, it's safe to move on to the next room.\n");
+                playersIO[i].put("\n--------------------------------------------------------------------------------------------------\n\n");
             }
         }
 
-        for (int i = 0; i < players.size(); ++i) {
-            rand = (int) (Math.random() * 3);
-            //33% chance of reward
-            if (rand == 0) {
-                rewardPlayer(playersIO[i], players.get(i));
-            }
-        }
     }
 
-    private void rewardPlayer(ITextIO playerIO, DECharacter player) {
-        //Rewards should be a new method
-        //Determines the amount of potions the player gets as a reward
-        int amountOfPotions = (int) (Math.random() * 3) + 1;
-        playerIO.put("\nYou found some items!\n");
-        //Adds random potions with the amount equal to the random number above
-        List<Long> potionIDs = new ArrayList();
-        for (int i = 0; i < amountOfPotions; ++i) {
-            double potionID = (Math.random() * 3) + 1;
-            try {
-                playerIO.put("\nYou found a " + pfc.getPotionByID((long) potionID).getName() + "\n");
-            } catch (ItemNotFoundException ex) {
-                //Couldnt find the item exception
-                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            potionIDs.add((long) potionID);
+    private void rewardPlayer(ITextIO playerIO, DECharacter playerDE) {
+
+        Player player = (Player) playerDE;
+
+        //Variables for gold and xp rewards
+        int xpGain = 0;
+        int avrgLevel = player.getLevel();
+        int avrgRequiredXp = player.getNeededExp();
+
+        int goldDrop = (int) ((Math.random() * 10) * avrgLevel);
+        if (avrgLevel == 1) {
+            xpGain += Math.pow(avrgLevel + 1, (avrgRequiredXp / (avrgRequiredXp / 3)));
+        } else {
+            xpGain += avrgLevel * Math.pow(avrgLevel, 3);
         }
 
-        //Adds single random trinket
-        List<Long> trinketIds = new ArrayList();
-        int trinketChance = (int) (Math.random() * 10);
-        if (trinketChance > 6) {
-            double trinketID = (Math.random() * 3) + 1;
-            try {
-                playerIO.put("You found a " + tfc.getTrinketById((long) trinketID).getName() + "\n");
-            } catch (ItemNotFoundException ex) {
-                //Couldnt find the item exception
-                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+        //Basic reward - gold and exp
+        pF.recieveExperience(player.getId(), xpGain);
+        pF.lootGold(player, goldDrop);
+
+        playerIO.put("You have gained " + xpGain + " XP and " + goldDrop + " Gold.\n");
+
+        //33% chance of loot
+        int rand = (int) (Math.random() * 3);
+        if (rand == 0) {
+            //Determines the amount of potions the player gets as a reward
+            int amountOfPotions = (int) (Math.random() * 3) + 1;
+            playerIO.put("\nYou found some items!\n");
+            //Adds random potions with the amount equal to the random number above
+            List<Long> potionIDs = new ArrayList();
+            for (int i = 0; i < amountOfPotions; ++i) {
+                double potionID = (Math.random() * 3) + 1;
+                try {
+                    playerIO.put("You found a " + pfc.getPotionByID((long) potionID).getName() + "\n");
+                } catch (ItemNotFoundException ex) {
+                    //Couldnt find the item exception
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                potionIDs.add((long) potionID);
             }
-            trinketIds.add((long) trinketID);
+
+            //Adds single random trinket
+            List<Long> trinketIds = new ArrayList();
+            int trinketChance = (int) (Math.random() * 10);
+            if (trinketChance > 6) {
+                double trinketID = (Math.random() * 3) + 1;
+                try {
+                    playerIO.put("You found a " + tfc.getTrinketById((long) trinketID).getName() + "\n");
+                } catch (ItemNotFoundException ex) {
+                    //Couldnt find the item exception
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                trinketIds.add((long) trinketID);
+            }
+            //Creates a new inventory with the potions 
+            Inventory inventory = new Inventory(potionIDs, trinketIds);
+            playerIO.put("\n");
+            //Adds the items from the new inventory to the existing inventory of the player
+            ifc.addToInventory(player, inventory);
         }
-        //Creates a new inventory with the potions 
-        Inventory inventory = new Inventory(potionIDs, trinketIds);
-        playerIO.put("\n");
-        //Adds the items from the new inventory to the existing inventory of the player
-        ifc.addToInventory(player, inventory);
+
+    }
+
+    private void showCharacter(DECharacter playerCharacterDE, ITextIO playerIO) {
+        Player playerCharacter = (Player) playerCharacterDE;
+        playerIO.clear();
+        aa.printCharacter(playerIO);
+        playerIO.put("\n\n                                      [Character]\n\n");
+        playerIO.put(">------------------------------------\n");
+        playerIO.put("[Character name]  - " + playerCharacter.getCharacterName() + "\n");
+        playerIO.put("[Level]           - " + playerCharacter.getLevel() + "\n");
+        playerIO.put("[Exp Points]      - (" + playerCharacter.getCurrentExp() + " / " + playerCharacter.getNeededExp() + ")\n\n");
+        playerIO.put("[Health Points]   - (" + playerCharacter.getHealth() + " / " + playerCharacter.getMaxHealth() + ")\n");
+        playerIO.put("[Mana Points]     - (" + playerCharacter.getMana() + " / " + playerCharacter.getMaxMana() + ")\n\n");
+        playerIO.put("[Atk Dmg]         - " + playerCharacter.getAttackDmg() + "\n");
+        playerIO.put(">------------------------------------");
+        List choices = Arrays.asList("Go back");
+        playerIO.select("", choices, "");
     }
 
 }

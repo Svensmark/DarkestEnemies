@@ -47,7 +47,7 @@ public class InventoryFacade {
 
         Player player = em.find(Player.class, character.getId());
         if (player == null) {
-            throw new PlayerNotFoundException("Character with id:" + character.getId() + " and named: " + character.getName() + "was not found.");
+            throw new PlayerNotFoundException("Character with id:" + character.getId() + " and named: " + character.getCharacterName() + "was not found.");
         }
         player.setInventory(inv);
         try {

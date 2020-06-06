@@ -392,7 +392,7 @@ public class DarkestEnemiesGame implements ITextGame {
     }
 
     private void printNPCStats(ITextIO playerIO, DECharacter npc) {
-        playerIO.put(npc.getName() + "\n");
+        playerIO.put(npc.getCharacterName() + "\n");
         playerIO.put("- " + npc.getHealth() + " HP \n");
         playerIO.put("- " + npc.getAttackDmg() + " ATK \n\n");
     }
@@ -400,7 +400,7 @@ public class DarkestEnemiesGame implements ITextGame {
     private void npcAction(ITextIO[] playersIO, List<DECharacter> opposingTeam, NPC npc) {
         for (int j = 0; j < playersIO.length; j++) {
             opposingTeam.get(j).setHealth(opposingTeam.get(j).getHealth() - npc.getAttackDmg());
-            playersIO[j].put(npc.getName() + " has hit you for " + npc.getAttackDmg() + ". \nYou now have " + opposingTeam.get(j).getHealth() + " hp left!\n\n");
+            playersIO[j].put(npc.getCharacterName() + " has hit you for " + npc.getAttackDmg() + ". \nYou now have " + opposingTeam.get(j).getHealth() + " hp left!\n\n");
             printNPCStats(playersIO[j], npc);
         }
     }
@@ -425,7 +425,7 @@ public class DarkestEnemiesGame implements ITextGame {
         ArrayList<String> names = new ArrayList();
         ArrayList<DECharacter> availableTargets = new ArrayList();
         for (int j = 0; j < encounter.size(); j++) {
-            names.add(encounter.get(j).getName());
+            names.add(encounter.get(j).getCharacterName());
             availableTargets.add(encounter.get(j));
         }
 

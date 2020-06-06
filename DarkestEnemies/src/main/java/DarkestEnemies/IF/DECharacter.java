@@ -16,7 +16,6 @@ import java.util.List;
  */
 public interface DECharacter {
 
-    public String getName();
     //Get methods
     public enum ENUMTYPE{PLAYER, NPC};
     public ENUMTYPE getType();

@@ -118,10 +118,6 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         this.mana = mana;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -247,4 +243,6 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
         this.neededExp = (int) ((Math.pow(this.level, 2) + this.level + 1) / 2 * 100 - (this.level * 100));
     }
 
+    
+    
 }
