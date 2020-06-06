@@ -7,6 +7,7 @@ package DarkestEnemies.Server;
 
 import DarkestEnemies.syncbox.SyncBox;
 import DarkestEnemies.textio.ITextIO;
+import HelpingClasses.HostingPlayer;
 import java.io.BufferedInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -43,16 +44,15 @@ public class GameServerMultithread implements Runnable {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on " + adr + ":" + port);
 
-            //SyncBoxes
-            SyncBox<HashMap> allSyncBoxes = new SyncBox();
-            allSyncBoxes.put(new HashMap());
-            
-            //Adding SyncBoxes to the list of all SyncBoxes
             //All playerIO hosting a multiplayer game as a list in a syncbox
-            SyncBox<ArrayList<ITextIO>> allPlayersSB = new SyncBox();
-            allPlayersSB.put(new ArrayList<>());
-            allSyncBoxes.peek().put("hostingPlayersSB", allPlayersSB);
-
+            SyncBox<ArrayList<HostingPlayer>> hostingPlayersList = new SyncBox();
+            hostingPlayersList.put(new ArrayList());
+            
+            SyncBox<HashMap> allSyncBoxes = new SyncBox();
+            HashMap allSyncBoxesHM = new HashMap();
+            allSyncBoxesHM.put("hostingPlayersList", hostingPlayersList);
+            allSyncBoxes.put(allSyncBoxesHM);
+            
             //Main server loop
             boolean serverUp = true;
             while (serverUp) {

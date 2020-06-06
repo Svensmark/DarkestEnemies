@@ -25,11 +25,14 @@ import DarkestEnemies.facades.PotionFacade;
 import DarkestEnemies.facades.TrinketFacade;
 import DarkestEnemies.syncbox.SyncBox;
 import DarkestEnemies.textio.ITextIO;
+import HelpingClasses.HostingPlayer;
+import HelpingClasses.JoiningPlayer;
 import com.github.javafaker.Faker;
 import entities.exceptions.WrongPasswordException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,7 +59,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         abF.setupBasicAbilities();
 
         //Asking wether
-        DECharacter playerCharacter = login(playerIO);
+        DECharacter playerCharacter = introScreen(playerIO);
 
         //Main loop
         while (true) {
@@ -65,7 +68,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
     }
 
-    private DECharacter login(ITextIO playerIO) {
+    private DECharacter introScreen(ITextIO playerIO) {
         DECharacter playerCharacter = null;
         //Login & Create account
         List<String> options = Arrays.asList("Login", "Create account");
@@ -107,32 +110,36 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
                 //User chooses to create account    
                 case 2:
-                    //Creates a new player, adds it to the database and writes it out to the IO
-                    String playerName = pF.createNewPlayer(playerIO).getCharacterName();
-                    Player player = null;
-                    try {
-                        player = pF.getPlayerByName(playerName);
-                    } catch (PlayerNotFoundException e) {
-                        System.out.println("Something went wrong with finding the player by name: " + playerName);
-                    }
-
-                    //Adds an inventory to the player 
-                    try {
-                        ifc.setupInventory(player);
-                    } catch (PlayerNotFoundException ex) {
-                        System.out.println("Something went wrong with adding an inventory to the player");
-                    }
-
-                    //Adds the start ability to the player "slam"
-                    try {
-                        pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("slam"));
-                    } catch (AbilityNotFoundException e) {
-                        System.out.println("Something went wrong with getting the SLAM ability");
-                    }
+                    createAccount(playerIO);
                     break;
             }
         }
         return playerCharacter;
+    }
+
+    private void createAccount(ITextIO playerIO) {
+        //Creates a new player, adds it to the database and writes it out to the IO
+        String playerName = pF.createNewPlayer(playerIO).getCharacterName();
+        Player player = null;
+        try {
+            player = pF.getPlayerByName(playerName);
+        } catch (PlayerNotFoundException e) {
+            System.out.println("Something went wrong with finding the player by name: " + playerName);
+        }
+
+        //Adds an inventory to the player
+        try {
+            ifc.setupInventory(player);
+        } catch (PlayerNotFoundException ex) {
+            System.out.println("Something went wrong with adding an inventory to the player");
+        }
+
+        //Adds the start ability to the player "slam"
+        try {
+            pF.addAbilityToPlayer(player.getId(), abF.getAbilityByName("slam"));
+        } catch (AbilityNotFoundException e) {
+            System.out.println("Something went wrong with getting the SLAM ability");
+        }
     }
 
     private void printServerIntroScreen(ITextIO playerIO) {
@@ -147,7 +154,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         while (menu) {
             playerIO.clear();
             aa.printTitle(playerIO);
-            List<String> options = Arrays.asList("Find enemy", "Inventory", "Log out");
+            List<String> options = Arrays.asList("Find dungeon", "Inventory", "Log out");
             int choiceMainMenu = playerIO.select("\n\n                                                        [Main menu]", options, "");
             switch (choiceMainMenu) {
 
@@ -159,44 +166,12 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                     int choiceFindEnemy = playerIO.select("\n                                                    [Game menu]", options, "");
 
                     switch (choiceFindEnemy) {
-                        case 1: //Player wishes to play solo
-                            playerIO.clear();
-                            aa.printRandom(playerIO);
-                            options = Arrays.asList("Short - (3 rooms)", "Medium - (6 rooms)", "Long - (10 rooms)", "Go back");
-                            int choiceDifficulty = playerIO.select("\n                                                    [Difficulty]", options, "");
-                            ITextIO[] test = {playerIO};                            
-                            switch(choiceDifficulty) {//Player chooses dungeon size (Amount of rooms)
-                                case 1: 
-                                    enterDungeon(test, Arrays.asList(playerCharacter), 3);
-                                    break;
-                                case 2:
-                                    enterDungeon(test, Arrays.asList(playerCharacter), 6);
-                                    break;
-                                case 3:
-                                    enterDungeon(test, Arrays.asList(playerCharacter), 10);
-                                    break;
-                                case 4:
-                                    break;
-                            }
+                        case 1: //Player wishes to play solo                             
+                            singlePlayerDungeon(playerIO, playerCharacter);
                             break;
 
-                        case 2: //Player wishes to play multiplayer
-                            playerIO.clear();
-                            aa.printMultiplayer(playerIO);
-                            options = Arrays.asList("Host a game", "Join a game", "Go back");
-                            int choiceMultiplayer = playerIO.select("\n                                 [Multiplayer menu]", options, "");
-                            switch (choiceMultiplayer) {
-                                case 1://Player wishes to host a game for someone to join
-
-                                    break;
-
-                                case 2://Player wishes to join a hosted game
-
-                                    break;
-
-                                case 3: //Player wants to go back
-                                    break;
-                            }
+                        case 2: //Player wishes to play multiplayer                             
+                            multiplayerMenu(playerIO, playerCharacter, allSyncBoxes);
                             break;
 
                         case 3: //Player wants to go back
@@ -223,18 +198,193 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         }
     }
 
-    private void showInventory(DECharacter player, ITextIO playerIO) {
+    private void multiplayerMenu(ITextIO playerIO, DECharacter playerCharacter, SyncBox allSyncBoxes) {
+        playerIO.clear();
+        aa.printMultiplayer(playerIO);
+        List<String> options = Arrays.asList("Host a room", "Join a room", "Go back");
+        int choiceMultiplayer = playerIO.select("\n                                 [Multiplayer menu]", options, "");
+        switch (choiceMultiplayer) {
+            case 1://Player wishes to host a game
+                hostMultiplayerGame(playerIO, playerCharacter, allSyncBoxes);
+                break;
+
+            case 2://Player wishes to join a hosted game
+                joinMultiplayerGame(playerIO, playerCharacter, allSyncBoxes);
+                break;
+
+            case 3: //Player wants to go back
+                break;
+        }
+    }
+
+    private void hostMultiplayerGame(ITextIO playerIO, DECharacter playerCharacter, SyncBox allSyncBoxes) {
+        HashMap allSyncBoxesHM = (HashMap) allSyncBoxes.peek();
+        SyncBox hostingPlayersListSB = (SyncBox) allSyncBoxesHM.get("hostingPlayersList");
+        ArrayList hostingPlayersList = (ArrayList) hostingPlayersListSB.peek();
+
+        playerIO.clear();
+        aa.printMultiplayer(playerIO);
+        playerIO.put("\n                                 [Enter room name]");
+        String roomName = "";
+        boolean flag = true;
+        while (true) {
+            flag = true;
+            roomName = playerIO.get();
+            for (int i = 0; i < hostingPlayersList.size(); ++i) {
+                HostingPlayer hostList = (HostingPlayer) hostingPlayersList.get(i);
+                if (hostList.getRoomName().equals(roomName)) {
+                    playerIO.put("\nA room with that name already exists - please choose another name\n");
+                    flag = false;
+                }
+            }
+            if (flag) {
+                break;
+            }
+        }
+        playerIO.put("\n                          [Enter amount of total players]");
+        int amount = playerIO.getInteger(2, 6);
+        HostingPlayer hostingPlayer = new HostingPlayer(playerIO, playerCharacter, roomName, amount);
+        hostingPlayersList.add(hostingPlayer);
+
+        playerIO.clear();
+        aa.printMultiplayer(playerIO);
+        playerIO.put("\n                                    [Your room]\n\n");
+        playerIO.put("[Room name] - " + roomName);
+        playerIO.put("\n[Players]   - " + amount);
+        playerIO.put("\n - Waiting for players to join");
+
+        SyncBox joiningPlayersSB = hostingPlayer.getJoiningPlayersSB();
+        ArrayList joiningPlayersList = (ArrayList) joiningPlayersSB.peek();
+        System.out.println(joiningPlayersList.size());
+        System.out.println(amount);
+        while (joiningPlayersList.size() < amount - 1) {
+        } //Locking the thread untill someone joins
+
+        ArrayList<ITextIO> playersIOList = new ArrayList();
+        playersIOList.add(playerIO);
+        ArrayList<DECharacter> playerCharacters = new ArrayList();
+        playerCharacters.add(playerCharacter);
+        ArrayList<DECharacter> allCharacters = new ArrayList();
+        allCharacters.add(playerCharacter);
+
+        for (int i = 0; i < joiningPlayersList.size(); ++i) {
+            JoiningPlayer joiningPlayer = (JoiningPlayer) joiningPlayersList.get(i);
+            playersIOList.add(joiningPlayer.getPlayerIO());
+            playerCharacters.add(joiningPlayer.getPlayerCharacter());
+            allCharacters.add(joiningPlayer.getPlayerCharacter());
+        }
+
+        NPC enemy = createNPC(playerCharacters);
+        allCharacters.add(enemy);
+        ArrayList<DECharacter> enemies = new ArrayList();
+        enemies.add(enemy);
+
+        ITextIO[] playersIO = new ITextIO[playersIOList.size()];
+        for (int i = 0; i < playersIOList.size(); ++i) {
+            playersIO[i] = (ITextIO) playersIOList.get(i);
+        }
+
+        playerIO.clear();
+        aa.printRandom(playerIO);
+        List<String> options = Arrays.asList("Short - (3 rooms)", "Medium - (6 rooms)", "Long - (10 rooms)");
+        int choiceDifficulty = playerIO.select("\n                                                    [Difficulty]", options, "");
+
+        for (int i = 0; i < hostingPlayersList.size(); ++i) {
+            HostingPlayer hostList = (HostingPlayer) hostingPlayersList.get(i);
+            if (hostList.getRoomName() == roomName) {
+                hostingPlayersList.remove(i);
+            }
+        }
+        switch (choiceDifficulty) {//Player chooses dungeon size (Amount of rooms)
+            case 1:
+                enterDungeon(playersIO, playerCharacters, 3);
+                break;
+            case 2:
+                enterDungeon(playersIO, playerCharacters, 6);
+                break;
+            case 3:
+                enterDungeon(playersIO, playerCharacters, 10);
+                break;
+        }
+
+        hostingPlayer.finish();
+
+    }
+
+    private void joinMultiplayerGame(ITextIO playerIO, DECharacter playerCharacter, SyncBox allSyncBoxes) {
+
+        HashMap allSyncBoxesHM = (HashMap) allSyncBoxes.peek();
+        SyncBox hostingPlayersListSB = (SyncBox) allSyncBoxesHM.get("hostingPlayersList");
+        ArrayList hostingPlayersList = (ArrayList) hostingPlayersListSB.peek();
+
+        playerIO.clear();
+        aa.printMultiplayer(playerIO);
+
+        ArrayList<String> options = new ArrayList();
+        for (int i = 0; i < hostingPlayersList.size(); ++i) {
+            HostingPlayer host = (HostingPlayer) hostingPlayersList.get(i);
+            options.add("[Room name] - " + host.getRoomName());
+        }
+        options.add("Go back");
+
+        int choice = playerIO.select("\n\n                                 [Available Rooms]\n", options, "");
+
+        if (choice != options.size()) {
+            HostingPlayer chosenHost = (HostingPlayer) hostingPlayersList.get(choice - 1);
+            ArrayList joiningPlayers = (ArrayList) chosenHost.getJoiningPlayersSB().peek();
+
+            playerIO.clear();
+            aa.printMultiplayer(playerIO);
+            playerIO.put("\n\n                                 [Joined room]\n");
+            playerIO.put("W\n - Waiting for players to join");
+
+            JoiningPlayer joiningPlayer = new JoiningPlayer(playerIO, playerCharacter);
+            joiningPlayers.add(joiningPlayer);
+
+            while (chosenHost.isGameFinished() == false) {
+            } //Locking the thread untill game finishes
+        }
+    }
+
+    private void singlePlayerDungeon(ITextIO playerIO, DECharacter playerCharacter) {
+        playerIO.clear();
+        aa.printRandom(playerIO);
+        List<String> options = Arrays.asList("Short - (3 rooms)", "Medium - (6 rooms)", "Long - (10 rooms)", "Go back");
+        int choiceDifficulty = playerIO.select("\n                                                    [Difficulty]", options, "");
+        ITextIO[] playersIO = {playerIO};
+        switch (choiceDifficulty) {//Player chooses dungeon size (Amount of rooms)
+            case 1:
+                enterDungeon(playersIO, Arrays.asList(playerCharacter), 3);
+                break;
+            case 2:
+                enterDungeon(playersIO, Arrays.asList(playerCharacter), 6);
+                break;
+            case 3:
+                enterDungeon(playersIO, Arrays.asList(playerCharacter), 10);
+                break;
+            case 4:
+                break;
+        }
+    }
+
+    private void showInventory(DECharacter playerCharacter, ITextIO playerIO) {
         playerIO.clear();
         aa.printTreasure(playerIO);
         List actions = Arrays.asList("Show potions", "Show trinkets", "Go back");
-        int choice = playerIO.select("\n\n                       [Inventory]\n", actions, "");
+        Player p = null;
+        try {
+            p = pF.getPlayerByID(playerCharacter.getId());
+        } catch (CharacterNotFoundException ex) {
+            Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        int choice = playerIO.select("\n\n                       [Inventory]\n[Gold] - " + p.getGold(), actions, "");
 
         switch (choice) {
             case 1:
-                showPotionInventory(player, playerIO);
+                showPotionInventory(playerCharacter, playerIO);
                 break;
             case 2:
-                showTrinketInventory(player, playerIO);
+                showTrinketInventory(playerCharacter, playerIO);
                 break;
             case 3:
                 break;
@@ -438,7 +588,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     }
 
     private void printNPCStats(ITextIO playerIO, DECharacter npc) {
-        playerIO.put("["+npc.getName() + "] - Stats\n");
+        playerIO.put("[" + npc.getName() + "] - Stats\n");
         playerIO.put("- " + npc.getHealth() + " HP \n");
         playerIO.put("- " + npc.getAttackDmg() + " ATK \n\n");
     }
@@ -562,6 +712,40 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
             //Encounter
             encounter(playersIO, allCharacters, players, enemies, true);
+
+            //Variables for gold and xp rewards
+            int xpGain = 0;
+            int avrgLevel = 0;
+            int avrgRequiredXp = 0;
+
+            for (DECharacter p : players) {
+                Player character = null;
+                try {
+                    character = pF.getPlayerByID(p.getId());
+                } catch (CharacterNotFoundException ex) {
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                avrgLevel += p.getLevel();
+                avrgRequiredXp += character.getNeededExp();
+            }
+            avrgLevel = avrgLevel / players.size();
+            avrgRequiredXp = avrgRequiredXp / players.size();
+            int goldDrop = (int) ((Math.random() * 10) * avrgLevel);
+            if (avrgLevel == 1) {
+                xpGain += Math.pow(avrgLevel + 1, (avrgRequiredXp / (avrgRequiredXp / 3)));
+            } else {
+                xpGain += avrgLevel * Math.pow(avrgLevel, 3);
+            }
+
+            for (DECharacter p : players) {
+                pF.recieveExperience(p.getId(), xpGain);
+                pF.lootGold(p, goldDrop);
+            }
+
+            for (int i = 0; i < players.size(); i++) {
+                playersIO[i].put("You have gained " + xpGain + " XP and " + goldDrop + " Gold.\n");
+            }
+
         } else {
             for (int i = 0; i < players.size(); i++) {
                 playersIO[i].clear();

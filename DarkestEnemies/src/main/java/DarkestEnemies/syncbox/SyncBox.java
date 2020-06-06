@@ -48,13 +48,19 @@ public class SyncBox<E>
     }
     
     public synchronized E peek() {
-        while (this.obj == null) {
-            try {
+        while(obj == null)
+        {
+            try
+            {
                 wait();
-            } catch (InterruptedException ex) {
+            } catch (InterruptedException ex)
+            {
                 //Do nothing...
             }
         }
-        return this.obj;
+        E res = obj;
+        //obj = null;
+        notifyAll();
+        return res;
     }
 }
