@@ -383,39 +383,47 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     }
 
     private void showInventory(DECharacter playerCharacter, ITextIO playerIO) {
-        playerIO.clear();
-        aa.printTreasure(playerIO);
-        List actions = Arrays.asList("Show potions", "Show trinkets", "Go back");
-        Player p = null;
-        try {
-            p = pF.getPlayerByID(playerCharacter.getId());
-        } catch (CharacterNotFoundException ex) {
-            Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        int choice = playerIO.select("\n\n                       [Inventory]\n[Gold] - " + p.getGold(), actions, "");
-
-        switch (choice) {
-            case 1:
-                showPotionInventory(playerCharacter, playerIO);
-                break;
-            case 2:
-                playerIO.clear();
-                aa.printTrinket(playerIO);
-                List<String> options = Arrays.asList("Show equipped trinkets", "Show unequipped trinkets", "Go back");
-                int trinkChoice = playerIO.select("\n\n                                                        [Trinkets]", options, "");
-                
-                switch(trinkChoice) {
+        while (true) {
+            playerIO.clear();
+            aa.printTreasure(playerIO);
+            List actions = Arrays.asList("Show potions", "Show trinkets", "Go back");
+            Player p = null;
+            try {
+                p = pF.getPlayerByID(playerCharacter.getId());
+            } catch (CharacterNotFoundException ex) {
+                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            int choice = playerIO.select("\n\n                       [Inventory]\n[Gold] - " + p.getGold(), actions, "");
+            if (choice != actions.size()) {
+                switch (choice) {
                     case 1:
-                        showEquippedTrinketInventory(playerCharacter, playerIO);
+                        showPotionInventory(playerCharacter, playerIO);
                         break;
-                        
                     case 2:
-                        showUnequippedTrinketInventory(playerCharacter, playerIO);
-                        break;
+                        playerIO.clear();
+                        aa.printTrinket(playerIO);
+                        List<String> options = Arrays.asList("Show equipped trinkets", "Show unequipped trinkets", "Go back");
+                        int trinkChoice = playerIO.select("\n\n                                                        [Trinkets]", options, "");
+
+                        switch (trinkChoice) {
+                            case 1:
+                                showEquippedTrinketInventory(playerCharacter, playerIO);
+                                break;
+
+                            case 2:
+                                showUnequippedTrinketInventory(playerCharacter, playerIO);
+                                break;
+                            case 3:
+                                break;
+                        }
+
                 }
+            }else{
                 break;
-                
-            case 3:
+            }
+        }
+    }
+
     private void showVendor(DECharacter playerCharacter, ITextIO playerIO) {
         while (true) {
             List<Potion> allPotions = pfc.getAllPotions();
@@ -549,39 +557,6 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
         }
     }
 
-    private void showInventory(DECharacter playerCharacter, ITextIO playerIO) {
-        while (true) {
-            playerIO.clear();
-            aa.printTreasure(playerIO);
-            List actions = Arrays.asList("Show potions", "Show equipped trinkets", "Show unequipped trinkets", "Go back");
-            Player p = null;
-            try {
-                p = pF.getPlayerByID(playerCharacter.getId());
-            } catch (CharacterNotFoundException ex) {
-                Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            int choice = playerIO.select("\n\n                       [Inventory]\n[Gold] - " + p.getGold(), actions, "");
-            if (choice != actions.size()) {
-                switch (choice) {
-                    case 1:
-                        showPotionInventory(playerCharacter, playerIO);
-                        break;
-                    case 2:
-                        showEquippedTrinketInventory(playerCharacter, playerIO);
-                        break;
-                    case 3:
-                        showUnequippedTrinketInventory(playerCharacter, playerIO);
-                        break;
-                    case 4:
-                        break;
-                }
-            } else {
-                break;
-            }
-
-        }
-    }
-
     private void showPotionInventory(DECharacter player, ITextIO playerIO) {
         while (true) {
             playerIO.clear();
@@ -670,6 +645,10 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 if (useChoice != use.size()) {
                     switch (useChoice) {
                         case 1:
+                            if (inv.getEquippedTrinketIds().size() == 3) {
+                                playerIO.put("You can only equip 3 tinkets at a time \n Press enter to go back");
+                                playerIO.get();
+                            }
                             tfc.equipTrinket(player, chosen);
                             ifc.equipTrinket(player, chosen.getId().intValue());
                             ifc.removeTrinketFromInventory(player, choice - 1);
@@ -681,27 +660,9 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                             break;
                     }
 
-            int useChoice = playerIO.select("What will you do?", use, "");
-            if (useChoice != use.size()) {
-                switch (useChoice) {
-                    case 1:
-                        if (inv.getEquippedTrinketIds().size() == 3) {
-                            playerIO.put("You can only equip 3 tinkets at a time \n Press enter to go back");
-                            playerIO.get();
-                        }
-                        tfc.equipTrinket(player, chosen);
-                        ifc.equipTrinket(player, chosen.getId().intValue());
-                        ifc.removeTrinketFromInventory(player, choice - 1);
-                        break;
-                    case 2:
-                        ifc.removeTrinketFromInventory(player, choice - 1);
-                        break;
-                    case 3:
-                        break;
+                } else {
+                    break;
                 }
-
-            } else {
-                break;
             }
         }
     }
@@ -759,7 +720,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
                 }
 
-            }else{
+            } else {
                 break;
             }
         }
