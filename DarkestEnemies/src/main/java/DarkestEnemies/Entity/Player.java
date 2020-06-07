@@ -223,6 +223,10 @@ public class Player implements DarkestEnemies.IF.DECharacter, Serializable {
     public void removeGold(int amount) {
         this.gold -= amount;
     }
+    
+    public void setGold(int ammount){
+        this.gold = ammount;
+    }
 
     public void addAbility(Ability ability) {
         abilities.add(ability);

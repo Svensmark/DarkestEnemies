@@ -26,7 +26,7 @@ public class Trinket implements Serializable, ItemI {
     private String name, info;
     private int healingValue, manaValue, dmgIncreaseValue, buyValue, sellValue;
 
-    public Trinket(String name, String info, int healingValue, int manaValue, int dmgIncreaseValue, int buyValue, int SellValue) {
+    public Trinket(String name, String info, int healingValue, int manaValue, int dmgIncreaseValue, int buyValue, int sellValue) {
         this.name = name;
         this.info = info;
         this.healingValue = healingValue;

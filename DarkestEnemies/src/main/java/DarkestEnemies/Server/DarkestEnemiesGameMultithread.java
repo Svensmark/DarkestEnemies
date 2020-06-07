@@ -383,6 +383,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     }
 
     private void showInventory(DECharacter playerCharacter, ITextIO playerIO) {
+        playerIO.clear();
         while (true) {
             playerIO.clear();
             aa.printTreasure(playerIO);
@@ -401,56 +402,50 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                         break;
                     case 2:
                         playerIO.clear();
-                        aa.printTrinket(playerIO);
-                        List<String> options = Arrays.asList("Show equipped trinkets", "Show unequipped trinkets", "Go back");
-                        int trinkChoice = playerIO.select("\n\n                                                        [Trinkets]", options, "");
-
-                        switch (trinkChoice) {
-                            case 1:
-                                showEquippedTrinketInventory(playerCharacter, playerIO);
+                        while (true) {
+                            aa.printTrinket(playerIO);
+                            List<String> options = Arrays.asList("Show equipped trinkets", "Show unequipped trinkets", "Go back");
+                            int trinkChoice = playerIO.select("\n\n                                                        [Trinkets]", options, "");
+                            if (trinkChoice != options.size()) {
+                                switch (trinkChoice) {
+                                    case 1:
+                                        showEquippedTrinketInventory(playerCharacter, playerIO);
+                                        playerIO.clear();
+                                        break;
+                                    case 2:
+                                        showUnequippedTrinketInventory(playerCharacter, playerIO);
+                                        playerIO.clear();
+                                        break;
+                                    case 3:
+                                        break;
+                                }
+                            } else {
                                 break;
-
-                            case 2:
-                                showUnequippedTrinketInventory(playerCharacter, playerIO);
-                                break;
-                            case 3:
-                                break;
+                            }
                         }
 
                 }
-            }else{
+            } else {
                 break;
             }
         }
     }
 
     private void showVendor(DECharacter playerCharacter, ITextIO playerIO) {
+        playerIO.clear();
         while (true) {
-            List<Potion> allPotions = pfc.getAllPotions();
-            List<Trinket> allTrinkets = tfc.getAllTrinkets();
-
-            ArrayList<String> potionActions = new ArrayList();
-            ArrayList<String> trinketActions = new ArrayList();
-            List actions = Arrays.asList("Potions", "Trinkets", "Go Back");
-
-            for (Potion potions : allPotions) {
-                potionActions.add(potions.getName() + " - " + potions.getInfo());
-            }
-            potionActions.add("Go back");
-
-            for (Trinket trinkets : allTrinkets) {
-                trinketActions.add(trinkets.getName() + " - " + trinkets.getInfo());
-            }
-            trinketActions.add("Go back");
-
-            int choice = playerIO.select("\n\n                            [Vendor]\n", actions, "");
+            List actions = Arrays.asList("Buy", "Sell", "Go Back");
+            int choice = playerIO.select("\n\n                            [Vendor]"
+                    + "\n                            Do you wish yo buy or sell?", actions, "");
             if (choice != actions.size()) {
                 switch (choice) {
                     case 1:
-                        showVendorPotions(playerCharacter, playerIO);
+                        vendorPurchase(playerIO, playerCharacter);
+                        playerIO.clear();
                         break;
                     case 2:
-                        showVendorTrinkets(playerCharacter, playerIO);
+                        vendorSell(playerIO, playerCharacter);
+                        playerIO.clear();
                         break;
                     case 3:
                         break;
@@ -463,8 +458,162 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
     }
 
-    private void showVendorPotions(DECharacter playerCharacter, ITextIO playerIO) {
+    private void vendorPurchase(ITextIO playerIO, DECharacter playerCharacter) {
+        playerIO.clear();
+        while (true) {
+            List actions = Arrays.asList("Potions", "Trinkets", "Go Back");
 
+            int choice = playerIO.select("\n\n                            [Vendor]\n", actions, "");
+            if (choice != actions.size()) {
+                switch (choice) {
+                    case 1:
+                        showVendorPotions(playerCharacter, playerIO);
+                        playerIO.clear();
+                        break;
+                    case 2:
+                        showVendorTrinkets(playerCharacter, playerIO);
+                        playerIO.clear();
+                        break;
+                    case 3:
+                        break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    private void vendorSell(ITextIO playerIO, DECharacter playerCharacter) {
+        playerIO.clear();
+        while (true) {
+            List actions = Arrays.asList("Potions", "Trinkets", "Go Back");
+            int choice = playerIO.select("What do you wish to sell?", actions, "");
+            if (choice != actions.size()) {
+                switch (choice) {
+                    case 1:
+                        vendorSellPotions(playerIO, playerCharacter);
+                        playerIO.clear();
+                        break;
+                    case 2:
+                        vendorSellTrinkets(playerIO, playerCharacter);
+                        playerIO.clear();
+                        break;
+                }
+            } else {
+                break;
+            }
+
+        }
+    }
+
+    private void vendorSellPotions(ITextIO playerIO, DECharacter playerCharacter) {
+        playerIO.clear();
+        while (true) {
+            aa.printTrinket(playerIO);
+            //All the possible actions the user can take will be placed here.
+            ArrayList<String> actions = new ArrayList();
+            //List of all the potions the current player has
+            List<Long> potionIds = new ArrayList();
+            Inventory inventory = ifc.getInventory(playerCharacter, playerCharacter.getInventory().getId());
+            potionIds = inventory.getPotionIds();
+            //All of the possible actions get added
+            //The actions include the name of the potion together with its description.
+            for (Long longs : potionIds) {
+                try {
+                    actions.add(pfc.getPotionByID(longs).getName() + " - " + pfc.getPotionByID(longs).getInfo());
+                } catch (ItemNotFoundException ex) {
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            actions.add("Go back");
+            //Gets player input
+            int choice = playerIO.select("\n\n                            [Potion inventory]\n", actions, "");
+            //Gets selected potion from the database.
+            if (choice != actions.size()) {
+
+                Potion chosen = null;
+                try {
+                    chosen = pfc.getPotionByID(potionIds.get(choice - 1));
+                } catch (ItemNotFoundException ex) {
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                List<String> confirmation = Arrays.asList("Yes", "No");
+                int subChoice = playerIO.select("Are you sure you want to sell " + chosen.getName() + "?", confirmation, "");
+                switch (subChoice) {
+                    case 1:
+                        //Consumes potion and removes it from the players inventory.
+                        Player player = (Player) playerCharacter;
+                        player.addGold(chosen.getSellValue());
+                        playerIO.clear();
+                        playerIO.put("\nYou have sold " + chosen.getName() + "for " + chosen.getSellValue() + " gold.\n");
+                        ifc.removeFromInventory(playerCharacter, choice - 1);
+                        break;
+                    case 2:
+                        playerIO.clear();
+                        playerIO.put(chosen.getName() + " was not sold.\n\n");
+                        break;
+                }
+
+            }else{
+                break;
+            }
+        }
+    }
+
+    private void vendorSellTrinkets(ITextIO playerIO, DECharacter playerCharacter) {
+        playerIO.clear();
+        while (true) {
+            aa.printPotion(playerIO);
+            ArrayList<String> actions = new ArrayList();
+            Inventory inventory = ifc.getInventory(playerCharacter, playerCharacter.getInventory().getId());
+            List<Long> trinketIds = inventory.getTrinketIds();
+
+            for (Long longs : trinketIds) {
+                try {
+                    actions.add(tfc.getTrinketById(longs).getName() + " - " + tfc.getTrinketById(longs).getInfo());
+                } catch (ItemNotFoundException ex) {
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            actions.add("Go back");
+            int choice = playerIO.select("\nWhich trinket do you wish to sell?", actions, "");
+            if (choice != actions.size()) {
+                Trinket chosen = null;
+
+                try {
+                    chosen = tfc.getTrinketById(trinketIds.get(choice - 1));
+                } catch (ItemNotFoundException ex) {
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                List<String> confirmation = Arrays.asList("Yes", "No");
+                int subChoice = playerIO.select("Are you sure you want to sell " + chosen.getName() + "?", confirmation, "");
+                switch (subChoice) {
+                    //Consumes potion and removes it from the players inventory.
+                    case 1:
+                        Player player = (Player) playerCharacter;
+                        player.addGold(chosen.getSellValue());
+                        playerIO.clear();
+                        playerIO.put("\nYou have sold " + chosen.getName() + "for " + chosen.getSellValue() + " gold.\n");
+                        ifc.removeTrinketFromInventory(playerCharacter, choice - 1);
+                        break;
+                    case 2:
+                        playerIO.clear();
+                        playerIO.put(chosen.getName() + " was not sold.");
+                        break;
+                }
+            } else {
+                break;
+            }
+
+        }
+
+    }
+
+    private void showVendorPotions(DECharacter playerCharacter, ITextIO playerIO) {
+        playerIO.clear();
         while (true) {
             try {
 
@@ -483,7 +632,6 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                     actions.add(potions.getName() + " - " + potions.getInfo() + " [" + potions.getBuyValue() + " gold]");
                 }
                 actions.add("Go back");
-
                 int choice = playerIO.select("\n\n                            [Potions]\n", actions, "");
 
                 if (choice != actions.size()) {
@@ -492,12 +640,20 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                         playerIO.clear();
                         playerIO.put("You don't have enough gold to purchase that.");
                     } else {
-                        potionId.add(chosen);
-                        newInventory.setPotionIds(potionId);
-                        ifc.addToInventory(playerCharacter, newInventory);
-                        player.removeGold(allPotions.get(choice - 1).getBuyValue());
-                        playerIO.clear();
-                        playerIO.put("YOu have purchased " + allPotions.get(choice - 1).getName());
+                        List<String> confirmation = Arrays.asList("Yes", "No");
+                        int choice2 = playerIO.select("Are you sure you wish to buy " + allPotions.get(choice - 1).getName() + "?", confirmation, "");
+                        if (choice2 != confirmation.size()) {
+                            potionId.add(chosen);
+                            newInventory.setPotionIds(potionId);
+                            ifc.addToInventory(playerCharacter, newInventory);
+                            player.removeGold(allPotions.get(choice - 1).getBuyValue());
+                            pF.updatePlayer(player);
+                            playerIO.clear();
+                            playerIO.put("You have purchased " + allPotions.get(choice - 1).getName() + ".");
+                        } else {
+                            playerIO.clear();
+                            playerIO.put(allPotions.get(choice - 1).getName() + " was not purchased.");
+                        }
                     }
                 } else {
                     break;
@@ -512,6 +668,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     }
 
     private void showVendorTrinkets(DECharacter playerCharacter, ITextIO playerIO) {
+        playerIO.clear();
         while (true) {
             try {
 
@@ -646,8 +803,9 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                     switch (useChoice) {
                         case 1:
                             if (inv.getEquippedTrinketIds().size() == 3) {
-                                playerIO.put("You can only equip 3 tinkets at a time \n Press enter to go back");
+                                playerIO.put("You can only equip 3 tinkets at a time, press enter to continue.");
                                 playerIO.get();
+                                break;
                             }
                             tfc.equipTrinket(player, chosen);
                             ifc.equipTrinket(player, chosen.getId().intValue());
@@ -663,11 +821,14 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 } else {
                     break;
                 }
+            } else {
+                break;
             }
         }
     }
 
     private void showEquippedTrinketInventory(DECharacter player, ITextIO playerIO) {
+        playerIO.clear();
         while (true) {
             playerIO.clear();
             aa.printTrinket(playerIO);

@@ -44,8 +44,10 @@ public class PlayerFacade {
         try {
             em.getTransaction().begin();
             Player p = em.find(Player.class, player.getId());
+            Player p2 = (Player) player;
             p.setHealth(player.getHealth());
             p.setAttackDmg(player.getMaxAttackDmg());
+            p.setGold(p2.getGold());
             em.merge(p);
             em.getTransaction().commit();
         } finally {
