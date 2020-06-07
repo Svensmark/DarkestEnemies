@@ -354,6 +354,11 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             joiningPlayers.add(joiningPlayer);
 
             while (chosenHost.isGameFinished() == false) {
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } //Locking the thread untill game finishes
         }
     }
@@ -553,7 +558,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                         break;
                 }
 
-            }else{
+            } else {
                 break;
             }
         }
