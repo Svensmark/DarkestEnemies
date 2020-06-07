@@ -8,6 +8,7 @@ package DarkestEnemies.facades;
 import DarkestEnemies.Entity.Potion;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.ItemNotFoundException;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -34,11 +35,15 @@ public class PotionFacade {
     private EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
+    
+    public List<Potion> getAllPotions(){
+        return getEntityManager().createQuery("SELECT potions FROM Potion potions", Potion.class).getResultList();
+    }
 
     public void addPotion(Potion potion) {
         EntityManager em = getEntityManager();
 
-        Potion pot = new Potion(potion.getName(), potion.getInfo(), potion.getHealingValue(), potion.getManaValue(), potion.getDmgIncreaseValue());
+        Potion pot = new Potion(potion.getName(), potion.getInfo(), potion.getHealingValue(), potion.getManaValue(), potion.getDmgIncreaseValue(), potion.getBuyValue(), potion.getSellValue());
 
         try {
             em.getTransaction().begin();
@@ -52,7 +57,7 @@ public class PotionFacade {
     public void addDamagePotion(Potion potion) {
         EntityManager em = getEntityManager();
 
-        Potion pot = new Potion(potion.getName(), potion.getInfo(), potion.getHealingValue(), potion.getManaValue(), potion.getDmgIncreaseValue());
+        Potion pot = new Potion(potion.getName(), potion.getInfo(), potion.getHealingValue(), potion.getManaValue(), potion.getDmgIncreaseValue(), potion.getBuyValue(), potion.getSellValue());
 
         try {
             em.getTransaction().begin();

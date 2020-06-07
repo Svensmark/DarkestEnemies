@@ -27,14 +27,17 @@ public class Potion implements DarkestEnemies.IF.ItemI, Serializable {
     private int healingValue;
     private int manaValue;
     private int dmgIncreaseValue;
-    //private int useAmmount;
+    private int buyValue;
+    private int sellValue;
 
-    public Potion(String name, String info, int healingValue, int manaValue, int dmgIncreaseValue) {
+    public Potion(String name, String info, int healingValue, int manaValue, int dmgIncreaseValue, int buyValue, int sellValue) {
         this.name = name;
         this.info = info;
         this.healingValue = healingValue;
         this.manaValue = manaValue;
         this.dmgIncreaseValue = dmgIncreaseValue;
+        this.buyValue = buyValue;
+        this.sellValue = sellValue;
     }
 
     public Potion() {
@@ -97,5 +100,29 @@ public class Potion implements DarkestEnemies.IF.ItemI, Serializable {
     public void setDmgIncreaseValue(int dmgIncreaseValue) {
         this.dmgIncreaseValue = dmgIncreaseValue;
     }
+
+    @Override
+    public int getBuyValue() {
+        return buyValue;
+    }
+
+    @Override
+    public void setBuyValue(int buyValue) {
+        this.buyValue = buyValue;
+    }
+
+    @Override
+    public int getSellValue() {
+        return sellValue;
+    }
+
+    @Override
+    public void setSellValue(int sellValue) {
+        this.sellValue = sellValue;
+    }
+    
+    
+    
+    
 
 }

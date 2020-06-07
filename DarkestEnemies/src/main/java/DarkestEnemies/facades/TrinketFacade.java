@@ -5,9 +5,11 @@
  */
 package DarkestEnemies.facades;
 
+import DarkestEnemies.Entity.Potion;
 import DarkestEnemies.Entity.Trinket;
 import DarkestEnemies.IF.DECharacter;
 import DarkestEnemies.exceptions.ItemNotFoundException;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -34,11 +36,15 @@ public class TrinketFacade {
     private EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
+    
+    public List<Trinket> getAllTrinkets(){
+        return getEntityManager().createQuery("SELECT trinkets FROM Trinket trinkets", Trinket.class).getResultList();
+    }
 
     public void addTrinket(Trinket trinket) {
         EntityManager em = getEntityManager();
 
-        Trinket trink = new Trinket(trinket.getName(), trinket.getInfo(), trinket.getHealingValue(), trinket.getManaValue(), trinket.getDmgIncreaseValue());
+        Trinket trink = new Trinket(trinket.getName(), trinket.getInfo(), trinket.getHealingValue(), trinket.getManaValue(), trinket.getDmgIncreaseValue(), trinket.getBuyValue(), trinket.getSellValue());
 
         try {
             em.getTransaction().begin();

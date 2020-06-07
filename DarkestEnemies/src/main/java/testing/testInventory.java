@@ -109,20 +109,20 @@ public class testInventory {
     }
 
     private static void SetupPotions(PotionFacade potfc) {
-        Potion hp1 = new Potion("Slight Healing Potion", "Restores 10 health", 10, 0, 0);
-        Potion hp2 = new Potion("Small Healing Potion", "Restores 20 health", 20, 0, 0);
-        Potion hp3 = new Potion("Medium Healing Potion", "Restores 30 health", 30, 0, 0);
-        Potion hp4 = new Potion("Large Healing Potion", "Restores 40 health", 40, 0, 0);
+        Potion hp1 = new Potion("Slight Healing Potion", "Restores 10 health", 10, 0, 0, 10, 10);
+        Potion hp2 = new Potion("Small Healing Potion", "Restores 20 health", 20, 0, 0, 20, 20);
+        Potion hp3 = new Potion("Medium Healing Potion", "Restores 30 health", 30, 0, 0, 30, 30);
+        Potion hp4 = new Potion("Large Healing Potion", "Restores 40 health", 40, 0, 0, 40, 40);
 
-        Potion mp1 = new Potion("Slight Mana Potion", "Restores 10 mana", 0, 10, 0);
-        Potion mp2 = new Potion("Small Mana Potion", "Restores 20 mana", 0, 20, 0);
-        Potion mp3 = new Potion("Medium Mana Potion", "Restores 30 mana", 0, 30, 0);
-        Potion mp4 = new Potion("Large Mana Potion", "Restores 40 mana", 0, 40, 0);
+        Potion mp1 = new Potion("Slight Mana Potion", "Restores 10 mana", 0, 10, 0, 10, 10);
+        Potion mp2 = new Potion("Small Mana Potion", "Restores 20 mana", 0, 20, 0, 20, 20);
+        Potion mp3 = new Potion("Medium Mana Potion", "Restores 30 mana", 0, 30, 0, 30 , 30);
+        Potion mp4 = new Potion("Large Mana Potion", "Restores 40 mana", 0, 40, 0, 40, 40);
 
-        Potion ap1 = new Potion("Essence of the Monkey", "Increases your dmg by 2 for this encounter.", 0, 0, 2);
-        Potion ap2 = new Potion("Essence of the Tiger", "Increases your dmg by 4 for this encounter.", 0, 0, 4);
-        Potion ap3 = new Potion("Essence of the Gorilla", "Increases your dmg by 6 for this encounter.", 0, 0, 6);
-        Potion ap4 = new Potion("Essence of the Titans", "Increases your dmg by 10 for this encounter.", 0, 0, 10);
+        Potion ap1 = new Potion("Essence of the Monkey", "Increases your dmg by 2 for this encounter.", 0, 0, 2, 10, 10);
+        Potion ap2 = new Potion("Essence of the Tiger", "Increases your dmg by 4 for this encounter.", 0, 0, 4, 20 , 20);
+        Potion ap3 = new Potion("Essence of the Gorilla", "Increases your dmg by 6 for this encounter.", 0, 0, 6, 30, 20);
+        Potion ap4 = new Potion("Essence of the Titans", "Increases your dmg by 10 for this encounter.", 0, 0, 10, 40, 20);
 
         potfc.addPotion(hp1);
         potfc.addPotion(hp2);
@@ -141,17 +141,17 @@ public class testInventory {
     }
     
     private static void setupTrinkets(TrinketFacade trf) {
-        Trinket th1 = new Trinket("Trinket of health", "Increases max health by 10", 10, 0, 0);
-        Trinket th2 = new Trinket("Great trinket of health", "Increases max health by 30", 30, 0, 0);
-        Trinket th3 = new Trinket("Superior trinket of health", "Increases max health by 50", 50, 0, 0);
+        Trinket th1 = new Trinket("Trinket of health", "Increases max health by 10", 10, 0, 0, 10, 10);
+        Trinket th2 = new Trinket("Great trinket of health", "Increases max health by 30", 30, 0, 0, 10, 10);
+        Trinket th3 = new Trinket("Superior trinket of health", "Increases max health by 50", 50, 0, 0, 10, 10);
         
-        Trinket tm1 = new Trinket("Trinket of mana", "Increases max mana by 10", 0, 10, 0);
-        Trinket tm2 = new Trinket("Great trinket of mana", "Increases max mana by 30", 0, 30, 0);
-        Trinket tm3 = new Trinket("Superior trinket of mana", "Increases max mana by 50", 0, 50, 0);
+        Trinket tm1 = new Trinket("Trinket of mana", "Increases max mana by 10", 0, 10, 0, 10, 10);
+        Trinket tm2 = new Trinket("Great trinket of mana", "Increases max mana by 30", 0, 30, 0, 20, 20);
+        Trinket tm3 = new Trinket("Superior trinket of mana", "Increases max mana by 50", 0, 50, 0, 30, 30);
         
-        Trinket ta1 = new Trinket("Trinket of damage", "Increases attack damage by 3", 0, 0, 3);
-        Trinket ta2 = new Trinket("Great trinket of damage", "Increases attack damage by 3", 0, 0, 6);
-        Trinket ta3 = new Trinket("Superior trinket of damage", "Increases attack damage by 3", 0, 0, 10);
+        Trinket ta1 = new Trinket("Trinket of damage", "Increases attack damage by 3", 0, 0, 3, 30, 30);
+        Trinket ta2 = new Trinket("Great trinket of damage", "Increases attack damage by 6", 0, 0, 6, 30, 30);
+        Trinket ta3 = new Trinket("Superior trinket of damage", "Increases attack damage by 10", 0, 0, 10, 40, 40);
         
         trf.addTrinket(th1);
         trf.addTrinket(th2);

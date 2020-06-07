@@ -10,7 +10,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.Id; 
 
 /**
  *
@@ -24,14 +24,16 @@ public class Trinket implements Serializable, ItemI {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name, info;
-    private int healingValue, manaValue, dmgIncreaseValue;
+    private int healingValue, manaValue, dmgIncreaseValue, buyValue, sellValue;
 
-    public Trinket(String name, String info, int healingValue, int manaValue, int dmgIncreaseValue) {
+    public Trinket(String name, String info, int healingValue, int manaValue, int dmgIncreaseValue, int buyValue, int SellValue) {
         this.name = name;
         this.info = info;
         this.healingValue = healingValue;
         this.manaValue = manaValue;
         this.dmgIncreaseValue = dmgIncreaseValue;
+        this.buyValue = buyValue;
+        this.sellValue = sellValue;
     }
 
     public Trinket() {
@@ -97,5 +99,27 @@ public class Trinket implements Serializable, ItemI {
     public void setDmgIncreaseValue(int value) {
         this.dmgIncreaseValue = value;
     }
+
+    @Override
+    public int getBuyValue() {
+        return buyValue;
+    }
+
+    @Override
+    public void setBuyValue(int buyValue) {
+        this.buyValue = buyValue;
+    }
+
+    @Override
+    public int getSellValue() {
+        return sellValue;
+    }
+
+    @Override
+    public void setSellValue(int sellValue) {
+        this.sellValue = sellValue;
+    }
+    
+    
 
 }
