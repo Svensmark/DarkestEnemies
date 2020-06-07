@@ -382,7 +382,7 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
     private void showInventory(DECharacter playerCharacter, ITextIO playerIO) {
         playerIO.clear();
         aa.printTreasure(playerIO);
-        List actions = Arrays.asList("Show potions", "Show equipped trinkets", "Show unequipped trinkets", "Go back");
+        List actions = Arrays.asList("Show potions", "Show trinkets", "Go back");
         Player p = null;
         try {
             p = pF.getPlayerByID(playerCharacter.getId());
@@ -396,12 +396,23 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
                 showPotionInventory(playerCharacter, playerIO);
                 break;
             case 2:
-                showEquippedTrinketInventory(playerCharacter, playerIO);
+                playerIO.clear();
+                aa.printTrinket(playerIO);
+                List<String> options = Arrays.asList("Show equipped trinkets", "Show unequipped trinkets", "Go back");
+                int trinkChoice = playerIO.select("\n\n                                                        [Trinkets]", options, "");
+                
+                switch(trinkChoice) {
+                    case 1:
+                        showEquippedTrinketInventory(playerCharacter, playerIO);
+                        break;
+                        
+                    case 2:
+                        showUnequippedTrinketInventory(playerCharacter, playerIO);
+                        break;
+                }
                 break;
+                
             case 3:
-                showUnequippedTrinketInventory(playerCharacter, playerIO);
-                break;
-            case 4:
                 break;
         }
     }
@@ -493,6 +504,10 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
             if (useChoice != use.size()) {
                 switch (useChoice) {
                     case 1:
+                        if (inv.getEquippedTrinketIds().size() == 3) {
+                            playerIO.put("You can only equip 3 tinkets at a time \n Press enter to go back");
+                            playerIO.get();
+                        }
                         tfc.equipTrinket(player, chosen);
                         ifc.equipTrinket(player, chosen.getId().intValue());
                         ifc.removeTrinketFromInventory(player, choice - 1);
