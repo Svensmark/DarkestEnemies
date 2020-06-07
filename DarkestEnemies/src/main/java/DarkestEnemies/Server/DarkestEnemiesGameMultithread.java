@@ -264,12 +264,9 @@ public class DarkestEnemiesGameMultithread implements ITextGameMultithread {
 
         SyncBox joiningPlayersSB = hostingPlayer.getJoiningPlayersSB();
         ArrayList joiningPlayersList = (ArrayList) joiningPlayersSB.peek();
-        System.out.println(joiningPlayersList.size());
-        System.out.println(amount);
         while (joiningPlayersList.size() < (amount - 1)) {
             try {
-                TimeUnit.SECONDS.sleep(5);
-                System.out.println(joiningPlayersList.size());
+                TimeUnit.SECONDS.sleep(2);
             } catch (InterruptedException ex) {
                 Logger.getLogger(DarkestEnemiesGameMultithread.class.getName()).log(Level.SEVERE, null, ex);
             }
